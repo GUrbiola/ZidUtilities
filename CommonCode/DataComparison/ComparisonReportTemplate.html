@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Comparison Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 40px);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .table-wrapper {
+            overflow: auto;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .row-count {
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .table-container {
+            overflow: auto;
+            flex: 1;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        thead tr:first-child th {
+            padding: 15px 10px 8px 10px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        thead tr:last-child th {
+            padding: 5px;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        th:last-child {
+            border-right: none !important;
+        }
+        .filter-input, .filter-select {
+            width: 100%;
+            padding: 5px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 11px;
+            color: #333;
+        }
+        .filter-input:focus, .filter-select:focus {
+            outline: none;
+            background: white;
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+        .filter-select {
+            cursor: pointer;
+        }
+        tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+            transition: background-color 0.2s ease;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        tbody tr:hover {
+            background-color: #e3f2fd;
+        }
+        tbody tr.hidden {
+            display: none;
+        }
+        tbody tr.highlighted {
+            background-color: #fff3cd !important;
+            border: 2px solid #ffc107;
+            box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+        }
+        td {
+            padding: 12px 10px;
+            border-right: 1px solid #e0e0e0;
+            position: relative;
+            min-width: 100px;
+        }
+        td:last-child {
+            border-right: none;
+        }
+        .change-type {
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-block;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .change-type.no-change {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .change-type.differences {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .change-type.only-source {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        .change-type.only-destination {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .cell-difference {
+            background-color: #ffc7ce !important;
+            color: #9c0006;
+            font-weight: 600;
+            cursor: help;
+        }
+        .tooltip {
+            position: fixed;
+            background: #333;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 10000;
+            pointer-events: none;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        .changed-columns {
+            font-size: 11px;
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Data Comparison Report</h1>
+            <p>Generated on {GENERATION_DATE}</p>
+            <p>{LABEL1} vs {LABEL2}</p>
+        </div>
+        <div class="table-wrapper">
+            <div class="row-count" id="rowCount">Showing {INITIAL_ROW_COUNT} rows</div>
+            <div class="table-container">
+                <table id="comparisonTable">
+                    <thead>
+                        <tr>
+{HEADER_COLUMNS}
+                        </tr>
+                        <tr>
+{FILTER_ROW}
+                        </tr>
+                    </thead>
+                    <tbody>
+{TABLE_ROWS}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="tooltip" class="tooltip"></div>
+    <script>
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Row highlighting functionality
+            var currentHighlightedRow = null;
+
+            function highlightRow(row) {
+                // Remove previous highlight
+                if (currentHighlightedRow) {
+                    currentHighlightedRow.classList.remove('highlighted');
+                }
+                // Add highlight to clicked row
+                row.classList.add('highlighted');
+                currentHighlightedRow = row;
+            }
+
+            window.removeAllHighlights = function() {
+                if (currentHighlightedRow) {
+                    currentHighlightedRow.classList.remove('highlighted');
+                    currentHighlightedRow = null;
+                }
+            };
+
+            // Add click listeners to all table cells
+            function attachCellClickListeners() {
+                var table = document.getElementById('comparisonTable');
+                if (!table) {
+                    console.error('Table not found');
+                    return;
+                }
+
+                var tbody = table.getElementsByTagName('tbody')[0];
+                if (!tbody) {
+                    console.error('Tbody not found');
+                    return;
+                }
+
+                var rows = tbody.getElementsByTagName('tr');
+                console.log('Attaching click listeners to ' + rows.length + ' rows');
+
+                for (var i = 0; i < rows.length; i++) {
+                    var cells = rows[i].getElementsByTagName('td');
+                    for (var j = 0; j < cells.length; j++) {
+                        (function(currentRow) {
+                            cells[j].addEventListener('click', function(e) {
+                                console.log('Cell clicked');
+                                highlightRow(currentRow);
+                            });
+                            cells[j].style.cursor = 'pointer';
+                        })(rows[i]);
+                    }
+                }
+            }
+
+            // Initialize cell click listeners
+            attachCellClickListeners();
+
+            // Filter functionality
+            document.querySelectorAll('.filter-input').forEach(function(input) {
+                input.addEventListener('keyup', function() {
+                    removeAllHighlights();
+                    filterTable();
+                });
+            });
+
+            document.querySelectorAll('.filter-select').forEach(function(select) {
+                select.addEventListener('change', function() {
+                    removeAllHighlights();
+                    filterTable();
+                });
+            });
+
+            function filterTable() {
+                var table = document.getElementById('comparisonTable');
+                var rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+                var filters = [];
+
+                // Collect filter values from both inputs and selects
+                document.querySelectorAll('.filter-input').forEach(function(input) {
+                    filters.push({
+                        column: parseInt(input.getAttribute('data-column')),
+                        value: input.value.toLowerCase()
+                    });
+                });
+
+                document.querySelectorAll('.filter-select').forEach(function(select) {
+                    filters.push({
+                        column: parseInt(select.getAttribute('data-column')),
+                        value: select.value.toLowerCase()
+                    });
+                });
+
+                var visibleCount = 0;
+                for (var i = 0; i < rows.length; i++) {
+                    var row = rows[i];
+                    var cells = row.getElementsByTagName('td');
+                    var showRow = true;
+
+                    for (var j = 0; j < filters.length; j++) {
+                        var filter = filters[j];
+                        if (filter.value && cells[filter.column]) {
+                            var cellText = cells[filter.column].textContent.toLowerCase();
+                            if (cellText.indexOf(filter.value) === -1) {
+                                showRow = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (showRow) {
+                        row.classList.remove('hidden');
+                        visibleCount++;
+                    } else {
+                        row.classList.add('hidden');
+                    }
+                }
+
+                // Update row count
+                var rowCountLabel = document.getElementById('rowCount');
+                rowCountLabel.textContent = 'Showing ' + visibleCount + ' rows';
+            }
+
+            // Tooltip functionality with dynamic width
+            var tooltip = document.getElementById('tooltip');
+            var tooltipVisible = false;
+
+            document.querySelectorAll('.cell-difference').forEach(function(cell) {
+                cell.addEventListener('mouseenter', function(e) {
+                    var tooltipText = this.getAttribute('data-tooltip');
+                    if (tooltipText) {
+                        tooltip.textContent = tooltipText;
+                        tooltip.style.display = 'block';
+                        tooltipVisible = true;
+
+                        // Calculate dynamic width based on content length
+                        var textLength = tooltipText.length;
+                        var width;
+                        if (textLength < 50) {
+                            width = 'auto';
+                        } else if (textLength < 100) {
+                            width = '250px';
+                        } else if (textLength < 150) {
+                            width = '350px';
+                        } else {
+                            width = '450px';
+                        }
+                        tooltip.style.width = width;
+                        tooltip.style.maxWidth = '500px';
+
+                        updateTooltipPosition(e);
+                    }
+                });
+
+                cell.addEventListener('mousemove', function(e) {
+                    if (tooltipVisible) {
+                        updateTooltipPosition(e);
+                    }
+                });
+
+                cell.addEventListener('mouseleave', function() {
+                    tooltip.style.display = 'none';
+                    tooltipVisible = false;
+                });
+            });
+
+            function updateTooltipPosition(e) {
+                var x = e.clientX;
+                var y = e.clientY;
+                var tooltipRect = tooltip.getBoundingClientRect();
+                var offsetX = 15;
+                var offsetY = 15;
+
+                // Adjust position if tooltip would go off screen
+                if (x + tooltipRect.width + offsetX > window.innerWidth) {
+                    x = x - tooltipRect.width - offsetX;
+                } else {
+                    x = x + offsetX;
+                }
+
+                if (y + tooltipRect.height + offsetY > window.innerHeight) {
+                    y = y - tooltipRect.height - offsetY;
+                } else {
+                    y = y + offsetY;
+                }
+
+                tooltip.style.left = x + 'px';
+                tooltip.style.top = y + 'px';
+            }
+        });
+    </script>
+</body>
+</html>

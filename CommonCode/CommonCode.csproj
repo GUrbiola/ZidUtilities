@@ -62,7 +62,10 @@
     <Compile Include="DifferenceEngine\Structure\DiffStatus.cs" />
     <Compile Include="DifferenceEngine\Structure\IDiffList.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="ImageHelper.cs" />
+    <Compile Include="PasswordGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Check.cs" />
     <Compile Include="ServerFiltering\FieldType.cs" />
     <Compile Include="ServerFiltering\FilterDescription.cs" />
     <Compile Include="ServerFiltering\FilterMerge.cs" />

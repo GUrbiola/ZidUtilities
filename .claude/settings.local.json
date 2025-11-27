@@ -4,7 +4,8 @@
       "Bash(dotnet build:*)",
       "Bash(Tester.exe)",
       "Bash(\"D:\\Just For Fun\\ZidUtilities\\Tester\\bin\\Debug\\Tester.exe\")",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(dotnet new:*)"
     ],
     "deny": [],
     "ask": []

@@ -6,11 +6,19 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Threading;
 
-
-
 namespace CommonCode.DataAccess
 {
+    /// <summary>
+    /// Delegate to notify start/finish of a query processing operation.
+    /// </summary>
+    /// <param name="Query">The SQL query being processed.</param>
+    /// <param name="Time">The time of the event.</param>
     public delegate void ProcessingQuery(string Query, DateTime Time);
+
+    /// <summary>
+    /// Provides helper methods to execute SQL Server commands using ADO.NET,
+    /// offering sync and async execution, transaction support, and simple logging.
+    /// </summary>
     public partial class SqlConnector
     {
         #region Variables
@@ -20,10 +28,29 @@ namespace CommonCode.DataAccess
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets or sets the number of rows affected by the last non-query command.
+        /// </summary>
         public int RowsAffected { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of rows read by the last query execution.
+        /// </summary>
         public int RowsRead { get; set; }
+
+        /// <summary>
+        /// Gets or sets the last operation message. "OK" indicates success; otherwise contains an error message.
+        /// </summary>
         public string LastMessage { get; set; }
+
+        /// <summary>
+        /// Gets or sets the underlying SQL connection used by commands.
+        /// </summary>
         public SqlConnection Connection { get; set; }
+
+        /// <summary>
+        /// Gets a new SQL connection instance using the current connection string.
+        /// </summary>
         public SqlConnection NewConnection
         {
             get
@@ -31,16 +58,28 @@ namespace CommonCode.DataAccess
                 return new SqlConnection(ConnectionString);
             }
         }
+
+        /// <summary>
+        /// Gets or sets the connection string used to establish SQL Server connections.
+        /// </summary>
         public string ConnectionString
         {
             get { return Connection.ConnectionString; }
             set { Connection.ConnectionString = value; }
         }
+
+        /// <summary>
+        /// Gets or sets the current transaction associated with the command.
+        /// </summary>
         public SqlTransaction Transaction
         {
             get { return cmd == null ? null : cmd.Transaction; }
             set { cmd.Transaction = value; }
         }
+
+        /// <summary>
+        /// Gets the time span representing the last execution duration.
+        /// </summary>
         public TimeSpan ExecutionLapse
         {
             get
@@ -48,7 +87,15 @@ namespace CommonCode.DataAccess
                 return _endingTime.Subtract(_startTime);
             }
         }
+
+        /// <summary>
+        /// Gets a value indicating whether any execution is currently in progress.
+        /// </summary>
         public bool OnExecution { get; private set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating the execution state. Setting true starts timing; false stops timing.
+        /// </summary>
         public bool Executing
         {
             get
@@ -69,7 +116,15 @@ namespace CommonCode.DataAccess
                 }
             }
         }
+
+        /// <summary>
+        /// Gets or sets the command timeout (in seconds). Zero means default.
+        /// </summary>
         public int TimeOut { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the last operation produced an error.
+        /// </summary>
         public bool Error
         {
             get
@@ -77,8 +132,20 @@ namespace CommonCode.DataAccess
                 return LastMessage != "OK";
             }
         }
+
+        /// <summary>
+        /// Gets or sets the last thrown general exception.
+        /// </summary>
         public Exception LastException { get; set; }
+
+        /// <summary>
+        /// Gets or sets the last thrown SQL exception.
+        /// </summary>
         public SqlException LastSqlException { get; set; }
+
+        /// <summary>
+        /// Gets the SQL Server instance (data source) from the current connection.
+        /// </summary>
         public string Server
         {
             get
@@ -88,6 +155,10 @@ namespace CommonCode.DataAccess
                 return "";
             }
         }
+
+        /// <summary>
+        /// Gets the current database name from the connection.
+        /// </summary>
         public string DataBase
         {
             get
@@ -100,6 +171,9 @@ namespace CommonCode.DataAccess
         #endregion
 
         #region Constructors
+        /// <summary>
+        /// Initializes a new instance of the SqlConnector with an empty connection.
+        /// </summary>
         public SqlConnector()
         {
             TimeOut = 0;
@@ -109,6 +183,11 @@ namespace CommonCode.DataAccess
             cmd = new SqlCommand();
             da = new SqlDataAdapter();
         }
+
+        /// <summary>
+        /// Initializes a new instance of the SqlConnector with the provided connection string.
+        /// </summary>
+        /// <param name="connectionString">The connection string to use.</param>
         public SqlConnector(string connectionString)
         {
             TimeOut = 0;
@@ -118,6 +197,11 @@ namespace CommonCode.DataAccess
             cmd = new SqlCommand();
             da = new SqlDataAdapter();
         }
+
+        /// <summary>
+        /// Initializes a new instance of the SqlConnector with the provided SqlConnection.
+        /// </summary>
+        /// <param name="connection">The SQL connection to use. If null, a new connection is created.</param>
         public SqlConnector(SqlConnection connection)
         {
             TimeOut = 0;
@@ -129,6 +213,10 @@ namespace CommonCode.DataAccess
         }
         #endregion
 
+        /// <summary>
+        /// Tests the ability to open and close the current connection.
+        /// </summary>
+        /// <returns>True if connection open/close succeeds; otherwise false.</returns>
         public bool TestConnection()
         {
             try
@@ -151,6 +239,10 @@ namespace CommonCode.DataAccess
             return true;
         }
 
+        /// <summary>
+        /// Begins a transaction on the current connection and assigns it to the command.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown when connection or command is invalid.</exception>
         private void BeginTransaction()
         {
             if (Connection != null && cmd != null)
@@ -162,6 +254,11 @@ namespace CommonCode.DataAccess
                 throw new InvalidOperationException("There must be a valid connection before starting a transaction.");
             }
         }
+
+        /// <summary>
+        /// Commits the current transaction associated with the command.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown when no transaction is in progress.</exception>
         private void CommitTransaction()
         {
             if (cmd != null && cmd.Transaction != null)
@@ -180,6 +277,11 @@ namespace CommonCode.DataAccess
                 throw new InvalidOperationException("A transaction must be in progress before commiting the changes.");
             }
         }
+
+        /// <summary>
+        /// Rolls back the current transaction associated with the command.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown when no transaction is in progress.</exception>
         private void RollbackTransaction()
         {
 
@@ -200,6 +302,12 @@ namespace CommonCode.DataAccess
             }
         }
 
+        /// <summary>
+        /// Executes a non-query SQL command (INSERT/UPDATE/DELETE).
+        /// </summary>
+        /// <param name="sql">The SQL text to execute.</param>
+        /// <param name="autoTransact">If true, wraps execution in a transaction which is committed on success or rolled back on failure.</param>
+        /// <returns>0 on success; -1 on failure.</returns>
         public int ExecuteNonQuery(string sql, bool autoTransact = false)
         {
             int result = 0;
@@ -254,6 +362,13 @@ namespace CommonCode.DataAccess
             }
             return result;
         }
+
+        /// <summary>
+        /// Executes a SQL command and returns the first column of the first row in the result set.
+        /// </summary>
+        /// <param name="sql">The SQL text to execute.</param>
+        /// <param name="autoTransact">If true, wraps execution in a transaction which is committed on success or rolled back on failure.</param>
+        /// <returns>The scalar value returned by the query; null if failed.</returns>
         public object ExecuteScalar(string sql, bool autoTransact = false)
         {
             object result = null;
@@ -310,6 +425,13 @@ namespace CommonCode.DataAccess
             }
             return result;
         }
+
+        /// <summary>
+        /// Executes a SQL query and returns a DataSet containing one or more result tables.
+        /// </summary>
+        /// <param name="sql">The SQL text to execute.</param>
+        /// <param name="autoTransact">If true, wraps execution in a transaction which is committed on success or rolled back on failure.</param>
+        /// <returns>A DataSet with the results; null if failed.</returns>
         public DataSet ExecuteDataSet(string sql, bool autoTransact = false)
         {
             DataSet result = new DataSet();
@@ -371,6 +493,14 @@ namespace CommonCode.DataAccess
             }
             return result;
         }
+
+        /// <summary>
+        /// Executes a SQL query and returns the first table in the result.
+        /// </summary>
+        /// <param name="sql">The SQL text to execute.</param>
+        /// <param name="autoTransact">If true, wraps execution in a transaction which is committed on success or rolled back on failure.</param>
+        /// <param name="tableName">Optional name to assign to the returned DataTable.</param>
+        /// <returns>The first DataTable from the result; null if failed or no tables.</returns>
         public DataTable ExecuteTable(string sql, bool autoTransact = false, string tableName = "")
         {
             DataTable aux = null;
@@ -388,6 +518,13 @@ namespace CommonCode.DataAccess
 
             return aux;
         }
+
+        /// <summary>
+        /// Executes a SQL query expected to return a single column and maps it to a list of strings.
+        /// </summary>
+        /// <param name="sql">The SQL text to execute.</param>
+        /// <param name="autoTransact">If true, wraps execution in a transaction which is committed on success or rolled back on failure.</param>
+        /// <returns>A list of string values from the first column; empty list on failure or no rows.</returns>
         public List<string> ExecuteColumn(string sql, bool autoTransact = false)
         {
             List<string> back = new List<string>();
@@ -402,6 +539,10 @@ namespace CommonCode.DataAccess
             return back;
         }
 
+        /// <summary>
+        /// Creates a table in SQL Server based on the provided DataTable schema.
+        /// </summary>
+        /// <param name="table">The DataTable whose schema is used to generate a CREATE TABLE statement.</param>
         public void CreateTableInSQL(DataTable table)
         {
             string sql;
@@ -410,10 +551,11 @@ namespace CommonCode.DataAccess
         }
 
         /// <summary>
-        /// Inspects a DataTable and return a SQL string that can be used to CREATE a TABLE in SQL Server.
+        /// Builds a SQL Server CREATE TABLE script from a DataTable schema,
+        /// including default values and primary key constraints.
         /// </summary>
-        /// <param name="table">System.Data.DataTable object to be inspected for building the SQL CREATE TABLE statement.</param>
-        /// <returns>String of SQL</returns>
+        /// <param name="table">The DataTable to inspect.</param>
+        /// <returns>A string containing the SQL CREATE TABLE and ALTER statements.</returns>
         public static string GetTableScript(DataTable table)
         {
             StringBuilder sql = new StringBuilder();
@@ -470,54 +612,11 @@ namespace CommonCode.DataAccess
                     default:
                     case "System.String":
                         if (table.Columns[i].MaxLength == -1)
-                            sql.AppendFormat(" nvarchar(500)");
+                            sql.AppendFormat(" nvarchar(2000)");
                         else
                             sql.AppendFormat(" nvarchar({0})", table.Columns[i].MaxLength);
                         break;
                 }
-
-
-                /*
-                switch (table.Columns[i].DataType.ToString().ToUpper())
-                {
-                    case "SYSTEM.INT16":
-                        sql.Append(" smallint");
-                        isNumeric = true;
-                        break;
-                    case "SYSTEM.INT32":
-                        sql.Append(" int");
-                        isNumeric = true;
-                        break;
-                    case "SYSTEM.INT64":
-                        sql.Append(" bigint");
-                        isNumeric = true;
-                        break;
-                    case "SYSTEM.DATETIME":
-                        sql.Append(" datetime");
-                        usesColumnDefault = false;
-                        break;
-                    case "SYSTEM.STRING":
-                        if(table.Columns[i].MaxLength == -1)
-                            sql.AppendFormat(" nvarchar(500)");
-                        else
-                            sql.AppendFormat(" nvarchar({0})", table.Columns[i].MaxLength);
-                        break;
-                    case "SYSTEM.SINGLE":
-                        sql.Append(" single");
-                        isNumeric = true;
-                        break;
-                    case "SYSTEM.DOUBLE":
-                        sql.Append(" double");
-                        isNumeric = true;
-                        break;
-                    case "SYSTEM.DECIMAL":
-                        sql.AppendFormat(" decimal(18, 6)");
-                        isNumeric = true;
-                        break;
-                    default:
-                        sql.AppendFormat(" nvarchar({0})", table.Columns[i].MaxLength);
-                        break;
-                }*/
 
                 if (table.Columns[i].AutoIncrement)
                 {
@@ -610,15 +709,33 @@ namespace CommonCode.DataAccess
         private string curquery;
         public int AsyncResult;
         private bool _CancelExecution;
+
+        /// <summary>
+        /// Occurs when an async query execution starts.
+        /// </summary>
         public event ProcessingQuery StartExecution;
+
+        /// <summary>
+        /// Occurs when an async query execution finishes.
+        /// </summary>
         public event ProcessingQuery FinishExecution;
 
+        /// <summary>
+        /// Gets or sets the command used during async operations.
+        /// </summary>
         public SqlCommand AsyncCmd = null;
 
         private DataSet _Results;
+
+        /// <summary>
+        /// Gets the results DataSet from the last async execution.
+        /// </summary>
         public DataSet Results { get { return _Results; } }
 
-
+        /// <summary>
+        /// Starts asynchronous execution of the provided SQL query, building a DataSet incrementally.
+        /// </summary>
+        /// <param name="Query">The SQL query text to execute asynchronously.</param>
         public void AsyncExecuteDataSet(string Query)
         {
             if (!OnExecution)
@@ -638,10 +755,18 @@ namespace CommonCode.DataAccess
                 LastMessage = "There is already another async query on execution, must wait until its completion to execute a new one.";
             }
         }
+
+        /// <summary>
+        /// Requests cancellation of the current async execution loop.
+        /// </summary>
         public void CancelExecute()
         {
             _CancelExecution = true;
         }
+
+        /// <summary>
+        /// Attempts to stop the async execution immediately and clean up resources.
+        /// </summary>
         public void ExtremeStop()
         {
             if (Executor.IsAlive)
@@ -666,6 +791,9 @@ namespace CommonCode.DataAccess
             }
         }
 
+        /// <summary>
+        /// Internal thread method that executes the current query asynchronously and populates the Results DataSet.
+        /// </summary>
         private void AsyncExecQuery()
         {
             DateTime LastCheck;
@@ -780,6 +908,9 @@ namespace CommonCode.DataAccess
         }
         #endregion
 
+        /// <summary>
+        /// Creates database tables required for logging (SystemLog and SystemExceptions) if they do not exist.
+        /// </summary>
         public void CreateLogTables()
         {
             string sql = @"
@@ -816,11 +947,24 @@ END
             ExecuteNonQuery(sql);
         }
 
-        private SpResponse<int> RegisterException(Exception Ex)
+        /// <summary>
+        /// Registers an exception in the SystemExceptions table.
+        /// </summary>
+        /// <param name="Ex">The exception to register.</param>
+        /// <returns>A response containing the inserted exception ID or failure details.</returns>
+        private SqlResponse<int> RegisterException(Exception Ex)
         {
             return RegisterException(Ex.Message, Ex.StackTrace, Ex.Source);
         }
-        private SpResponse<int> RegisterException(string msg, string stackTrace, string source)
+
+        /// <summary>
+        /// Registers an exception in the SystemExceptions table using explicit fields.
+        /// </summary>
+        /// <param name="msg">Exception message.</param>
+        /// <param name="stackTrace">Exception stack trace.</param>
+        /// <param name="source">Exception source.</param>
+        /// <returns>A response containing the inserted exception ID or failure details.</returns>
+        private SqlResponse<int> RegisterException(string msg, string stackTrace, string source)
         {
             string sql = @"
     SET NOCOUNT ON
@@ -864,28 +1008,81 @@ END
             back = buff == null ? -1 : Convert.ToInt32(buff);
             if (back <= 0)
             {
-                return SpResponse<int>.Failure("Error while registering exception on DB.", LastException ?? (Exception)LastSqlException);
+                return SqlResponse<int>.Failure("Error while registering exception on DB.", LastException ?? (Exception)LastSqlException);
             }
-            return SpResponse<int>.Successful(back);
+            return SqlResponse<int>.Successful(back);
         }
 
-        public SpResponse<int> Debug(string comment, string className, string methodName, string executor, string processType)
+        /// <summary>
+        /// Registers a DEBUG level log into SystemLog.
+        /// </summary>
+        /// <param name="comment">Log comment.</param>
+        /// <param name="className">Origin class name.</param>
+        /// <param name="methodName">Origin method name.</param>
+        /// <param name="executor">Executor identity.</param>
+        /// <param name="processType">Process type descriptor.</param>
+        /// <returns>Response with inserted log ID or failure.</returns>
+        public SqlResponse<int> Debug(string comment, string className, string methodName, string executor, string processType)
         {
             return RegisterLog(comment, className, methodName, executor, "DEBUG", processType);
         }
-        public SpResponse<int> Info(string comment, string className, string methodName, string executor, string processType)
+
+        /// <summary>
+        /// Registers an INFO level log into SystemLog.
+        /// </summary>
+        /// <param name="comment">Log comment.</param>
+        /// <param name="className">Origin class name.</param>
+        /// <param name="methodName">Origin method name.</param>
+        /// <param name="executor">Executor identity.</param>
+        /// <param name="processType">Process type descriptor.</param>
+        /// <returns>Response with inserted log ID or failure.</returns>
+        public SqlResponse<int> Info(string comment, string className, string methodName, string executor, string processType)
         {
             return RegisterLog(comment, className, methodName, executor, "INFO", processType);
         }
-        public SpResponse<int> Warning(string comment, string className, string methodName, string executor, string processType, Exception Ex = null)
+
+        /// <summary>
+        /// Registers a WARN level log into SystemLog, optionally linking an exception.
+        /// </summary>
+        /// <param name="comment">Log comment.</param>
+        /// <param name="className">Origin class name.</param>
+        /// <param name="methodName">Origin method name.</param>
+        /// <param name="executor">Executor identity.</param>
+        /// <param name="processType">Process type descriptor.</param>
+        /// <param name="Ex">Optional exception to register.</param>
+        /// <returns>Response with inserted log ID or failure.</returns>
+        public SqlResponse<int> Warning(string comment, string className, string methodName, string executor, string processType, Exception Ex = null)
         {
             return RegisterLog(comment, className, methodName, executor, "WARN", processType, Ex);
         }
-        public SpResponse<int> Exception(string comment, string className, string methodName, string executor, string processType, Exception Ex = null)
+
+        /// <summary>
+        /// Registers an ERROR level log into SystemLog, optionally linking an exception.
+        /// </summary>
+        /// <param name="comment">Log comment.</param>
+        /// <param name="className">Origin class name.</param>
+        /// <param name="methodName">Origin method name.</param>
+        /// <param name="executor">Executor identity.</param>
+        /// <param name="processType">Process type descriptor.</param>
+        /// <param name="Ex">Optional exception to register.</param>
+        /// <returns>Response with inserted log ID or failure.</returns>
+        public SqlResponse<int> Exception(string comment, string className, string methodName, string executor, string processType, Exception Ex = null)
         {
             return RegisterLog(comment, className, methodName, executor, "ERROR", processType, Ex);
         }
-        public SpResponse<int> RegisterLog(string comment, string className, string methodName, string executor, string logLevel, string processType, Exception Ex = null)
+
+        /// <summary>
+        /// Registers a log record into SystemLog with the specified level, optionally linking an exception.
+        /// </summary>
+        /// <param name="comment">Log comment.</param>
+        /// <param name="className">Origin class name.</param>
+        /// <param name="methodName">Origin method name.</param>
+        /// <param name="executor">Executor identity.</param>
+        /// <param name="logLevel">Log level text (e.g., DEBUG, INFO, WARN, ERROR).</param>
+        /// <param name="processType">Process type descriptor.</param>
+        /// <param name="Ex">Optional exception to register.</param>
+        /// <returns>Response with inserted log ID or failure.</returns>
+        public SqlResponse<int> RegisterLog(string comment, string className, string methodName, string executor, string logLevel, string processType, Exception Ex = null)
         {
             string sql = @"
     SET NOCOUNT ON
@@ -929,7 +1126,7 @@ END
                 var response = RegisterException(Ex);
                 if (response.IsFailure)
                 {
-                    return SpResponse<int>.Failure("Error while registering exception on DB.", response.Errors.FirstOrDefault()?.Exception);
+                    return SqlResponse<int>.Failure("Error while registering exception on DB.", response.Errors.FirstOrDefault()?.Exception);
                 }
                 exceptionId = response.Result;
             }
@@ -946,21 +1143,46 @@ END
             back = buff == null ? -1 : Convert.ToInt32(buff);
             if (back <= 0)
             {
-                return SpResponse<int>.Failure("Error while registering log on DB.", LastException ?? (Exception)LastSqlException);
+                return SqlResponse<int>.Failure("Error while registering log on DB.", LastException ?? (Exception)LastSqlException);
             }
-            return SpResponse<int>.Successful(back);
+            return SqlResponse<int>.Successful(back);
         }
     }
+
+    /// <summary>
+    /// Represents an error entry in a response, capturing execution time, message and exception details.
+    /// </summary>
     public class ErrorOnResponse
     {
+        /// <summary>
+        /// Gets or sets the time when the error was recorded.
+        /// </summary>
         public DateTime ExecutionTime { get; set; }
+
+        /// <summary>
+        /// Gets or sets the error message.
+        /// </summary>
         public string Message { get; set; }
+
+        /// <summary>
+        /// Gets or sets the associated exception, if any.
+        /// </summary>
         public Exception Exception { get; set; }
+
+        /// <summary>
+        /// Initializes a new ErrorOnResponse with a default message.
+        /// </summary>
         public ErrorOnResponse()
         {
             this.ExecutionTime = DateTime.Now;
             this.Message = "An error occurred while processing your request.";
         }
+
+        /// <summary>
+        /// Initializes a new ErrorOnResponse with a specific message and optional exception.
+        /// </summary>
+        /// <param name="message">The error message.</param>
+        /// <param name="Ex">Optional exception associated with the error.</param>
         public ErrorOnResponse(string message, Exception Ex = null)
         {
             this.ExecutionTime = DateTime.Now;
@@ -968,10 +1190,22 @@ END
             this.Exception = Ex == null ? new Exception(this.Message) : Ex;
         }
     }
-    public class SpResponse<T>
+
+    /// <summary>
+    /// Generic response container supporting result lists, single result, error collection, and status messages.
+    /// </summary>
+    /// <typeparam name="T">Type of the result.</typeparam>
+    public class SqlResponse<T>
     {
         #region Properties
+        /// <summary>
+        /// Gets or sets the time the response was produced.
+        /// </summary>
         public DateTime ExecutionTime { get; set; }
+
+        /// <summary>
+        /// Gets the execution time in a formatted string (yyyy-MM-dd HH:mm:ss.fff).
+        /// </summary>
         public string ExecutionTimeString
         {
             get
@@ -979,8 +1213,17 @@ END
                 return ExecutionTime.ToString("yyyy-MM-dd HH:mm:ss.fff", System.Globalization.CultureInfo.InvariantCulture);
             }
         }
+
         private List<T> _Results;
+
+        /// <summary>
+        /// Gets or sets the list of results.
+        /// </summary>
         public List<T> Results { get { return _Results; } set { _Results = value; } }
+
+        /// <summary>
+        /// Gets or sets the first result item. Setting will replace the Results list with a single item.
+        /// </summary>
         public T Result
         {
             get
@@ -998,13 +1241,26 @@ END
                 Results.Add(value);
             }
         }
+
+        /// <summary>
+        /// Gets or sets the collection of errors associated with the response.
+        /// </summary>
         public List<ErrorOnResponse> Errors { get; set; }
+
         private string _Message = String.Empty;
+
+        /// <summary>
+        /// Gets or sets the status message (e.g., "Success" or an error description).
+        /// </summary>
         public string Message
         {
             get { return _Message; }
             set { _Message = value; }
         }
+
+        /// <summary>
+        /// Gets a value indicating whether an error occurred based on errors list and message.
+        /// </summary>
         public bool ErrorOccured
         {
             get
@@ -1014,18 +1270,36 @@ END
                 return !Message.Equals("Success", StringComparison.OrdinalIgnoreCase);
             }
         }
+
+        /// <summary>
+        /// Gets a value indicating successful response (no error occurred).
+        /// </summary>
         public bool IsOK { get { return !ErrorOccured; } }
+
+        /// <summary>
+        /// Gets a value indicating failure response (an error occurred).
+        /// </summary>
         public bool IsFailure { get { return ErrorOccured; } }
         #endregion
+
         #region Class contructor
-        public SpResponse()
+        /// <summary>
+        /// Initializes a new instance of SqlResponse with empty results and errors, and sets ExecutionTime.
+        /// </summary>
+        public SqlResponse()
         {
             Errors = new List<ErrorOnResponse>();
             Results = new List<T>();
             ExecutionTime = DateTime.Now;
         }
         #endregion
+
         #region Indexers of the class, by field number(position on the table) and by field name(case insensitive)
+        /// <summary>
+        /// Gets a field by name ("results", "result", "message") in a case-insensitive manner.
+        /// </summary>
+        /// <param name="fieldName">The field name to access.</param>
+        /// <returns>The value of the field or null if not found.</returns>
         public object this[string fieldName]
         {
             get
@@ -1103,25 +1377,46 @@ END
         }
         #endregion
 
+        /// <summary>
+        /// Adds a single result to the Results list.
+        /// </summary>
+        /// <param name="result">The result to add.</param>
         public void AddResult(T result)
         {
             if (this.Results == null)
                 this.Results = new List<T>();
             this.Results.Add(result);
         }
+
+        /// <summary>
+        /// Adds a range of results to the Results list.
+        /// </summary>
+        /// <param name="results">The list of results to add.</param>
         public void AddResults(List<T> results)
         {
             if (this.Results == null)
                 this.Results = new List<T>();
             this.Results.AddRange(results);
         }
-        public SpResponse<T> Fail()
+
+        /// <summary>
+        /// Marks the response as failure and adds a default error using the current message.
+        /// </summary>
+        /// <returns>The same response instance for chaining.</returns>
+        public SqlResponse<T> Fail()
         {
             ExecutionTime = DateTime.Now;
             this.Errors.Add(new ErrorOnResponse(this.Message));
             return this;
         }
-        public SpResponse<T> Fail(string message, Exception ex = null)
+
+        /// <summary>
+        /// Marks the response as failure with a specific message and optional exception.
+        /// </summary>
+        /// <param name="message">Failure message.</param>
+        /// <param name="ex">Optional exception.</param>
+        /// <returns>The same response instance for chaining.</returns>
+        public SqlResponse<T> Fail(string message, Exception ex = null)
         {
             ExecutionTime = DateTime.Now;
             if (ex != null)
@@ -1134,7 +1429,13 @@ END
             }
             return this;
         }
-        public SpResponse<T> Fail(Exception ex)
+
+        /// <summary>
+        /// Marks the response as failure using the provided exception.
+        /// </summary>
+        /// <param name="ex">Exception causing the failure.</param>
+        /// <returns>The same response instance for chaining.</returns>
+        public SqlResponse<T> Fail(Exception ex)
         {
             ExecutionTime = DateTime.Now;
             if (ex == null)
@@ -1147,20 +1448,40 @@ END
             }
             return this;
         }
-        public SpResponse<T> Success(string message = "Success")
+
+        /// <summary>
+        /// Marks the response as successful, setting the message.
+        /// </summary>
+        /// <param name="message">Optional success message (default "Success").</param>
+        /// <returns>The same response instance for chaining.</returns>
+        public SqlResponse<T> Success(string message = "Success")
         {
             ExecutionTime = DateTime.Now;
             this.Message = message;
             return this;
         }
-        public SpResponse<T> Success(T result, string message = "Success")
+
+        /// <summary>
+        /// Marks the response as successful with a single result and message.
+        /// </summary>
+        /// <param name="result">The result to store.</param>
+        /// <param name="message">Optional success message.</param>
+        /// <returns>The same response instance for chaining.</returns>
+        public SqlResponse<T> Success(T result, string message = "Success")
         {
             ExecutionTime = DateTime.Now;
             this.Result = result;
             this.Message = message;
             return this;
         }
-        public SpResponse<T> Success(List<T> results, string message = "Success")
+
+        /// <summary>
+        /// Marks the response as successful with a list of results and message.
+        /// </summary>
+        /// <param name="results">The results to store.</param>
+        /// <param name="message">Optional success message.</param>
+        /// <returns>The same response instance for chaining.</returns>
+        public SqlResponse<T> Success(List<T> results, string message = "Success")
         {
             ExecutionTime = DateTime.Now;
             this.Results = results;
@@ -1168,26 +1489,57 @@ END
             return this;
         }
 
-        public static SpResponse<T> Failure(string message, Exception ex = null)
+        /// <summary>
+        /// Creates a failure response with specified message and optional exception.
+        /// </summary>
+        /// <param name="message">Failure message.</param>
+        /// <param name="ex">Optional exception.</param>
+        /// <returns>A new failure SqlResponse instance.</returns>
+        public static SqlResponse<T> Failure(string message, Exception ex = null)
         {
-            return new SpResponse<T>().Fail(message, ex);
-        }
-        public static SpResponse<T> Failure(Exception ex = null)
-        {
-            return new SpResponse<T>().Fail(ex);
-        }
-        public static SpResponse<T> Successful(List<T> results, string message = "Success")
-        {
-            return new SpResponse<T>().Success(results, message);
-        }
-        public static SpResponse<T> Successful(T result, string message = "Success")
-        {
-            return new SpResponse<T>().Success(result, message);
-        }
-        public static SpResponse<T> Successful(string message = "Success")
-        {
-            return new SpResponse<T>().Success(message);
+            return new SqlResponse<T>().Fail(message, ex);
         }
 
+        /// <summary>
+        /// Creates a failure response with optional exception.
+        /// </summary>
+        /// <param name="ex">Optional exception.</param>
+        /// <returns>A new failure SqlResponse instance.</returns>
+        public static SqlResponse<T> Failure(Exception ex = null)
+        {
+            return new SqlResponse<T>().Fail(ex);
+        }
+
+        /// <summary>
+        /// Creates a success response with a list of results and optional message.
+        /// </summary>
+        /// <param name="results">Results list.</param>
+        /// <param name="message">Optional success message.</param>
+        /// <returns>A new success SqlResponse instance.</returns>
+        public static SqlResponse<T> Successful(List<T> results, string message = "Success")
+        {
+            return new SqlResponse<T>().Success(results, message);
+        }
+
+        /// <summary>
+        /// Creates a success response with a single result and optional message.
+        /// </summary>
+        /// <param name="result">Single result.</param>
+        /// <param name="message">Optional success message.</param>
+        /// <returns>A new success SqlResponse instance.</returns>
+        public static SqlResponse<T> Successful(T result, string message = "Success")
+        {
+            return new SqlResponse<T>().Success(result, message);
+        }
+
+        /// <summary>
+        /// Creates a success response with no results and optional message.
+        /// </summary>
+        /// <param name="message">Optional success message.</param>
+        /// <returns>A new success SqlResponse instance.</returns>
+        public static SqlResponse<T> Successful(string message = "Success")
+        {
+            return new SqlResponse<T>().Success(message);
+        }
     }
 }

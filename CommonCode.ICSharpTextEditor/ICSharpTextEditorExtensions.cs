@@ -1,12 +1,15 @@
-﻿using System;
+﻿using ICSharpCode.TextEditor;
+using ICSharpCode.TextEditor.Document;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CommonCode.ICSharpTextEditor
 {
-    public static class Extensions
+    public static class ICSharpTextEditorExtensions
     {
 
         public static int CurrentLineNumber(this TextEditorControl TxtEditor)

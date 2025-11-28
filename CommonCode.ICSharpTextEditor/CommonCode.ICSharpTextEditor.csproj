@@ -63,13 +63,105 @@
     <Compile Include="FoldingStrategies\GenericFoldingStrategy.cs" />
     <Compile Include="FoldingStrategies\SqlFoldingStrategy.cs" />
     <Compile Include="ICSharpTextEditorExtensions.cs" />
+    <Compile Include="InlineSyntaxProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SyntaxFiles.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SyntaxFiles.resx</DependentUpon>
+    </Compile>
     <Compile Include="SyntaxHighlighting.cs" />
     <Compile Include="ToolbarOption.cs" />
     <Compile Include="ToolbarTextBox.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Syntaxes\ActionScript.xshd" />
+    <None Include="Syntaxes\Ada.xshd" />
+    <None Include="Syntaxes\ANTLR.xshd" />
+    <None Include="Syntaxes\Assembly.xshd" />
+    <None Include="Syntaxes\AutoHotkey.xshd" />
+    <None Include="Syntaxes\Batch.xshd" />
+    <None Include="Syntaxes\Boo.xshd" />
+    <None Include="Syntaxes\C++.xshd" />
+    <None Include="Syntaxes\C.xshd" />
+    <None Include="Syntaxes\Ceylon.xshd" />
+    <None Include="Syntaxes\ChucK.xshd" />
+    <None Include="Syntaxes\Clojure.xshd" />
+    <None Include="Syntaxes\Cocoa.xshd" />
+    <None Include="Syntaxes\CoffeeScript.xshd" />
+    <None Include="Syntaxes\Cool.xshd" />
+    <None Include="Syntaxes\CSharp.xshd" />
+    <None Include="Syntaxes\CSS.xshd" />
+    <None Include="Syntaxes\D.xshd" />
+    <None Include="Syntaxes\Dart.xshd" />
+    <None Include="Syntaxes\Delphi.xshd" />
+    <None Include="Syntaxes\Eiffel.xshd" />
+    <None Include="Syntaxes\Elixir.xshd" />
+    <None Include="Syntaxes\Erlang.xshd" />
+    <None Include="Syntaxes\F#.xshd" />
+    <None Include="Syntaxes\Falcon.xshd" />
+    <None Include="Syntaxes\Fantom.xshd" />
+    <None Include="Syntaxes\Fortran95.xshd" />
+    <None Include="Syntaxes\Go.xshd" />
+    <None Include="Syntaxes\Goovy.xshd" />
+    <None Include="Syntaxes\Gui4Cli.xshd" />
+    <None Include="Syntaxes\Haskell.xshd" />
+    <None Include="Syntaxes\Haxe.xshd" />
+    <None Include="Syntaxes\HTML.xshd" />
+    <None Include="Syntaxes\Icon.xshd" />
+    <None Include="Syntaxes\ILYC.xshd" />
+    <None Include="Syntaxes\INI.xshd" />
+    <None Include="Syntaxes\Io.xshd" />
+    <None Include="Syntaxes\Java.xshd" />
+    <None Include="Syntaxes\JavaScript.xshd" />
+    <None Include="Syntaxes\JSON.xshd" />
+    <None Include="Syntaxes\Julia.xshd" />
+    <None Include="Syntaxes\Just BASIC.xshd" />
+    <None Include="Syntaxes\KiXtart.xshd" />
+    <None Include="Syntaxes\Kotlin.xshd" />
+    <None Include="Syntaxes\Lean.xshd" />
+    <None Include="Syntaxes\Lisp.xshd" />
+    <None Include="Syntaxes\Lua.xshd" />
+    <None Include="Syntaxes\MySQL.xshd" />
+    <None Include="Syntaxes\Nemerle.xshd" />
+    <None Include="Syntaxes\Nim.xshd" />
+    <None Include="Syntaxes\Objective-C.xshd" />
+    <None Include="Syntaxes\OCaml.xshd" />
+    <None Include="Syntaxes\ParaSail.xshd" />
+    <None Include="Syntaxes\Pascal.xshd" />
+    <None Include="Syntaxes\PHP.xshd" />
+    <None Include="Syntaxes\Pike.xshd" />
+    <None Include="Syntaxes\PowerShell.xshd" />
+    <None Include="Syntaxes\Prolog.xshd" />
+    <None Include="Syntaxes\PureScript.xshd" />
+    <None Include="Syntaxes\Python.xshd" />
+    <None Include="Syntaxes\R.xshd" />
+    <None Include="Syntaxes\Registry.xshd" />
+    <None Include="Syntaxes\Resource.xshd" />
+    <None Include="Syntaxes\Rexx.xshd" />
+    <None Include="Syntaxes\Rust.xshd" />
+    <None Include="Syntaxes\Scala.xshd" />
+    <None Include="Syntaxes\Scheme.xshd" />
+    <None Include="Syntaxes\Solidity.xshd" />
+    <None Include="Syntaxes\Spike.xshd" />
+    <None Include="Syntaxes\SQF.xshd" />
+    <None Include="Syntaxes\Swift.xshd" />
+    <None Include="Syntaxes\T-SQL.xshd" />
+    <None Include="Syntaxes\TCL.xshd" />
+    <None Include="Syntaxes\Thrift.xshd" />
+    <None Include="Syntaxes\TypeScript.xshd" />
+    <None Include="Syntaxes\Vala.xshd" />
+    <None Include="Syntaxes\VBNET.xshd" />
+    <None Include="Syntaxes\VBScript.xshd" />
+    <None Include="Syntaxes\Verilog.xshd" />
+    <None Include="Syntaxes\VHDL.xshd" />
+    <None Include="Syntaxes\Volt.xshd" />
+    <None Include="Syntaxes\VS Solution.xshd" />
+    <None Include="Syntaxes\X10.xshd" />
+    <None Include="Syntaxes\XC.xshd" />
+    <None Include="Syntaxes\XML.xshd" />
+    <None Include="Syntaxes\Xtend.xshd" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CommonCode.Files\CommonCode.Files.csproj">
@@ -88,6 +180,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ExtendedEditor.resx">
       <DependentUpon>ExtendedEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SyntaxFiles.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>SyntaxFiles.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

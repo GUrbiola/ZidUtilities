@@ -29,95 +29,233 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.extendedEditor1 = new CommonCode.ICSharpTextEditor.ExtendedEditor();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.loadFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadSQLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadHtmlToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadJavaScriptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadCssToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadXmlToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadJsonToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.removeHighlightingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.extEditor = new CommonCode.ICSharpTextEditor.ExtendedEditor();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // extendedEditor1
+            // menuStrip1
             // 
-            this.extendedEditor1.BtnClearBookmarks.Enabled = true;
-            this.extendedEditor1.BtnClearBookmarks.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon")));
-            this.extendedEditor1.BtnClearBookmarks.Name = "ClearBookmarks";
-            this.extendedEditor1.BtnClearBookmarks.Tooltip = "Clears all bookmarks";
-            this.extendedEditor1.BtnClearBookmarks.Visible = true;
-            this.extendedEditor1.BtnComment.Enabled = false;
-            this.extendedEditor1.BtnComment.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon1")));
-            this.extendedEditor1.BtnComment.Name = "Comment";
-            this.extendedEditor1.BtnComment.Tooltip = "Comment selected code lines";
-            this.extendedEditor1.BtnComment.Visible = true;
-            this.extendedEditor1.BtnKill.Enabled = false;
-            this.extendedEditor1.BtnKill.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon2")));
-            this.extendedEditor1.BtnKill.Name = "Kill";
-            this.extendedEditor1.BtnKill.Tooltip = "Kills thread executing code";
-            this.extendedEditor1.BtnKill.Visible = true;
-            this.extendedEditor1.BtnLoadFromFile.Enabled = true;
-            this.extendedEditor1.BtnLoadFromFile.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon3")));
-            this.extendedEditor1.BtnLoadFromFile.Name = "LoadFromFile";
-            this.extendedEditor1.BtnLoadFromFile.Tooltip = "Load text from file into the editor";
-            this.extendedEditor1.BtnLoadFromFile.Visible = true;
-            this.extendedEditor1.BtnNextBookmark.Enabled = true;
-            this.extendedEditor1.BtnNextBookmark.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon4")));
-            this.extendedEditor1.BtnNextBookmark.Name = "NextBookmark";
-            this.extendedEditor1.BtnNextBookmark.Tooltip = "Moves cursor/position to the next bookmark";
-            this.extendedEditor1.BtnNextBookmark.Visible = true;
-            this.extendedEditor1.BtnPreviousBookmark.Enabled = true;
-            this.extendedEditor1.BtnPreviousBookmark.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon5")));
-            this.extendedEditor1.BtnPreviousBookmark.Name = "PreviousBookmark";
-            this.extendedEditor1.BtnPreviousBookmark.Tooltip = "Moves cursor/position to the previous bookmark";
-            this.extendedEditor1.BtnPreviousBookmark.Visible = true;
-            this.extendedEditor1.BtnRun.Enabled = true;
-            this.extendedEditor1.BtnRun.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon6")));
-            this.extendedEditor1.BtnRun.Name = "Run";
-            this.extendedEditor1.BtnRun.Tooltip = "Executes selected/all code";
-            this.extendedEditor1.BtnRun.Visible = true;
-            this.extendedEditor1.BtnSaveToFile.Enabled = true;
-            this.extendedEditor1.BtnSaveToFile.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon7")));
-            this.extendedEditor1.BtnSaveToFile.Name = "SaveToFile";
-            this.extendedEditor1.BtnSaveToFile.Tooltip = "Save text on editor to a file";
-            this.extendedEditor1.BtnSaveToFile.Visible = true;
-            this.extendedEditor1.BtnSearch.Enabled = true;
-            this.extendedEditor1.BtnSearch.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon8")));
-            this.extendedEditor1.BtnSearch.Name = "Search";
-            this.extendedEditor1.BtnSearch.Tooltip = "Shows dialog to search/replace text from editor";
-            this.extendedEditor1.BtnSearch.Visible = true;
-            this.extendedEditor1.BtnStop.Enabled = true;
-            this.extendedEditor1.BtnStop.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon9")));
-            this.extendedEditor1.BtnStop.Name = "Stop";
-            this.extendedEditor1.BtnStop.Tooltip = "Stops code execution";
-            this.extendedEditor1.BtnStop.Visible = true;
-            this.extendedEditor1.BtnToggleBookmark.Enabled = true;
-            this.extendedEditor1.BtnToggleBookmark.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon10")));
-            this.extendedEditor1.BtnToggleBookmark.Name = "ToggleBookmark";
-            this.extendedEditor1.BtnToggleBookmark.Tooltip = "Creates or remove a bookmark from the current line";
-            this.extendedEditor1.BtnToggleBookmark.Visible = true;
-            this.extendedEditor1.BtnUncomment.Enabled = true;
-            this.extendedEditor1.BtnUncomment.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon11")));
-            this.extendedEditor1.BtnUncomment.Name = "Uncomment";
-            this.extendedEditor1.BtnUncomment.Tooltip = "Uncomment selected code lines";
-            this.extendedEditor1.BtnUncomment.Visible = true;
-            this.extendedEditor1.Location = new System.Drawing.Point(0, 0);
-            this.extendedEditor1.Name = "extendedEditor1";
-            this.extendedEditor1.ShowToolbar = true;
-            this.extendedEditor1.Size = new System.Drawing.Size(614, 424);
-            this.extendedEditor1.Syntax = CommonCode.ICSharpTextEditor.SyntaxHighlighting.None;
-            this.extendedEditor1.TabIndex = 0;
-            this.extendedEditor1.Txt01Helper = null;
-            this.extendedEditor1.Txt02Helper = null;
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.loadFilesToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(937, 24);
+            this.menuStrip1.TabIndex = 1;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // loadFilesToolStripMenuItem
+            // 
+            this.loadFilesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.loadSQLToolStripMenuItem,
+            this.loadCToolStripMenuItem,
+            this.loadHtmlToolStripMenuItem,
+            this.loadJavaScriptToolStripMenuItem,
+            this.loadCssToolStripMenuItem,
+            this.loadXmlToolStripMenuItem,
+            this.loadJsonToolStripMenuItem,
+            this.removeHighlightingToolStripMenuItem});
+            this.loadFilesToolStripMenuItem.Name = "loadFilesToolStripMenuItem";
+            this.loadFilesToolStripMenuItem.Size = new System.Drawing.Size(71, 20);
+            this.loadFilesToolStripMenuItem.Text = "Load Files";
+            // 
+            // loadSQLToolStripMenuItem
+            // 
+            this.loadSQLToolStripMenuItem.Name = "loadSQLToolStripMenuItem";
+            this.loadSQLToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.loadSQLToolStripMenuItem.Text = "Load SQL";
+            this.loadSQLToolStripMenuItem.Click += new System.EventHandler(this.loadSQLToolStripMenuItem_Click);
+            // 
+            // loadCToolStripMenuItem
+            // 
+            this.loadCToolStripMenuItem.Name = "loadCToolStripMenuItem";
+            this.loadCToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.loadCToolStripMenuItem.Text = "Load C#";
+            this.loadCToolStripMenuItem.Click += new System.EventHandler(this.loadCToolStripMenuItem_Click);
+            // 
+            // loadHtmlToolStripMenuItem
+            // 
+            this.loadHtmlToolStripMenuItem.Name = "loadHtmlToolStripMenuItem";
+            this.loadHtmlToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.loadHtmlToolStripMenuItem.Text = "Load Html";
+            this.loadHtmlToolStripMenuItem.Click += new System.EventHandler(this.loadHtmlToolStripMenuItem_Click);
+            // 
+            // loadJavaScriptToolStripMenuItem
+            // 
+            this.loadJavaScriptToolStripMenuItem.Name = "loadJavaScriptToolStripMenuItem";
+            this.loadJavaScriptToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.loadJavaScriptToolStripMenuItem.Text = "Load JavaScript";
+            this.loadJavaScriptToolStripMenuItem.Click += new System.EventHandler(this.loadJavaScriptToolStripMenuItem_Click);
+            // 
+            // loadCssToolStripMenuItem
+            // 
+            this.loadCssToolStripMenuItem.Name = "loadCssToolStripMenuItem";
+            this.loadCssToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.loadCssToolStripMenuItem.Text = "Load Css";
+            this.loadCssToolStripMenuItem.Click += new System.EventHandler(this.loadCssToolStripMenuItem_Click);
+            // 
+            // loadXmlToolStripMenuItem
+            // 
+            this.loadXmlToolStripMenuItem.Name = "loadXmlToolStripMenuItem";
+            this.loadXmlToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.loadXmlToolStripMenuItem.Text = "Load Xml";
+            this.loadXmlToolStripMenuItem.Click += new System.EventHandler(this.loadXmlToolStripMenuItem_Click);
+            // 
+            // loadJsonToolStripMenuItem
+            // 
+            this.loadJsonToolStripMenuItem.Name = "loadJsonToolStripMenuItem";
+            this.loadJsonToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.loadJsonToolStripMenuItem.Text = "Load Json";
+            this.loadJsonToolStripMenuItem.Click += new System.EventHandler(this.loadJsonToolStripMenuItem_Click);
+            // 
+            // removeHighlightingToolStripMenuItem
+            // 
+            this.removeHighlightingToolStripMenuItem.Name = "removeHighlightingToolStripMenuItem";
+            this.removeHighlightingToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.removeHighlightingToolStripMenuItem.Text = "Remove Highlighting";
+            this.removeHighlightingToolStripMenuItem.Click += new System.EventHandler(this.removeHighlightingToolStripMenuItem_Click);
+            // 
+            // extEditor
+            // 
+            this.extEditor.BtnClearBookmarks.Enabled = true;
+            this.extEditor.BtnClearBookmarks.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon")));
+            this.extEditor.BtnClearBookmarks.Name = "ClearBookmarks";
+            this.extEditor.BtnClearBookmarks.ShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnClearBookmarks.ThenShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnClearBookmarks.Tooltip = "Clears all bookmarks";
+            this.extEditor.BtnClearBookmarks.Visible = true;
+            this.extEditor.BtnComment.Enabled = true;
+            this.extEditor.BtnComment.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon1")));
+            this.extEditor.BtnComment.Name = "Comment";
+            this.extEditor.BtnComment.ShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnComment.ThenShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnComment.Tooltip = "Comment selected code lines";
+            this.extEditor.BtnComment.Visible = true;
+            this.extEditor.BtnKill.Enabled = true;
+            this.extEditor.BtnKill.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon2")));
+            this.extEditor.BtnKill.Name = "Kill";
+            this.extEditor.BtnKill.ShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnKill.ThenShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnKill.Tooltip = "Kills thread executing code";
+            this.extEditor.BtnKill.Visible = true;
+            this.extEditor.BtnLoadFromFile.Enabled = true;
+            this.extEditor.BtnLoadFromFile.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon3")));
+            this.extEditor.BtnLoadFromFile.Name = "LoadFromFile";
+            this.extEditor.BtnLoadFromFile.ShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnLoadFromFile.ThenShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnLoadFromFile.Tooltip = "Load text from file into the editor";
+            this.extEditor.BtnLoadFromFile.Visible = true;
+            this.extEditor.BtnNextBookmark.Enabled = true;
+            this.extEditor.BtnNextBookmark.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon4")));
+            this.extEditor.BtnNextBookmark.Name = "NextBookmark";
+            this.extEditor.BtnNextBookmark.ShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnNextBookmark.ThenShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnNextBookmark.Tooltip = "Moves cursor/position to the next bookmark";
+            this.extEditor.BtnNextBookmark.Visible = true;
+            this.extEditor.BtnPreviousBookmark.Enabled = true;
+            this.extEditor.BtnPreviousBookmark.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon5")));
+            this.extEditor.BtnPreviousBookmark.Name = "PreviousBookmark";
+            this.extEditor.BtnPreviousBookmark.ShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnPreviousBookmark.ThenShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnPreviousBookmark.Tooltip = "Moves cursor/position to the previous bookmark";
+            this.extEditor.BtnPreviousBookmark.Visible = true;
+            this.extEditor.BtnRun.Enabled = true;
+            this.extEditor.BtnRun.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon6")));
+            this.extEditor.BtnRun.Name = "Run";
+            this.extEditor.BtnRun.ShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnRun.ThenShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnRun.Tooltip = "Executes selected/all code";
+            this.extEditor.BtnRun.Visible = true;
+            this.extEditor.BtnSaveToFile.Enabled = true;
+            this.extEditor.BtnSaveToFile.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon7")));
+            this.extEditor.BtnSaveToFile.Name = "SaveToFile";
+            this.extEditor.BtnSaveToFile.ShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnSaveToFile.ThenShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnSaveToFile.Tooltip = "Save text on editor to a file";
+            this.extEditor.BtnSaveToFile.Visible = true;
+            this.extEditor.BtnSearch.Enabled = true;
+            this.extEditor.BtnSearch.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon8")));
+            this.extEditor.BtnSearch.Name = "Search";
+            this.extEditor.BtnSearch.ShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnSearch.ThenShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnSearch.Tooltip = "Shows dialog to search/replace text from editor";
+            this.extEditor.BtnSearch.Visible = true;
+            this.extEditor.BtnStop.Enabled = true;
+            this.extEditor.BtnStop.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon9")));
+            this.extEditor.BtnStop.Name = "Stop";
+            this.extEditor.BtnStop.ShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnStop.ThenShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnStop.Tooltip = "Stops code execution";
+            this.extEditor.BtnStop.Visible = true;
+            this.extEditor.BtnToggleBookmark.Enabled = true;
+            this.extEditor.BtnToggleBookmark.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon10")));
+            this.extEditor.BtnToggleBookmark.Name = "ToggleBookmark";
+            this.extEditor.BtnToggleBookmark.ShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnToggleBookmark.ThenShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnToggleBookmark.Tooltip = "Creates or remove a bookmark from the current line";
+            this.extEditor.BtnToggleBookmark.Visible = true;
+            this.extEditor.BtnUncomment.Enabled = true;
+            this.extEditor.BtnUncomment.Icon = ((System.Drawing.Image)(resources.GetObject("resource.Icon11")));
+            this.extEditor.BtnUncomment.Name = "Uncomment";
+            this.extEditor.BtnUncomment.ShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnUncomment.ThenShortCut = System.Windows.Forms.Keys.None;
+            this.extEditor.BtnUncomment.Tooltip = "Uncomment selected code lines";
+            this.extEditor.BtnUncomment.Visible = true;
+            this.extEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.extEditor.Location = new System.Drawing.Point(0, 24);
+            this.extEditor.Name = "extEditor";
+            this.extEditor.ShowToolbar = true;
+            this.extEditor.Size = new System.Drawing.Size(937, 572);
+            this.extEditor.Syntax = CommonCode.ICSharpTextEditor.SyntaxHighlighting.None;
+            this.extEditor.TabIndex = 0;
+            this.extEditor.Txt01Helper.Text = "TextBoxHelper1";
+            this.extEditor.Txt01Helper.ToolTip = "";
+            this.extEditor.Txt01Helper.Visible = false;
+            this.extEditor.Txt02Helper.Text = "TextBoxHelper2";
+            this.extEditor.Txt02Helper.ToolTip = "";
+            this.extEditor.Txt02Helper.Visible = false;
+            this.extEditor.Load += new System.EventHandler(this.extendedEditor1_Load);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.extendedEditor1);
+            this.ClientSize = new System.Drawing.Size(937, 596);
+            this.Controls.Add(this.extEditor);
+            this.Controls.Add(this.menuStrip1);
+            this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
-        private CommonCode.ICSharpTextEditor.ExtendedEditor extendedEditor1;
+        private CommonCode.ICSharpTextEditor.ExtendedEditor extEditor;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem loadFilesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadSQLToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadCToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadHtmlToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadJavaScriptToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadCssToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadXmlToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadJsonToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem removeHighlightingToolStripMenuItem;
     }
 }
 

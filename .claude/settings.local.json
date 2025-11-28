@@ -5,7 +5,19 @@
       "Bash(Tester.exe)",
       "Bash(\"D:\\Just For Fun\\ZidUtilities\\Tester\\bin\\Debug\\Tester.exe\")",
       "Bash(dir:*)",
-      "Bash(dotnet new:*)"
+      "Bash(dotnet new:*)",
+      "Bash(nuget restore:*)",
+      "Bash(dotnet restore:*)",
+      "Bash(where nuget:*)",
+      "Bash(msbuild:*)",
+      "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"D:\\Just For Fun\\ZidUtilities\\CommonCode.ICSharpTextEditor\\CommonCode.ICSharpTextEditor.csproj\" /t:Restore)",
+      "Bash(\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"D:\\Just For Fun\\ZidUtilities\\CommonCode.ICSharpTextEditor\\CommonCode.ICSharpTextEditor.csproj\" /t:Restore)",
+      "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"D:\\Just For Fun\\ZidUtilities\\ZidUtilities.sln\" \"/t:Restore\")",
+      "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"D:\\Just For Fun\\ZidUtilities\\ZidUtilities.sln\" /t:Build /v:detailed)",
+      "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\":*)",
+      "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" ZidUtilities.sln)",
+      "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" CommonCodeCommonCode.csproj /t:Rebuild)",
+      "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"D:\\Just For Fun\\ZidUtilities\\CommonCode\\CommonCode.csproj\")"
     ],
     "deny": [],
     "ask": []

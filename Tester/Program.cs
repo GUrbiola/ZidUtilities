@@ -107,11 +107,11 @@ namespace Tester
             comparer.PrimaryKeyFields.Add(0);// First column is the primary key (AssociateId)
             comparer.RunComparison(adData, adpData);
 
-            //comparer.GenerateXmlTrackFile("C:\\Temp\\DataComparisonReport.xml", "TestComparison", true, false);
+            comparer.GenerateXmlTrackFile("C:\\Temp\\DataComparisonReport.xml", "TestComparison", true, false);
 
-            //string notepadPlusPlusPath = @"C:\Program Files\Notepad++\notepad++.exe";
-            //if (File.Exists(notepadPlusPlusPath))
-            //    System.Diagnostics.Process.Start(notepadPlusPlusPath, "C:\\Temp\\DataComparisonReport.xml");
+            string notepadPlusPlusPath = @"C:\Program Files\Notepad++\notepad++.exe";
+            if (File.Exists(notepadPlusPlusPath))
+                System.Diagnostics.Process.Start(notepadPlusPlusPath, "C:\\Temp\\DataComparisonReport.xml");
 
             comparer.GenerateHtmlTrackFile("C:\\Temp\\DataComparisonReport.html", false, true);
             System.Diagnostics.Process.Start("C:\\Temp\\DataComparisonReport.html");

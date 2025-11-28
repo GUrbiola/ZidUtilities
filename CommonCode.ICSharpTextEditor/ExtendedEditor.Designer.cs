@@ -28,10 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.CtrlEditor = new ICSharpCode.TextEditor.TextEditorControl();
             this.CtrlToolbar = new System.Windows.Forms.ToolStrip();
-            this.tsText2 = new System.Windows.Forms.ToolStripTextBox();
-            this.tsText1 = new System.Windows.Forms.ToolStripTextBox();
             this.tsRun = new System.Windows.Forms.ToolStripButton();
             this.tsStop = new System.Windows.Forms.ToolStripButton();
             this.tsKill = new System.Windows.Forms.ToolStripButton();
@@ -44,16 +43,21 @@
             this.tsClearBookmarks = new System.Windows.Forms.ToolStripButton();
             this.tsSaveToFile = new System.Windows.Forms.ToolStripButton();
             this.tsLoadFromFile = new System.Windows.Forms.ToolStripButton();
+            this.tsText2 = new System.Windows.Forms.ToolStripTextBox();
+            this.tsText1 = new System.Windows.Forms.ToolStripTextBox();
+            this.FoldingRefresher = new System.Windows.Forms.Timer(this.components);
             this.CtrlToolbar.SuspendLayout();
             this.SuspendLayout();
             // 
             // CtrlEditor
             // 
             this.CtrlEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.CtrlEditor.IsIconBarVisible = true;
             this.CtrlEditor.IsReadOnly = false;
             this.CtrlEditor.Location = new System.Drawing.Point(0, 30);
             this.CtrlEditor.Name = "CtrlEditor";
-            this.CtrlEditor.Size = new System.Drawing.Size(838, 585);
+            this.CtrlEditor.ShowVRuler = false;
+            this.CtrlEditor.Size = new System.Drawing.Size(767, 336);
             this.CtrlEditor.TabIndex = 0;
             // 
             // CtrlToolbar
@@ -77,25 +81,9 @@
             this.tsText1});
             this.CtrlToolbar.Location = new System.Drawing.Point(0, 0);
             this.CtrlToolbar.Name = "CtrlToolbar";
-            this.CtrlToolbar.Size = new System.Drawing.Size(838, 30);
+            this.CtrlToolbar.Size = new System.Drawing.Size(767, 30);
             this.CtrlToolbar.TabIndex = 1;
             this.CtrlToolbar.Text = "toolStrip1";
-            // 
-            // tsText2
-            // 
-            this.tsText2.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.tsText2.Enabled = false;
-            this.tsText2.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.tsText2.Name = "tsText2";
-            this.tsText2.Size = new System.Drawing.Size(200, 30);
-            // 
-            // tsText1
-            // 
-            this.tsText1.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.tsText1.Enabled = false;
-            this.tsText1.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.tsText1.Name = "tsText1";
-            this.tsText1.Size = new System.Drawing.Size(200, 30);
             // 
             // tsRun
             // 
@@ -106,31 +94,30 @@
             this.tsRun.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsRun.Name = "tsRun";
             this.tsRun.Size = new System.Drawing.Size(28, 28);
-            this.tsRun.Text = "toolStripButton1";
+            this.tsRun.Click += new System.EventHandler(this.tsRun_Click);
             // 
             // tsStop
             // 
             this.tsStop.AutoSize = false;
             this.tsStop.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsStop.Enabled = false;
             this.tsStop.Image = global::CommonCode.ICSharpTextEditor.Content.Stop;
             this.tsStop.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.tsStop.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsStop.Name = "tsStop";
             this.tsStop.Size = new System.Drawing.Size(28, 28);
-            this.tsStop.Text = "toolStripButton1";
+            this.tsStop.Click += new System.EventHandler(this.tsStop_Click);
             // 
             // tsKill
             // 
             this.tsKill.AutoSize = false;
             this.tsKill.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsKill.Enabled = false;
             this.tsKill.Image = global::CommonCode.ICSharpTextEditor.Content.RedAlert;
             this.tsKill.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.tsKill.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsKill.Name = "tsKill";
             this.tsKill.Size = new System.Drawing.Size(28, 28);
             this.tsKill.Text = "toolStripButton1";
+            this.tsKill.Click += new System.EventHandler(this.tsKill_Click);
             // 
             // tsComment
             // 
@@ -141,7 +128,6 @@
             this.tsComment.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsComment.Name = "tsComment";
             this.tsComment.Size = new System.Drawing.Size(28, 28);
-            this.tsComment.Text = "toolStripButton1";
             // 
             // tsUncomment
             // 
@@ -152,7 +138,6 @@
             this.tsUncomment.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsUncomment.Name = "tsUncomment";
             this.tsUncomment.Size = new System.Drawing.Size(28, 28);
-            this.tsUncomment.Text = "toolStripButton1";
             // 
             // tsSearch
             // 
@@ -163,7 +148,6 @@
             this.tsSearch.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsSearch.Name = "tsSearch";
             this.tsSearch.Size = new System.Drawing.Size(28, 28);
-            this.tsSearch.Text = "toolStripButton1";
             // 
             // tsToggleBookmark
             // 
@@ -174,7 +158,6 @@
             this.tsToggleBookmark.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsToggleBookmark.Name = "tsToggleBookmark";
             this.tsToggleBookmark.Size = new System.Drawing.Size(28, 28);
-            this.tsToggleBookmark.Text = "toolStripButton1";
             // 
             // tsPreviousBookmark
             // 
@@ -185,7 +168,6 @@
             this.tsPreviousBookmark.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsPreviousBookmark.Name = "tsPreviousBookmark";
             this.tsPreviousBookmark.Size = new System.Drawing.Size(28, 28);
-            this.tsPreviousBookmark.Text = "toolStripButton1";
             // 
             // tsNextBookmark
             // 
@@ -196,7 +178,6 @@
             this.tsNextBookmark.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsNextBookmark.Name = "tsNextBookmark";
             this.tsNextBookmark.Size = new System.Drawing.Size(28, 28);
-            this.tsNextBookmark.Text = "toolStripButton1";
             // 
             // tsClearBookmarks
             // 
@@ -207,7 +188,6 @@
             this.tsClearBookmarks.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsClearBookmarks.Name = "tsClearBookmarks";
             this.tsClearBookmarks.Size = new System.Drawing.Size(28, 28);
-            this.tsClearBookmarks.Text = "toolStripButton1";
             // 
             // tsSaveToFile
             // 
@@ -218,7 +198,6 @@
             this.tsSaveToFile.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsSaveToFile.Name = "tsSaveToFile";
             this.tsSaveToFile.Size = new System.Drawing.Size(28, 28);
-            this.tsSaveToFile.Text = "toolStripButton1";
             // 
             // tsLoadFromFile
             // 
@@ -229,7 +208,29 @@
             this.tsLoadFromFile.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsLoadFromFile.Name = "tsLoadFromFile";
             this.tsLoadFromFile.Size = new System.Drawing.Size(28, 28);
-            this.tsLoadFromFile.Text = "toolStripButton1";
+            // 
+            // tsText2
+            // 
+            this.tsText2.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.tsText2.Enabled = false;
+            this.tsText2.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.tsText2.Name = "tsText2";
+            this.tsText2.Size = new System.Drawing.Size(200, 30);
+            this.tsText2.Text = "TextBoxHelper2";
+            // 
+            // tsText1
+            // 
+            this.tsText1.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.tsText1.Enabled = false;
+            this.tsText1.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.tsText1.Name = "tsText1";
+            this.tsText1.Size = new System.Drawing.Size(200, 30);
+            this.tsText1.Text = "TextBoxHelper1";
+            // 
+            // FoldingRefresher
+            // 
+            this.FoldingRefresher.Interval = 200;
+            this.FoldingRefresher.Tick += new System.EventHandler(this.FoldingRefresher_Tick);
             // 
             // ExtendedEditor
             // 
@@ -238,7 +239,7 @@
             this.Controls.Add(this.CtrlEditor);
             this.Controls.Add(this.CtrlToolbar);
             this.Name = "ExtendedEditor";
-            this.Size = new System.Drawing.Size(838, 615);
+            this.Size = new System.Drawing.Size(767, 366);
             this.CtrlToolbar.ResumeLayout(false);
             this.CtrlToolbar.PerformLayout();
             this.ResumeLayout(false);
@@ -263,5 +264,6 @@
         private System.Windows.Forms.ToolStripButton tsLoadFromFile;
         private System.Windows.Forms.ToolStripTextBox tsText2;
         private System.Windows.Forms.ToolStripTextBox tsText1;
+        private System.Windows.Forms.Timer FoldingRefresher;
     }
 }

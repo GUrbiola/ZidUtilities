@@ -7,7 +7,10 @@ namespace CommonCode.ICSharpTextEditor.BracketMatching
     public class GenericBracketMatcher : DefaultFormattingStrategy
     {
         public GenericLanguage Language { get; set; }
-
+        public GenericBracketMatcher(GenericLanguage language)
+        {
+            Language = language;
+        }
         public override int SearchBracketForward(IDocument document, int offset, char openBracket, char closingBracket)
         {
             int tokenIndex, bracketTrick = 1;
@@ -71,9 +74,6 @@ namespace CommonCode.ICSharpTextEditor.BracketMatching
                         bracketTrick--;
                     }
                     else if (CurrentToken.Type == GenericTokenType.OPENBRACKET && CurrentToken.Text == openBracket.ToString())
-                    {
-                        bracketTrick++;
-                    }
                     {
                         bracketTrick++;
                     }

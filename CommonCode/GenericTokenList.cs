@@ -10,8 +10,6 @@ namespace ZidUtilities.CommonCode
     /// </summary>
     public class GenericTokenList
     {
-
-
         /// <summary>
         /// The underlying list of tokens in their sequence order.
         /// </summary>

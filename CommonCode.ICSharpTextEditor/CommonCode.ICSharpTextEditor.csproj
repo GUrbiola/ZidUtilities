@@ -46,8 +46,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BracketMatching\GenericBracketMatcher.cs" />
+    <Compile Include="BracketMatching\SqlBracketMatcher.cs" />
+    <Compile Include="Content.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Content.resx</DependentUpon>
+    </Compile>
+    <Compile Include="ExtendedEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ExtendedEditor.Designer.cs">
+      <DependentUpon>ExtendedEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FoldingStrategies\CSharpFoldingStrategy.cs" />
+    <Compile Include="FoldingStrategies\GenericFoldingStrategy.cs" />
+    <Compile Include="FoldingStrategies\SqlFoldingStrategy.cs" />
     <Compile Include="ICSharpTextEditorExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SyntaxHighlighting.cs" />
+    <Compile Include="ToolbarOption.cs" />
+    <Compile Include="ToolbarTextBox.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -61,6 +80,31 @@
       <Project>{e03d978a-06db-4a36-82fb-8184408e33dd}</Project>
       <Name>CommonCode</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Content.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Content.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ExtendedEditor.resx">
+      <DependentUpon>ExtendedEditor.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Play.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\Bookmark.png" />
+    <Content Include="Resources\Comment.png" />
+    <Content Include="Resources\DelBookmark.png" />
+    <Content Include="Resources\Next.png" />
+    <Content Include="Resources\Open.png" />
+    <Content Include="Resources\Previous.png" />
+    <Content Include="Resources\RedAlert.png" />
+    <Content Include="Resources\Save.png" />
+    <Content Include="Resources\Search.png" />
+    <Content Include="Resources\Stop.png" />
+    <Content Include="Resources\UnComment.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

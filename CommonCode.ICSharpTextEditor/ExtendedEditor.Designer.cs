@@ -128,6 +128,7 @@
             this.tsComment.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsComment.Name = "tsComment";
             this.tsComment.Size = new System.Drawing.Size(28, 28);
+            this.tsComment.Click += new System.EventHandler(this.BtnComment_Click);
             // 
             // tsUncomment
             // 
@@ -138,6 +139,7 @@
             this.tsUncomment.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsUncomment.Name = "tsUncomment";
             this.tsUncomment.Size = new System.Drawing.Size(28, 28);
+            this.tsUncomment.Click += new System.EventHandler(this.BtnUncomment_Click);
             // 
             // tsSearch
             // 
@@ -148,6 +150,7 @@
             this.tsSearch.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsSearch.Name = "tsSearch";
             this.tsSearch.Size = new System.Drawing.Size(28, 28);
+            this.tsSearch.Click += new System.EventHandler(this.BtnSearch_Click);
             // 
             // tsToggleBookmark
             // 
@@ -158,6 +161,7 @@
             this.tsToggleBookmark.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsToggleBookmark.Name = "tsToggleBookmark";
             this.tsToggleBookmark.Size = new System.Drawing.Size(28, 28);
+            this.tsToggleBookmark.Click += new System.EventHandler(this.BtnBookmark_Click);
             // 
             // tsPreviousBookmark
             // 
@@ -168,6 +172,7 @@
             this.tsPreviousBookmark.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsPreviousBookmark.Name = "tsPreviousBookmark";
             this.tsPreviousBookmark.Size = new System.Drawing.Size(28, 28);
+            this.tsPreviousBookmark.Click += new System.EventHandler(this.BtnPrevious_Click);
             // 
             // tsNextBookmark
             // 
@@ -178,6 +183,7 @@
             this.tsNextBookmark.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsNextBookmark.Name = "tsNextBookmark";
             this.tsNextBookmark.Size = new System.Drawing.Size(28, 28);
+            this.tsNextBookmark.Click += new System.EventHandler(this.BtnNext_Click);
             // 
             // tsClearBookmarks
             // 
@@ -188,6 +194,7 @@
             this.tsClearBookmarks.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsClearBookmarks.Name = "tsClearBookmarks";
             this.tsClearBookmarks.Size = new System.Drawing.Size(28, 28);
+            this.tsClearBookmarks.Click += new System.EventHandler(this.BtnClearBookmarks_Click);
             // 
             // tsSaveToFile
             // 
@@ -198,6 +205,7 @@
             this.tsSaveToFile.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsSaveToFile.Name = "tsSaveToFile";
             this.tsSaveToFile.Size = new System.Drawing.Size(28, 28);
+            this.tsSaveToFile.Click += new System.EventHandler(this.BtnSave_Click);
             // 
             // tsLoadFromFile
             // 
@@ -208,12 +216,12 @@
             this.tsLoadFromFile.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsLoadFromFile.Name = "tsLoadFromFile";
             this.tsLoadFromFile.Size = new System.Drawing.Size(28, 28);
+            this.tsLoadFromFile.Click += new System.EventHandler(this.BtnLoad_Click);
             // 
             // tsText2
             // 
             this.tsText2.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.tsText2.Enabled = false;
-            this.tsText2.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.tsText2.Name = "tsText2";
             this.tsText2.Size = new System.Drawing.Size(200, 30);
             this.tsText2.Text = "TextBoxHelper2";
@@ -222,7 +230,6 @@
             // 
             this.tsText1.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.tsText1.Enabled = false;
-            this.tsText1.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.tsText1.Name = "tsText1";
             this.tsText1.Size = new System.Drawing.Size(200, 30);
             this.tsText1.Text = "TextBoxHelper1";

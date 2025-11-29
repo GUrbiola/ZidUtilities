@@ -5,6 +5,52 @@ using System.Windows.Forms;
 
 namespace CommonCode.ICSharpTextEditor
 {
+    [TypeConverter(typeof(ImplicitShortcutConverter))]
+    public class ImplicitShortcut
+    {
+        [NotifyParentProperty(false)]
+        [Browsable(true)]
+        public Keys ShortCut { get; set; }
+        [NotifyParentProperty(false)]
+        [Browsable(true)]
+        public Keys ThenShortCut { get; set; }
+        
+        [NotifyParentProperty(false)]
+        [Browsable(true)]
+        public string Name  { get; set; }
+
+        [NotifyParentProperty(false)]
+        [Browsable(true)]
+        public bool Enabled { get; set; }
+
+        public ImplicitShortcut(string name)
+        {
+            this.Enabled = true;
+            this.Name = name;
+            this.ShortCut = Keys.None;
+            this.ThenShortCut = Keys.None;
+        }
+
+        public ImplicitShortcut()
+        {
+            this.Enabled = true;
+            this.Name = string.Empty;
+            this.ShortCut = Keys.None;
+            this.ThenShortCut = Keys.None;
+        }
+    }
+    public class ImplicitShortcutConverter : ExpandableObjectConverter
+    {
+        public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, System.Type destinationType)
+        {
+            if (destinationType == typeof(string) && value is ImplicitShortcut)
+            {
+                ImplicitShortcut Bt = (ImplicitShortcut)value;
+                return String.Format("Shortcut for: {0}", Bt.Name);
+            }
+            return base.ConvertTo(context, culture, value, destinationType);
+        }
+    }
     public delegate void OnOptionChanged(ToolbarOption option);
     [TypeConverter(typeof(ToolbarOptionConverter))]
     public class ToolbarOption

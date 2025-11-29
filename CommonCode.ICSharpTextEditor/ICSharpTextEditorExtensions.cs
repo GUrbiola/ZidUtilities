@@ -115,6 +115,17 @@ namespace CommonCode.ICSharpTextEditor
             TxtEditor.Document.MarkerStrategy.AddMarker(marker);
         }
 
+
+
+        public static void SetSelectionByLine(this TextEditorControl TxtEditor, int lineNumber)
+        {
+            LineSegment line = TxtEditor.Document.GetLineSegment(lineNumber);
+            TxtEditor.ActiveTextAreaControl.SelectionManager.SetSelection(
+                new ICSharpCode.TextEditor.TextLocation(0, line.LineNumber),
+                new ICSharpCode.TextEditor.TextLocation(line.Length, line.LineNumber)
+            );
+        }
+
         public static void SetSelectionByOffset(this TextEditorControl TxtEditor, int StartOffset, int EndOffset)
         {
             TxtEditor.ActiveTextAreaControl.SelectionManager.ClearSelection();
@@ -206,6 +217,61 @@ namespace CommonCode.ICSharpTextEditor
             catch
             {
                 // Silently fail
+            }
+        }
+
+        public static bool TryGetCurrentWord(this TextEditorControl TxtEditor, out int offset, out int length)
+        {
+            offset = TxtEditor.CurrentOffset();
+            length = 0;
+
+            try
+            {
+                var doc = TxtEditor.Document;
+                int textLength = doc.TextLength; // total number of characters in document
+
+                // If caret is at or beyond end of doc or invalid offset, nothing to do
+                if (offset < 0 || offset >= textLength)
+                    return false;
+
+                List<char> wordBreakers = new List<char>() 
+                { ' ', '\t', '\r', '\n', '.', ';', ':', '+', '-', '*', '/', '(', ')', '{', '}', '[', ']', '>', '<', '=' };
+
+
+                char currentChar = doc.GetCharAt(offset);
+                // If current char is a word breaker, consider there is no word at caret
+                if (wordBreakers.Contains(currentChar))
+                    return false;
+
+                // Find start of word
+                int start = offset;
+                while (start > 0)
+                {
+                    char prev = doc.GetCharAt(start - 1);
+                    if (wordBreakers.Contains(prev))
+                        break;
+                    start--;
+                }
+
+                // Find end of word
+                int end = offset;
+                while (end < textLength - 1)
+                {
+                    char next = doc.GetCharAt(end + 1);
+                    if (wordBreakers.Contains(next))
+                        break;
+                    end++;
+                }
+
+                offset = start;
+                length = end - start + 1;
+                return true;
+            }
+            catch
+            {
+                // On error, return false and leave offset/length as set (length = 0)
+                length = 0;
+                return false;
             }
         }
 

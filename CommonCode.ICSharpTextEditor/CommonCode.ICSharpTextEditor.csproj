@@ -62,6 +62,15 @@
     <Compile Include="FoldingStrategies\CSharpFoldingStrategy.cs" />
     <Compile Include="FoldingStrategies\GenericFoldingStrategy.cs" />
     <Compile Include="FoldingStrategies\SqlFoldingStrategy.cs" />
+    <Compile Include="HelperForms\HighlightGroup.cs" />
+    <Compile Include="HelperForms\SearchAndReplace.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HelperForms\SearchAndReplace.designer.cs">
+      <DependentUpon>SearchAndReplace.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HelperForms\TextEditorSearcher.cs" />
+    <Compile Include="HelperForms\TextRange.cs" />
     <Compile Include="ICSharpTextEditorExtensions.cs" />
     <Compile Include="InlineSyntaxProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -180,6 +189,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ExtendedEditor.resx">
       <DependentUpon>ExtendedEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HelperForms\SearchAndReplace.resx">
+      <DependentUpon>SearchAndReplace.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SyntaxFiles.resx">
       <Generator>ResXFileCodeGenerator</Generator>

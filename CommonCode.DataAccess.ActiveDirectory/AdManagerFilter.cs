@@ -1,7 +1,7 @@
 ﻿using System.Text;
 
 
-namespace CommonCode.DataAccess.ActiveDirectory
+namespace ZidUtilities.CommonCode.DataAccess.ActiveDirectory
 {
     /// <summary>
     /// The ad manager filter.

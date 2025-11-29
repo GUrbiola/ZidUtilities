@@ -1,4 +1,4 @@
-﻿namespace CommonCode.Log4Net
+﻿namespace ZidUtilities.CommonCode.Log4Net
 {
     /// <summary>
     /// Specifies the supported types of appenders for log4net configuration.

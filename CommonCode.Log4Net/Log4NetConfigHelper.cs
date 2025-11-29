@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CommonCode.Log4Net
+namespace ZidUtilities.CommonCode.Log4Net
 {
     /// <summary>
     /// Helper class to construct and persist log4net configuration XML.

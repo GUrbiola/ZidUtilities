@@ -1,6 +1,6 @@
-﻿using CommonCode.ICSharpTextEditor.BracketMatching;
-using CommonCode.ICSharpTextEditor.FoldingStrategies;
-using CommonCode.ICSharpTextEditor.HelperForms;
+﻿using ZidUtilities.CommonCode.ICSharpTextEditor.BracketMatching;
+using ZidUtilities.CommonCode.ICSharpTextEditor.FoldingStrategies;
+using ZidUtilities.CommonCode.ICSharpTextEditor.HelperForms;
 using ICSharpCode.TextEditor;
 using ICSharpCode.TextEditor.Document;
 using System;
@@ -17,7 +17,7 @@ using System.Windows.Forms;
 using ZidUtilities.CommonCode;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
-namespace CommonCode.ICSharpTextEditor
+namespace ZidUtilities.CommonCode.ICSharpTextEditor
 {
     public delegate void OnToolbarButtonClick(string selectedText, ToolbarOption btnClicked);
     public delegate void OnKeyPressOnEditor(Keys keyData);
@@ -181,6 +181,9 @@ namespace CommonCode.ICSharpTextEditor
         {
             get { return this.CtrlEditor; }
         }
+        [Category("Custom Properties")]
+        [Description("Exposes the TextEditor's property Text, for ease of use")]
+        public string EditorText { get { return CtrlEditor.Text; } set { CtrlEditor.Text = value; } }
 
         [Category("Custom Properties")]
         [Description("Shows or hides the toolbar")]
@@ -198,19 +201,7 @@ namespace CommonCode.ICSharpTextEditor
 
         [Category("Custom Properties")]
         [Description("Determines if the control should track key press for toolbar shortcuts and implicit shortcuts.")]
-        public bool TrackToolbarShortcuts
-        {
-            get
-            {
-                return this.CtrlToolbar.Visible;
-            }
-            set
-            {
-                this.CtrlToolbar.Visible = value;
-            }
-        }
-
-
+        public bool TrackToolbarShortcuts { get; set; }
 
         #region Properties that represent the toolbar buttons, so they can be customized at design time
         private ToolbarOption _btnRun = new ToolbarOption("Run", "Executes selected/all code (F5)", Content.Play, true) { Enabled = true, ShortCut = Keys.F5 };
@@ -461,6 +452,10 @@ namespace CommonCode.ICSharpTextEditor
             get { return _txt02Helper; }
             set { _txt02Helper = value; }
         }
+        [Category("Custom Properties")]
+        [Description("Sets the control to read only mode.")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public bool IsReadOnly { get { return Editor.IsReadOnly; } set { Editor.IsReadOnly = value; } }
         #endregion
 
         public ExtendedEditor()

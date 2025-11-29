@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CommonCode.Files
+namespace ZidUtilities.CommonCode.Files
 {
     public partial class DataImporter
     {

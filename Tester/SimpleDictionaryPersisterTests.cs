@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using ZidUtilities.CommonCode;
 
-namespace Tester
+namespace ZidUtilities.Tester
 {
     /// <summary>
     /// Comprehensive test suite for the SimpleDictionaryPersister class.

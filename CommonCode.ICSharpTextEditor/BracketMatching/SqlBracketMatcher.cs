@@ -2,7 +2,7 @@
 using ZidUtilities.CommonCode;
 
 
-namespace CommonCode.ICSharpTextEditor.BracketMatching
+namespace ZidUtilities.CommonCode.ICSharpTextEditor.BracketMatching
 {
     /// <summary>
     /// SQL-aware bracket matcher used by the ICSharpCode.TextEditor integration.

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CommonCode.ICSharpTextEditor
+namespace ZidUtilities.CommonCode.ICSharpTextEditor
 {
     /// <summary>
     /// A collection of extension helper methods for working with an

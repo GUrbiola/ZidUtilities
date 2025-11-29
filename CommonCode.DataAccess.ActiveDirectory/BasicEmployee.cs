@@ -1,4 +1,4 @@
-﻿namespace CommonCode.DataAccess.ActiveDirectory
+﻿namespace ZidUtilities.CommonCode.DataAccess.ActiveDirectory
 {
     /// <summary>
     /// Represents a basic Active Directory employee record with commonly used identity and contact fields.

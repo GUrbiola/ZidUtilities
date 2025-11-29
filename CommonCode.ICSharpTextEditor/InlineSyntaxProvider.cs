@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using ZidUtilities.CommonCode;
 
-namespace CommonCode.ICSharpTextEditor
+namespace ZidUtilities.CommonCode.ICSharpTextEditor
 {
     /// <summary>
     /// Provides an in-memory syntax definition to the ICSharpCode text editor by implementing

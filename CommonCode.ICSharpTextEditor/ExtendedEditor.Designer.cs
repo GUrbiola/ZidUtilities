@@ -1,4 +1,4 @@
-﻿namespace CommonCode.ICSharpTextEditor
+﻿namespace ZidUtilities.CommonCode.ICSharpTextEditor
 {
     partial class ExtendedEditor
     {
@@ -89,7 +89,7 @@
             // 
             this.tsRun.AutoSize = false;
             this.tsRun.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsRun.Image = global::CommonCode.ICSharpTextEditor.Content.Play;
+            this.tsRun.Image = global::ZidUtilities.CommonCode.ICSharpTextEditor.Content.Play;
             this.tsRun.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.tsRun.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsRun.Name = "tsRun";
@@ -100,7 +100,7 @@
             // 
             this.tsStop.AutoSize = false;
             this.tsStop.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsStop.Image = global::CommonCode.ICSharpTextEditor.Content.Stop;
+            this.tsStop.Image = global::ZidUtilities.CommonCode.ICSharpTextEditor.Content.Stop;
             this.tsStop.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.tsStop.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsStop.Name = "tsStop";
@@ -111,7 +111,7 @@
             // 
             this.tsKill.AutoSize = false;
             this.tsKill.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsKill.Image = global::CommonCode.ICSharpTextEditor.Content.RedAlert;
+            this.tsKill.Image = global::ZidUtilities.CommonCode.ICSharpTextEditor.Content.RedAlert;
             this.tsKill.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.tsKill.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsKill.Name = "tsKill";
@@ -123,7 +123,7 @@
             // 
             this.tsComment.AutoSize = false;
             this.tsComment.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsComment.Image = global::CommonCode.ICSharpTextEditor.Content.Comment;
+            this.tsComment.Image = global::ZidUtilities.CommonCode.ICSharpTextEditor.Content.Comment;
             this.tsComment.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.tsComment.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsComment.Name = "tsComment";
@@ -134,7 +134,7 @@
             // 
             this.tsUncomment.AutoSize = false;
             this.tsUncomment.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsUncomment.Image = global::CommonCode.ICSharpTextEditor.Content.UnComment;
+            this.tsUncomment.Image = global::ZidUtilities.CommonCode.ICSharpTextEditor.Content.UnComment;
             this.tsUncomment.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.tsUncomment.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsUncomment.Name = "tsUncomment";
@@ -145,7 +145,7 @@
             // 
             this.tsSearch.AutoSize = false;
             this.tsSearch.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsSearch.Image = global::CommonCode.ICSharpTextEditor.Content.Search;
+            this.tsSearch.Image = global::ZidUtilities.CommonCode.ICSharpTextEditor.Content.Search;
             this.tsSearch.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.tsSearch.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsSearch.Name = "tsSearch";
@@ -156,7 +156,7 @@
             // 
             this.tsToggleBookmark.AutoSize = false;
             this.tsToggleBookmark.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsToggleBookmark.Image = global::CommonCode.ICSharpTextEditor.Content.Bookmark;
+            this.tsToggleBookmark.Image = global::ZidUtilities.CommonCode.ICSharpTextEditor.Content.Bookmark;
             this.tsToggleBookmark.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.tsToggleBookmark.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsToggleBookmark.Name = "tsToggleBookmark";
@@ -167,7 +167,7 @@
             // 
             this.tsPreviousBookmark.AutoSize = false;
             this.tsPreviousBookmark.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsPreviousBookmark.Image = global::CommonCode.ICSharpTextEditor.Content.Previous;
+            this.tsPreviousBookmark.Image = global::ZidUtilities.CommonCode.ICSharpTextEditor.Content.Previous;
             this.tsPreviousBookmark.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.tsPreviousBookmark.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsPreviousBookmark.Name = "tsPreviousBookmark";
@@ -178,7 +178,7 @@
             // 
             this.tsNextBookmark.AutoSize = false;
             this.tsNextBookmark.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsNextBookmark.Image = global::CommonCode.ICSharpTextEditor.Content.Next;
+            this.tsNextBookmark.Image = global::ZidUtilities.CommonCode.ICSharpTextEditor.Content.Next;
             this.tsNextBookmark.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.tsNextBookmark.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsNextBookmark.Name = "tsNextBookmark";
@@ -189,7 +189,7 @@
             // 
             this.tsClearBookmarks.AutoSize = false;
             this.tsClearBookmarks.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsClearBookmarks.Image = global::CommonCode.ICSharpTextEditor.Content.DelBookmark;
+            this.tsClearBookmarks.Image = global::ZidUtilities.CommonCode.ICSharpTextEditor.Content.DelBookmark;
             this.tsClearBookmarks.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.tsClearBookmarks.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsClearBookmarks.Name = "tsClearBookmarks";
@@ -200,7 +200,7 @@
             // 
             this.tsSaveToFile.AutoSize = false;
             this.tsSaveToFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsSaveToFile.Image = global::CommonCode.ICSharpTextEditor.Content.Save;
+            this.tsSaveToFile.Image = global::ZidUtilities.CommonCode.ICSharpTextEditor.Content.Save;
             this.tsSaveToFile.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.tsSaveToFile.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsSaveToFile.Name = "tsSaveToFile";
@@ -211,7 +211,7 @@
             // 
             this.tsLoadFromFile.AutoSize = false;
             this.tsLoadFromFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsLoadFromFile.Image = global::CommonCode.ICSharpTextEditor.Content.Open;
+            this.tsLoadFromFile.Image = global::ZidUtilities.CommonCode.ICSharpTextEditor.Content.Open;
             this.tsLoadFromFile.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.tsLoadFromFile.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsLoadFromFile.Name = "tsLoadFromFile";

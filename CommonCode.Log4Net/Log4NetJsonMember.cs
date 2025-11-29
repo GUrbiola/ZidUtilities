@@ -1,4 +1,4 @@
-﻿namespace CommonCode.Log4Net
+﻿namespace ZidUtilities.CommonCode.Log4Net
 {
     /// <summary>
     /// Represents a single member of a Log4Net JSON-like structure.

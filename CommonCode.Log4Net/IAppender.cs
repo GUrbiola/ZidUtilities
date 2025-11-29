@@ -1,4 +1,4 @@
-﻿namespace CommonCode.Log4Net
+﻿namespace ZidUtilities.CommonCode.Log4Net
 {
     /// <summary>
     /// Represents a logging appender abstraction used by the logging system.

@@ -1,4 +1,4 @@
-﻿namespace CommonCode.Log4Net
+﻿namespace ZidUtilities.CommonCode.Log4Net
 {
     /// <summary>
     /// Represents configuration information for a log4net layout.

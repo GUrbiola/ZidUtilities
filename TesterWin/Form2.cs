@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace TesterWin
+namespace ZidUtilities.TesterWin
 {
     public partial class Form2 : Form
     {

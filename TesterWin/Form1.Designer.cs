@@ -1,4 +1,4 @@
-﻿namespace TesterWin
+﻿namespace ZidUtilities.TesterWin
 {
     partial class Form1
     {

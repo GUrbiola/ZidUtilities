@@ -4,7 +4,7 @@ using System.Windows.Forms;
 using ICSharpCode.TextEditor.Document;
 using ICSharpCode.TextEditor;
 
-namespace CommonCode.ICSharpTextEditor.HelperForms  
+namespace ZidUtilities.CommonCode.ICSharpTextEditor.HelperForms  
 {
     /// <summary>
     /// Bundles a group of markers together so that they can be cleared 

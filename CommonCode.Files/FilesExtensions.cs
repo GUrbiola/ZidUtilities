@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ZidUtilities.CommonCode.DataComparison;
 
-namespace CommonCode.Files
+namespace ZidUtilities.CommonCode.Files
 {
     public static class FilesExtensions
     {

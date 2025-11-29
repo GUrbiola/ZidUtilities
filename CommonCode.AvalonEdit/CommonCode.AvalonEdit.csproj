@@ -7,8 +7,8 @@
     <ProjectGuid>{29D471E9-AD18-426A-87B9-2BD3A84BF5C3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CommonCode.AvalonEdit</RootNamespace>
-    <AssemblyName>CommonCode.AvalonEdit</AssemblyName>
+    <RootNamespace>ZidUtilities.CommonCode.AvalonEdit</RootNamespace>
+    <AssemblyName>ZidUtilities.CommonCode.AvalonEdit</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

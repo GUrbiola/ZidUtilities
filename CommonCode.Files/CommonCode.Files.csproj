@@ -7,8 +7,8 @@
     <ProjectGuid>{BD979760-04C5-4080-82BB-11137DFFEB20}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CommonCode.Files</RootNamespace>
-    <AssemblyName>CommonCode.Files</AssemblyName>
+    <RootNamespace>ZidUtilities.CommonCode.Files</RootNamespace>
+    <AssemblyName>ZidUtilities.CommonCode.Files</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

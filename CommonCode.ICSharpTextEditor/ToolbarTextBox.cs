@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace CommonCode.ICSharpTextEditor
+namespace ZidUtilities.CommonCode.ICSharpTextEditor
 {
     /// <summary>
     /// Delegate invoked when a <see cref="ToolbarTextBox"/> option changes.

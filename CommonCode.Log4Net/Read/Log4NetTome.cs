@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using ZidUtilities.CommonCode;
 
-namespace CommonCode.Log4Net.Read
+namespace ZidUtilities.CommonCode.Log4Net.Read
 {
     /// <summary>
     /// Represents a collection (tome) of parsed log4net records loaded from a file.

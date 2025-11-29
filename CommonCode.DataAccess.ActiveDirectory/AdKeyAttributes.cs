@@ -1,4 +1,4 @@
-﻿namespace CommonCode.DataAccess.ActiveDirectory
+﻿namespace ZidUtilities.CommonCode.DataAccess.ActiveDirectory
 {
     /// <summary>
     /// Holds the three unique identifier attributes for an Active Directory record.

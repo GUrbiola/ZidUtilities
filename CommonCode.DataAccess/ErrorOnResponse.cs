@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CommonCode.DataAccess
+namespace ZidUtilities.CommonCode.DataAccess
 {
     /// <summary>
     /// Represents an error entry in a response, capturing execution time, message and exception details.

@@ -7,8 +7,8 @@
     <ProjectGuid>{C341EA45-88E1-4FB5-ADD2-591E309DCBAC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CommonCode.Web</RootNamespace>
-    <AssemblyName>CommonCode.Web</AssemblyName>
+    <RootNamespace>ZidUtilities.CommonCode.Web</RootNamespace>
+    <AssemblyName>ZidUtilities.CommonCode.Web</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

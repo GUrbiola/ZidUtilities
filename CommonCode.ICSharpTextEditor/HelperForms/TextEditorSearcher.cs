@@ -4,7 +4,7 @@ using ICSharpCode.TextEditor.Document;
 using System.Diagnostics;
 using ZidUtilities.CommonCode;
 
-namespace CommonCode.ICSharpTextEditor.HelperForms  
+namespace ZidUtilities.CommonCode.ICSharpTextEditor.HelperForms  
 {
     /// <summary>
     /// Provides search functionality over an <see cref="IDocument"/> similar to a "Find" operation.

@@ -5,7 +5,7 @@ using ICSharpCode.TextEditor.Document;
 using ZidUtilities.CommonCode;
 
 
-namespace CommonCode.ICSharpTextEditor.FoldingStrategies
+namespace ZidUtilities.CommonCode.ICSharpTextEditor.FoldingStrategies
 {
     /// <summary>
     /// Provides a folding strategy for SQL-like scripts by scanning tokenized text and producing fold markers.

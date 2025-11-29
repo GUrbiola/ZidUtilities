@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace CommonCode.Log4Net
+namespace ZidUtilities.CommonCode.Log4Net
 {
     public class RollingFileAppender : IAppender
     {

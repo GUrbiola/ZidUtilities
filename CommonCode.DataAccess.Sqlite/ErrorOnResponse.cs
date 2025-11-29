@@ -1,6 +1,6 @@
 using System;
 
-namespace CommonCode.DataAccess.Sqlite
+namespace ZidUtilities.CommonCode.DataAccess.Sqlite
 {
     /// <summary>
     /// Represents an error entry in a response, capturing execution time, message and exception details.

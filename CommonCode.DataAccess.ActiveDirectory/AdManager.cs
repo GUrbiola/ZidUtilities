@@ -11,7 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 
-namespace CommonCode.DataAccess.ActiveDirectory
+namespace ZidUtilities.CommonCode.DataAccess.ActiveDirectory
 {
     /// <summary>
     /// Helper class to work with Active Directory.

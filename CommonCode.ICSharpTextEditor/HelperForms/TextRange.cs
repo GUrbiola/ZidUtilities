@@ -1,6 +1,6 @@
 ﻿using ICSharpCode.TextEditor.Document;
 
-namespace CommonCode.ICSharpTextEditor.HelperForms  
+namespace ZidUtilities.CommonCode.ICSharpTextEditor.HelperForms  
 {
     /// <summary>
     /// Represents a contiguous range of text within an <see cref="IDocument"/>.

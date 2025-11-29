@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CommonCode.DataAccess.ActiveDirectory
+namespace ZidUtilities.CommonCode.DataAccess.ActiveDirectory
 {
     /// <summary>
     /// Template for the function that is supposed to parse the raw value in Active Directory to a meaningful

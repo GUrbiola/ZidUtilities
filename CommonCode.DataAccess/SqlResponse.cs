@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CommonCode.DataAccess
+namespace ZidUtilities.CommonCode.DataAccess
 {
     /// <summary>
     /// Generic response container supporting result lists, single result, error collection, and status messages.

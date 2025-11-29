@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CommonCode.DataAccess.Sqlite
+namespace ZidUtilities.CommonCode.DataAccess.Sqlite
 {
     /// <summary>
     /// Generic response container supporting result lists, single result, error collection, and status messages.

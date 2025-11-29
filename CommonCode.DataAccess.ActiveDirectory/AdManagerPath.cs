@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
 
-namespace CommonCode.DataAccess.ActiveDirectory
+namespace ZidUtilities.CommonCode.DataAccess.ActiveDirectory
 {
     /// <summary>
     /// Represents a single Active Directory Organizational Unit (OU) search path used by the AdManager.

@@ -7,8 +7,8 @@
     <ProjectGuid>{41018FD2-7B8E-455B-9190-68A122C28E27}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CommonCode.DataAccess.ActiveDirectory</RootNamespace>
-    <AssemblyName>CommonCode.DataAccess.ActiveDirectory</AssemblyName>
+    <RootNamespace>ZidUtilities.CommonCode.DataAccess.ActiveDirectory</RootNamespace>
+    <AssemblyName>ZidUtilities.CommonCode.DataAccess.ActiveDirectory</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

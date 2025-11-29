@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CommonCode.Log4Net.Read
+namespace ZidUtilities.CommonCode.Log4Net.Read
 {
     public class Log4NetRecord
     {

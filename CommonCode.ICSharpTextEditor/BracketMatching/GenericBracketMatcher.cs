@@ -1,7 +1,7 @@
 ﻿using ICSharpCode.TextEditor.Document;
 using ZidUtilities.CommonCode;
 
-namespace CommonCode.ICSharpTextEditor.BracketMatching
+namespace ZidUtilities.CommonCode.ICSharpTextEditor.BracketMatching
 {
     /// <summary>
     /// Provides bracket matching functionality for a generic language.

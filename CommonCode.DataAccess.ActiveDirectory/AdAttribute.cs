@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 
-namespace CommonCode.DataAccess.ActiveDirectory
+namespace ZidUtilities.CommonCode.DataAccess.ActiveDirectory
 {
     /// <summary>
     /// The ad attribute. Is meant to represent an attribute that will be pulled by the AdManager.

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CommonCode.ICSharpTextEditor
+namespace ZidUtilities.CommonCode.ICSharpTextEditor
 {
     /// <summary>
     /// Enumeration of a small set of common syntax highlighting categories used by the editor.

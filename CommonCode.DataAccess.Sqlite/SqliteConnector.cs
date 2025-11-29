@@ -6,7 +6,7 @@ using System.Data;
 using System.Data.SQLite;
 using System.Threading;
 
-namespace CommonCode.DataAccess.Sqlite
+namespace ZidUtilities.CommonCode.DataAccess.Sqlite
 {
     /// <summary>
     /// Delegate to notify start/finish of a query processing operation.

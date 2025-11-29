@@ -1,4 +1,4 @@
-﻿namespace CommonCode.Log4Net.Read
+﻿namespace ZidUtilities.CommonCode.Log4Net.Read
 {
     /// <summary>
     /// Enum with the different log4net message levels, such as DEBUG, INFO, WARN, ERROR, FATAL. 

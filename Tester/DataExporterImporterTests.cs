@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using CommonCode.Files;
 using ZidUtilities.CommonCode;
+using ZidUtilities.CommonCode.Files;
 
-namespace Tester
+namespace ZidUtilities.Tester
 {
     /// <summary>
     /// Comprehensive test suite for DataExporter and DataImporter classes.

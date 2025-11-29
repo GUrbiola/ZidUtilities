@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Windows.Forms;
 
-namespace CommonCode.ICSharpTextEditor
+namespace ZidUtilities.CommonCode.ICSharpTextEditor
 {
     /// <summary>
     /// Represents a pair of keyboard shortcuts (a primary and a following shortcut) with a name and enabled flag.

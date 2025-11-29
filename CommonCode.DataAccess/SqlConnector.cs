@@ -6,7 +6,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Threading;
 
-namespace CommonCode.DataAccess
+namespace ZidUtilities.CommonCode.DataAccess
 {
     /// <summary>
     /// Delegate to notify start/finish of a query processing operation.

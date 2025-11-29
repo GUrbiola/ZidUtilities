@@ -10,7 +10,7 @@ using ICSharpCode.TextEditor.Document;
 using ICSharpCode.TextEditor;
 using ZidUtilities.CommonCode;
 
-namespace CommonCode.ICSharpTextEditor.HelperForms  
+namespace ZidUtilities.CommonCode.ICSharpTextEditor.HelperForms  
 {
     /// <summary>
     /// SearchAndReplace form allows users to search and replace text within a TextEditorControl.

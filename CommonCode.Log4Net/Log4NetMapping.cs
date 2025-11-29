@@ -1,4 +1,4 @@
-﻿namespace CommonCode.Log4Net
+﻿namespace ZidUtilities.CommonCode.Log4Net
 {
     /// <summary>
     /// Represents a mapping between a log level and the console colors used to render that level.

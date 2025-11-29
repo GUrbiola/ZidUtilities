@@ -1,4 +1,4 @@
-﻿namespace CommonCode.ICSharpTextEditor.HelperForms
+﻿namespace ZidUtilities.CommonCode.ICSharpTextEditor.HelperForms
 {
     partial class SearchAndReplace
     {

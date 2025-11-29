@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using ZidUtilities.CommonCode;
 using ZidUtilities.CommonCode.DataComparison;
 
-namespace Tester
+namespace ZidUtilities.Tester
 {
     internal class Program
     {

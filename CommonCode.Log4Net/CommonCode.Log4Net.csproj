@@ -7,8 +7,8 @@
     <ProjectGuid>{30914A89-CB7D-4800-A722-517BBA51EFA9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CommonCode.Log4Net</RootNamespace>
-    <AssemblyName>CommonCode.Log4Net</AssemblyName>
+    <RootNamespace>ZidUtilities.CommonCode.Log4Net</RootNamespace>
+    <AssemblyName>ZidUtilities.CommonCode.Log4Net</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

@@ -1,7 +1,7 @@
 using System;
 using ZidUtilities.CommonCode;
 
-namespace ZidUtilities.Examples
+namespace ZidUtilities.Tester
 {
     /// <summary>
     /// Examples demonstrating how to use the modernized Crypter class

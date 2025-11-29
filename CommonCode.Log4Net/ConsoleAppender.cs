@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace CommonCode.Log4Net
+namespace ZidUtilities.CommonCode.Log4Net
 {
     /// <summary>
     /// Represents a colored console appender configuration for log4net.

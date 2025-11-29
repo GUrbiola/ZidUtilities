@@ -1,9 +1,9 @@
-using CommonCode.Files;
 using System;
 using System.Data;
 using System.IO;
+using ZidUtilities.CommonCode.Files;
 
-namespace Tester
+namespace ZidUtilities.Tester
 {
     /// <summary>
     /// Demonstrates all 14 Excel styles available in DataExporter.

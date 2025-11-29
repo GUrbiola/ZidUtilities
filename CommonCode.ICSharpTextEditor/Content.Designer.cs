@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CommonCode.ICSharpTextEditor {
+namespace ZidUtilities.CommonCode.ICSharpTextEditor {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace CommonCode.ICSharpTextEditor {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("CommonCode.ICSharpTextEditor.Content", typeof(Content).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ZidUtilities.CommonCode.ICSharpTextEditor.Content", typeof(Content).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

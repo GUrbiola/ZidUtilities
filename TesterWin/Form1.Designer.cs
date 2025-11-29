@@ -259,6 +259,7 @@
             this.extEditor.Txt02Helper.Text = "TextBoxHelper2";
             this.extEditor.Txt02Helper.ToolTip = "";
             this.extEditor.Txt02Helper.Visible = true;
+            this.extEditor.OnRun += new CommonCode.ICSharpTextEditor.OnToolbarButtonClick(this.extEditor_OnRun);
             // 
             // Form1
             // 

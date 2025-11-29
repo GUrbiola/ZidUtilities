@@ -2,6 +2,9 @@
 
 namespace CommonCode.ICSharpTextEditor
 {
+    /// <summary>
+    /// Enumeration of a small set of common syntax highlighting categories used by the editor.
+    /// </summary>
     public enum SyntaxHighlighting
     {
         None,
@@ -117,8 +120,18 @@ namespace CommonCode.ICSharpTextEditor
         /// Gets the syntax definition file content for the specified language.
         /// </summary>
         /// <param name="language">The syntax language to retrieve.</param>
-        /// <returns>The XML content of the syntax definition file (.xshd).</returns>
+        /// <returns>
+        /// The XML content of the syntax definition file (.xshd) for the specified <paramref name="language"/>.
+        /// The returned string contains the complete syntax definition used by the editor's highlighting engine.
+        /// </returns>
         /// <exception cref="ArgumentException">Thrown when the language is not supported.</exception>
+        /// <remarks>
+        /// This method maps the <see cref="SyntaxLanguage"/> enumeration values to corresponding
+        /// embedded resource strings in the <c>SyntaxFiles</c> class. Consumers should handle
+        /// <see cref="ArgumentException"/> in case an unsupported or unknown language value is supplied.
+        /// The syntax highlighting definitions all come from this URL: https://github.com/xv/ICSharpCode.TextEditor-Lexers
+        /// Except for TSQL which was created by me.
+        /// </remarks>
         public static string GetSyntaxFile(SyntaxLanguage language)
         {
             switch (language)

@@ -9,19 +9,50 @@ using System.Threading.Tasks;
 
 namespace CommonCode.ICSharpTextEditor
 {
+    /// <summary>
+    /// A collection of extension helper methods for working with an
+    /// <see cref="TextEditorControl"/> (ICSharpCode.TextEditor).
+    /// Provides utilities to query caret position, manipulate selection, insert text,
+    /// add markers and scroll the view.
+    /// </summary>
     public static class ICSharpTextEditorExtensions
     {
 
+        /// <summary>
+        /// Gets the 0-based line number that contains the current caret position.
+        /// </summary>
+        /// <param name="TxtEditor">The text editor control to query.</param>
+        /// <returns>
+        /// The line number (0-based) of the line that contains the caret.
+        /// If the document or caret are unavailable this may throw as per underlying API.
+        /// </returns>
         public static int CurrentLineNumber(this TextEditorControl TxtEditor)
         {
             return TxtEditor.Document.GetLineSegmentForOffset(TxtEditor.CurrentOffset()).LineNumber;
         }
 
+        /// <summary>
+        /// Gets the current caret offset within the document.
+        /// </summary>
+        /// <param name="TxtEditor">The text editor control to query.</param>
+        /// <returns>
+        /// The integer offset (0-based) from the start of the document to the caret position.
+        /// This uses the editor's caret position converted to a document offset.
+        /// </returns>
         public static int CurrentOffset(this TextEditorControl TxtEditor)
         {
             return TxtEditor.Document.PositionToOffset(TxtEditor.ActiveTextAreaControl.Caret.Position);
         }
 
+        /// <summary>
+        /// Retrieves the text of a specific line in the document.
+        /// </summary>
+        /// <param name="TxtEditor">The text editor control containing the document.</param>
+        /// <param name="LineNumber">The 0-based line number to read.</param>
+        /// <returns>
+        /// The text of the requested line. If the <paramref name="LineNumber"/> is out of range,
+        /// an empty string is returned.
+        /// </returns>
         public static string GetLineText(this TextEditorControl TxtEditor, int LineNumber)
         {
             LineSegment line;
@@ -38,6 +69,20 @@ namespace CommonCode.ICSharpTextEditor
             return lineText;
         }
 
+        /// <summary>
+        /// Inserts a string into the document at a specified position or at the caret.
+        /// If there is a selection and <paramref name="Position"/> is -1, the selection is replaced.
+        /// </summary>
+        /// <param name="TxtEditor">The text editor control to modify.</param>
+        /// <param name="InsStr">The string to insert.</param>
+        /// <param name="Position">
+        /// The document offset at which to insert the string. If -1, the method will use the
+        /// current selection start (if there is a selection) or the caret offset.
+        /// </param>
+        /// <param name="DoRefreshAfter">
+        /// If true, the editor is refreshed after insertion to update the visual state.
+        /// </param>
+        /// <returns>None.</returns>
         public static void InsertString(this TextEditorControl TxtEditor, string InsStr, int Position = -1, bool DoRefreshAfter = true)
         {
             int SelectionLength = 0;
@@ -66,6 +111,14 @@ namespace CommonCode.ICSharpTextEditor
                 TxtEditor.Refresh();
         }
 
+        /// <summary>
+        /// Marks a whole line with a visual text marker of a given color and type.
+        /// </summary>
+        /// <param name="TxtEditor">The text editor control whose document will be marked.</param>
+        /// <param name="LineNumber">The 0-based line number to mark.</param>
+        /// <param name="MarkColor">The color to use for the marker.</param>
+        /// <param name="MarkType">The kind of marker (defaults to <see cref="TextMarkerType.SolidBlock"/>).</param>
+        /// <returns>None.</returns>
         public static void MarkLine(this TextEditorControl TxtEditor, int LineNumber, Color MarkColor, TextMarkerType MarkType = TextMarkerType.SolidBlock)
         {
             LineSegment line = TxtEditor.Document.GetLineSegment(LineNumber);
@@ -73,6 +126,12 @@ namespace CommonCode.ICSharpTextEditor
             TxtEditor.Document.MarkerStrategy.AddMarker(marker);
         }
 
+        /// <summary>
+        /// Selects the entire specified line in the editor and scrolls to it.
+        /// </summary>
+        /// <param name="TxtEditor">The text editor control to operate on.</param>
+        /// <param name="LineNumber">The 0-based line number to select. If out of range, selection is cleared.</param>
+        /// <returns>None.</returns>
         public static void SelectLine(this TextEditorControl TxtEditor, int LineNumber)
         {
             LineSegment Line;
@@ -98,6 +157,14 @@ namespace CommonCode.ICSharpTextEditor
             }
         }
 
+        /// <summary>
+        /// Selects a range of text given by a document offset and length, moves the caret to the end of the selection,
+        /// and scrolls the view so the start of the selection is visible.
+        /// </summary>
+        /// <param name="TxtEditor">The text editor control to operate on.</param>
+        /// <param name="offset">The start offset (0-based) of the selection in the document.</param>
+        /// <param name="length">The length of the selection in characters.</param>
+        /// <returns>None.</returns>
         public static void SelectText(this TextEditorControl TxtEditor, int offset, int length)
         {
             TextLocation p1 = TxtEditor.Document.OffsetToPosition(offset);
@@ -109,14 +176,27 @@ namespace CommonCode.ICSharpTextEditor
             TxtEditor.ActiveTextAreaControl.Caret.Position = TxtEditor.Document.OffsetToPosition(offset + length);
         }
 
+        /// <summary>
+        /// Adds a text marker covering a specific offset and length in the document.
+        /// </summary>
+        /// <param name="TxtEditor">The text editor control whose document will receive the marker.</param>
+        /// <param name="Offset">Start offset (0-based) in the document where the marker begins.</param>
+        /// <param name="Length">Number of characters the marker should cover.</param>
+        /// <param name="MarkColor">Color used for the marker.</param>
+        /// <param name="MarkType">Type of marker to add (defaults to <see cref="TextMarkerType.SolidBlock"/>).</param>
+        /// <returns>None.</returns>
         public static void SetMarker(this TextEditorControl TxtEditor, int Offset, int Length, Color MarkColor, TextMarkerType MarkType = TextMarkerType.SolidBlock)
         {
             TextMarker marker = new TextMarker(Offset, Length, MarkType, MarkColor);
             TxtEditor.Document.MarkerStrategy.AddMarker(marker);
         }
 
-
-
+        /// <summary>
+        /// Sets the current selection to cover the entire specified 0-based line.
+        /// </summary>
+        /// <param name="TxtEditor">The text editor control to operate on.</param>
+        /// <param name="lineNumber">The 0-based line number to select.</param>
+        /// <returns>None.</returns>
         public static void SetSelectionByLine(this TextEditorControl TxtEditor, int lineNumber)
         {
             LineSegment line = TxtEditor.Document.GetLineSegment(lineNumber);
@@ -126,6 +206,13 @@ namespace CommonCode.ICSharpTextEditor
             );
         }
 
+        /// <summary>
+        /// Sets the current selection using two document offsets.
+        /// </summary>
+        /// <param name="TxtEditor">The text editor control to operate on.</param>
+        /// <param name="StartOffset">The start offset (0-based) of the selection.</param>
+        /// <param name="EndOffset">The end offset (0-based) of the selection.</param>
+        /// <returns>None.</returns>
         public static void SetSelectionByOffset(this TextEditorControl TxtEditor, int StartOffset, int EndOffset)
         {
             TxtEditor.ActiveTextAreaControl.SelectionManager.ClearSelection();
@@ -135,6 +222,12 @@ namespace CommonCode.ICSharpTextEditor
         /// <summary>
         /// Sets the first visible physical line in the text editor
         /// </summary>
+        /// <param name="editor">The text editor control to scroll.</param>
+        /// <param name="lineNumber">The 0-based line number that should become the first visible physical line.</param>
+        /// <remarks>
+        /// This method attempts to bound-check <paramref name="lineNumber"/> and uses the editor's scrolling APIs.
+        /// Exceptions are caught and ignored when scrolling is not possible.
+        /// </remarks>
         public static void SetFirstPhysicalLineVisible(this TextEditorControl editor, int lineNumber)
         {
             try
@@ -174,8 +267,17 @@ namespace CommonCode.ICSharpTextEditor
         }
 
         /// <summary>
-        /// Scrolls the editor to make the specified line visible and optionally centered
+        /// Scrolls the editor so the specified line is visible. Optionally centers it within the view.
         /// </summary>
+        /// <param name="editor">The text editor control to scroll.</param>
+        /// <param name="lineNumber">The 0-based line number to make visible.</param>
+        /// <param name="centerInView">
+        /// If true, attempts to position the line near the center of the visible area; otherwise,
+        /// scrolls so the line is visible at its natural position.
+        /// </param>
+        /// <remarks>
+        /// Exceptions are caught and ignored when scrolling is not possible.
+        /// </remarks>
         public static void ScrollToLine(this TextEditorControl editor, int lineNumber, bool centerInView = true)
         {
             try
@@ -220,6 +322,22 @@ namespace CommonCode.ICSharpTextEditor
             }
         }
 
+        /// <summary>
+        /// Attempts to identify the word under the caret and returns its starting offset and length.
+        /// </summary>
+        /// <param name="TxtEditor">The text editor control to inspect.</param>
+        /// <param name="offset">
+        /// Output parameter that will contain the start offset (0-based) of the word if found.
+        /// On entry this is set to the current caret offset and may be updated on success.
+        /// </param>
+        /// <param name="length">
+        /// Output parameter that will contain the length in characters of the detected word.
+        /// Set to 0 on failure.
+        /// </param>
+        /// <returns>
+        /// True if a word was found at the caret position (and <paramref name="offset"/> and
+        /// <paramref name="length"/> are populated). False if no word is present or an error occurred.
+        /// </returns>
         public static bool TryGetCurrentWord(this TextEditorControl TxtEditor, out int offset, out int length)
         {
             offset = TxtEditor.CurrentOffset();
@@ -236,7 +354,7 @@ namespace CommonCode.ICSharpTextEditor
 
                 List<char> wordBreakers = new List<char>() 
                 { ' ', '\t', '\r', '\n', '.', ';', ':', '+', '-', '*', '/', '(', ')', '{', '}', '[', ']', '>', '<', '=' };
-
+                
 
                 char currentChar = doc.GetCharAt(offset);
                 // If current char is a word breaker, consider there is no word at caret

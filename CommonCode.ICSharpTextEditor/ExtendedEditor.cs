@@ -20,9 +20,22 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 namespace CommonCode.ICSharpTextEditor
 {
     public delegate void OnToolbarButtonClick(string selectedText, ToolbarOption btnClicked);
+    public delegate void OnKeyPressOnEditor(Keys keyData);
     public partial class ExtendedEditor : UserControl
     {
-        public event OnToolbarButtonClick OnRun, OnStop, OnKill;
+        [Category("Custom Event")]
+        [Description("Event triggered on click/shortcur of toolbar button: Run")]
+        public event OnToolbarButtonClick OnRun;
+        [Category("Custom Event")]
+        [Description("Event triggered on click/shortcur of toolbar button: Stop")]
+        public event OnToolbarButtonClick OnStop;
+        [Category("Custom Event")]
+        [Description("Event triggered on click/shortcur of toolbar button: Kill")]
+        public event OnToolbarButtonClick OnKill;
+        [Category("Custom Event")]
+        [Description("Event triggered on key press on editor, it is processed after shortcuts.")]
+        public event OnKeyPressOnEditor OnEditorKeyPress;
+
         private SearchAndReplace searchForm = null;
         private bool _lastSearchLoopedAround = false, _lastSearchWasBackward = false;
 
@@ -196,6 +209,8 @@ namespace CommonCode.ICSharpTextEditor
                 this.CtrlToolbar.Visible = value;
             }
         }
+
+
 
         #region Properties that represent the toolbar buttons, so they can be customized at design time
         private ToolbarOption _btnRun = new ToolbarOption("Run", "Executes selected/all code (F5)", Content.Play, true) { Enabled = true, ShortCut = Keys.F5 };
@@ -550,7 +565,13 @@ namespace CommonCode.ICSharpTextEditor
                 impShortcuts.Add(ImpToggleOutlining);
 
             if (!TrackToolbarShortcuts)
+            {
+                if(OnEditorKeyPress != null)
+                    OnEditorKeyPress(keyData);
+                
                 return Echo;
+            }
+                
 
             // Echo == true, then NoEcho == false
             #region Key shortcut processing for toolbar shortcuts
@@ -651,6 +672,10 @@ namespace CommonCode.ICSharpTextEditor
             #endregion
 
             LastKeyPressed = keyData;//store last key pressed for two key impShortcuts
+
+            if (OnEditorKeyPress != null)
+                OnEditorKeyPress(keyData);
+
             return Echo;
         }
 

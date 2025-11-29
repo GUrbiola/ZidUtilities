@@ -15,6 +15,11 @@ namespace CommonCode.ICSharpTextEditor.FoldingStrategies
         public List<string> SpamFolding { get; set; }
 
         public SyntaxLanguage Language { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GenericFoldingStrategy"/> class
+        /// with default empty folding token lists and the default language (<see cref="SyntaxLanguage.CSharp"/>).
+        /// </summary>
         public GenericFoldingStrategy() 
         { 
             StartFolding = new List<string>();
@@ -22,6 +27,16 @@ namespace CommonCode.ICSharpTextEditor.FoldingStrategies
             SpamFolding = new List<string>();
             Language = SyntaxLanguage.CSharp;
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GenericFoldingStrategy"/> class
+        /// with default empty folding token lists and the specified language.
+        /// </summary>
+        /// <param name="language">
+        /// The <see cref="SyntaxLanguage"/> that this folding strategy should be associated with.
+        /// This value is stored in the <see cref="Language"/> property and does not directly affect
+        /// token matching unless callers configure the token lists accordingly.
+        /// </param>
         public GenericFoldingStrategy(SyntaxLanguage language)
         {
             StartFolding = new List<string>();
@@ -29,10 +44,39 @@ namespace CommonCode.ICSharpTextEditor.FoldingStrategies
             SpamFolding = new List<string>();
             Language = language;
         }
+
+        /// <summary>
+        /// Generate fold markers for the provided document using the strategy's configured
+        /// <see cref="StartFolding"/> and <see cref="EndFolding"/> token lists.
+        /// </summary>
+        /// <param name="document">The document to analyze for fold markers. Must implement <see cref="IDocument"/>.</param>
+        /// <param name="fileName">The name of the file being analyzed. This parameter is not used by the current implementation
+        /// but is kept for compatibility with the folding strategy interface.</param>
+        /// <param name="parseInformation">Optional parse information produced by a parser. This parameter is not used by the current implementation.</param>
+        /// <returns>
+        /// A list of <see cref="FoldMarker"/> instances representing regions in the document that can be folded.
+        /// Returns an empty list if no foldable regions are found or if the start/end token lists are not configured.
+        /// </returns>
         public List<FoldMarker> GenerateFoldMarkers(IDocument document, string fileName, object parseInformation)
         {
             return GenerateFoldMarkers(document, fileName, parseInformation, StartFolding, EndFolding);
         }
+
+        /// <summary>
+        /// Internal implementation that generates fold markers for the provided document using the given
+        /// start and end token lists. The method finds lines that start with any token in <paramref name="StartFoldTokens"/>
+        /// and lines that end with any token in <paramref name="EndFoldTokens"/> and matches them to create fold regions.
+        /// It also creates folding regions for consecutive "spam" lines configured via the <see cref="SpamFolding"/> list.
+        /// </summary>
+        /// <param name="document">The document to scan for folding regions.</param>
+        /// <param name="fileName">The file name associated with the document; not used by the implementation but provided for compatibility.</param>
+        /// <param name="parseInformation">Optional parser information; not used by this implementation.</param>
+        /// <param name="StartFoldTokens">A list of tokens that indicate the start of a foldable region. Each entry is matched at the beginning of a trimmed line.</param>
+        /// <param name="EndFoldTokens">A list of tokens that indicate the end of a foldable region. Each entry is matched at the end of a trimmed line.</param>
+        /// <returns>
+        /// A list of <see cref="FoldMarker"/> objects representing the detected foldable regions.
+        /// The method returns an empty list if inputs are null/empty or no regions are found.
+        /// </returns>
         private List<FoldMarker> GenerateFoldMarkers(IDocument document, string fileName, object parseInformation, List<string> StartFoldTokens, List<string> EndFoldTokens)
         {
             List<FoldMarker> list = new List<FoldMarker>();

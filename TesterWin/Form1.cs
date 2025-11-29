@@ -542,5 +542,10 @@ END
             extEditor.Editor.Text = code;
             extEditor.Editor.Refresh();
         }
+
+        private void extEditor_OnRun(string selectedText, CommonCode.ICSharpTextEditor.ToolbarOption btnClicked)
+        {
+			MessageBox.Show($"You clicked the {btnClicked} button!");
+        }
     }
 }

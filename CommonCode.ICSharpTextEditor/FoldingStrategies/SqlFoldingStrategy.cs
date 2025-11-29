@@ -7,8 +7,39 @@ using ZidUtilities.CommonCode;
 
 namespace CommonCode.ICSharpTextEditor.FoldingStrategies
 {
+    /// <summary>
+    /// Provides a folding strategy for SQL-like scripts by scanning tokenized text and producing fold markers.
+    /// </summary>
+    /// <remarks>
+    /// This strategy produces fold regions for:
+    /// - Block constructs identified by BEGIN ... END tokens,
+    /// - Block comments,
+    /// - Custom line-comment folders using markers like "--fold" and "--/fold".
+    /// The produced <see cref="FoldMarker"/> instances can be used by the editor to collapse and expand regions.
+    /// </remarks>
     public class SqlFoldingStrategy : IFoldingStrategy
     {
+        /// <summary>
+        /// Scans the provided <paramref name="document"/> and generates a list of fold markers representing
+        /// foldable regions found in the text.
+        /// </summary>
+        /// <param name="document">
+        /// The <see cref="IDocument"/> instance whose text will be analyzed. The method reads the entire document
+        /// text and converts character offsets to <see cref="TextLocation"/> values when creating fold markers.
+        /// </param>
+        /// <param name="fileName">
+        /// The name of the file being analyzed. This parameter is accepted for interface compatibility and is not
+        /// used by the current implementation.
+        /// </param>
+        /// <param name="parseInformation">
+        /// Optional parse information that may be provided by a parser. This implementation does not rely on
+        /// parse information and ignores this parameter.
+        /// </param>
+        /// <returns>
+        /// A <see cref="List{FoldMarker}"/> containing fold markers discovered in the document. Each fold marker
+        /// describes the start and end <see cref="TextLocation"/> of a foldable region, the fold type, and
+        /// display text used when the region is collapsed.
+        /// </returns>
         public List<FoldMarker> GenerateFoldMarkers(IDocument document, string fileName, object parseInformation)
         {
             List<FoldMarker> Back = new List<FoldMarker>();

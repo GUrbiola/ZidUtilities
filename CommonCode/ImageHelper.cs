@@ -138,12 +138,12 @@ namespace ZidUtilities.CommonCode
         /// <summary>
         /// Reads an image from the provided stream and returns detailed bitmap information (pixel format, size, DPI, palette, codec, etc.).
         /// </summary>
-        /// <param name="stream">The readable <see cref="Stream"/> from which the image will be loaded.</param>
+        /// <param name="stream">The readable <see cref="Stream"/> from which the image will be loaded. The stream is not disposed by this method.</param>
         /// <returns>
         /// An <see cref="ImagingBitmapInfo"/> describing the image's properties and codec information.
         /// </returns>
         /// <remarks>
-        /// The stream is not disposed by this method. The caller is responsible for stream lifetime management.
+        /// The caller is responsible for managing the lifetime of <paramref name="stream"/>. This method inspects the image and extracts metadata such as pixel format, palette, DPI, and codec/mime information.
         /// </remarks>
         public static ImagingBitmapInfo BitmapPixelFormat(Stream stream)
         {
@@ -213,15 +213,34 @@ namespace ZidUtilities.CommonCode
             return newBitmap;
         }
 
+        /// <summary>
+        /// Creates and returns a resized bitmap scaled by the given percentage.
+        /// </summary>
+        /// <param name="original">The source <see cref="Bitmap"/> to resize.</param>
+        /// <param name="percentageChange">Scaling factor applied to both width and height (e.g., 0.5 reduces size by half).</param>
+        /// <returns>A new <see cref="Bitmap"/> instance with resized dimensions.</returns>
         public static Bitmap ResizeBitmap(Bitmap original, float percentageChange)
         {
             return new Bitmap(original, (int)(original.Width * percentageChange), (int)(original.Height * percentageChange));
         }
 
+        /// <summary>
+        /// Creates and returns a resized bitmap with explicit width and height.
+        /// </summary>
+        /// <param name="original">The source <see cref="Bitmap"/> to resize.</param>
+        /// <param name="width">Desired output width in pixels.</param>
+        /// <param name="height">Desired output height in pixels.</param>
+        /// <returns>A new <see cref="Bitmap"/> instance with the requested dimensions.</returns>
         public static Bitmap ResizeBitmap(Bitmap original, int width, int height)
         {
             return new Bitmap(original, width, height);
         }
+
+        /// <summary>
+        /// Converts the provided bitmap to a 32bpp ARGB bitmap, preserving resolution.
+        /// </summary>
+        /// <param name="original">The source <see cref="Bitmap"/> to convert.</param>
+        /// <returns>A new <see cref="Bitmap"/> in <see cref="PixelFormat.Format32bppArgb"/> format containing the original image data.</returns>
         public static Bitmap ConvertToRGB(Bitmap original)
         {
             Bitmap newImage = new Bitmap(original.Width, original.Height, PixelFormat.Format32bppArgb);
@@ -232,6 +251,16 @@ namespace ZidUtilities.CommonCode
             }
             return newImage;
         }
+
+        /// <summary>
+        /// Converts the provided bitmap to a bitonal (1bpp indexed) image using a fixed luminance threshold.
+        /// </summary>
+        /// <param name="original">The source <see cref="Bitmap"/> to convert. If not 32bpp ARGB, the method will convert it temporarily for processing.</param>
+        /// <returns>A new <see cref="Bitmap"/> in <see cref="PixelFormat.Format1bppIndexed"/> format representing a black-and-white version of the source image.</returns>
+        /// <remarks>
+        /// This conversion uses a simple threshold-based algorithm to decide whether a pixel becomes black or white.
+        /// The returned bitmap is a new object; the original bitmap is not modified.
+        /// </remarks>
         public static Bitmap ConvertToBitonal(Bitmap original)
         {
             Bitmap source = null;

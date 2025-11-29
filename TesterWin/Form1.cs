@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,8 +27,7 @@ namespace TesterWin
 
         private void loadSQLToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            extEditor.Editor.Text = @"
-CREATE PROCEDURE [dbo].[StartDistribution](@SalaryBudget FLOAT, @EquityBudget FLOAT, @ReviewPeriod INT, @CutOffDate DATETIME, @TopPerformerBudgetPercent FLOAT, @UserId INT, @LastCompRevisionDateAccepted DATE) AS
+            string code = @"CREATE PROCEDURE [dbo].[StartDistribution](@SalaryBudget FLOAT, @EquityBudget FLOAT, @ReviewPeriod INT, @CutOffDate DATETIME, @TopPerformerBudgetPercent FLOAT, @UserId INT, @LastCompRevisionDateAccepted DATE) AS
 BEGIN
 	SET NOCOUNT ON
 	BEGIN TRANSACTION;	
@@ -414,7 +414,12 @@ BEGIN
 	   COMMIT TRANSACTION;	
 END
 ";
-			extEditor.Syntax = CommonCode.ICSharpTextEditor.SyntaxHighlighting.TransactSQL;
+
+			if(!File.Exists("SampleSQL.txt"))
+				code.WriteToTextFile("SampleSQL.txt");
+
+            extEditor.Editor.Text = code;
+            extEditor.Syntax = CommonCode.ICSharpTextEditor.SyntaxHighlighting.TransactSQL;
 			extEditor.Editor.Refresh();
         }
 
@@ -428,7 +433,15 @@ END
         {
 			string code = String.Empty;
 
-			code = "D:\\Just For Fun\\ZidUtilities\\CommonCode\\Extensions.cs".ReadFromTextFile();
+            if (File.Exists("SampleCSharp.txt"))
+			{
+				code = "SampleCSharp.txt".ReadFromTextFile();
+            }
+			else
+			{
+                code = "D:\\Just For Fun\\ZidUtilities\\CommonCode\\Extensions.cs".ReadFromTextFile();
+				code.WriteToTextFile("SampleCSharp.txt");
+            }
 
             extEditor.Syntax = CommonCode.ICSharpTextEditor.SyntaxHighlighting.CSharp;
 			extEditor.Editor.Text = code;
@@ -439,7 +452,15 @@ END
         {
             string code = String.Empty;
 
-            code = "C:\\Temp\\DataComparisonReport.xml".ReadFromTextFile();
+            if (File.Exists("SampleXml.txt"))
+            {
+                code = "SampleXml.txt".ReadFromTextFile();
+            }
+            else
+            {
+                code = "C:\\Temp\\DataComparisonReport.xml".ReadFromTextFile();
+                code.WriteToTextFile("SampleXml.txt");
+            }
 
             extEditor.Syntax = CommonCode.ICSharpTextEditor.SyntaxHighlighting.XML;
             extEditor.Editor.Text = code;
@@ -450,9 +471,17 @@ END
         {
             string code = String.Empty;
 
-            code = "C:\\Temp\\DataComparisonReport.html".ReadFromTextFile();
+            if (File.Exists("SampleHtml.txt"))
+            {
+                code = "SampleHtml.txt".ReadFromTextFile();
+            }
+            else
+            {
+                code = "C:\\Temp\\DataComparisonReport.html".ReadFromTextFile();
+                code.WriteToTextFile("SampleHtml.txt");
+            }
             
-            extEditor.Syntax = CommonCode.ICSharpTextEditor.SyntaxHighlighting.HTML;
+			extEditor.Syntax = CommonCode.ICSharpTextEditor.SyntaxHighlighting.HTML;
             extEditor.Editor.Text = code;
             extEditor.Editor.Refresh();
         }
@@ -461,7 +490,15 @@ END
         {
             string code = String.Empty;
 
-            code = "D:\\Restart\\PlusSalud\\PlusSalud\\Website\\Scripts\\Common.js".ReadFromTextFile();
+            if (File.Exists("SampleJavaScript.txt"))
+            {
+                code = "SampleJavaScript.txt".ReadFromTextFile();
+            }
+            else
+            {
+                code = "D:\\Restart\\PlusSalud\\PlusSalud\\Website\\Scripts\\Common.js".ReadFromTextFile();
+                code.WriteToTextFile("SampleJavaScript.txt");
+            }
 
             extEditor.Syntax = CommonCode.ICSharpTextEditor.SyntaxHighlighting.JavaScript;
             extEditor.Editor.Text = code;
@@ -472,8 +509,16 @@ END
         {
             string code = String.Empty;
 
-            code = "D:\\Trash\\Content\\sb-admin.css".ReadFromTextFile();
-
+            if (File.Exists("SampleCss.txt"))
+            {
+                code = "SampleCss.txt".ReadFromTextFile();
+            }
+            else
+            {
+                code = "D:\\Trash\\Content\\sb-admin.css".ReadFromTextFile();
+                code.WriteToTextFile("SampleCss.txt");
+            }
+            
             extEditor.Syntax = CommonCode.ICSharpTextEditor.SyntaxHighlighting.CSS;
             extEditor.Editor.Text = code;
             extEditor.Editor.Refresh();
@@ -483,7 +528,15 @@ END
         {
             string code = String.Empty;
 
-            code = "D:\\Trash\\LogSample.json".ReadFromTextFile();
+            if (File.Exists("SampleJson.txt"))
+            {
+                code = "SampleJson.txt".ReadFromTextFile();
+            }
+            else
+            {
+                code = "D:\\Trash\\LogSample.json".ReadFromTextFile();
+                code.WriteToTextFile("SampleJson.txt");
+            }
 
             extEditor.Syntax = CommonCode.ICSharpTextEditor.SyntaxHighlighting.Json;
             extEditor.Editor.Text = code;

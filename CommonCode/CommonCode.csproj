@@ -49,6 +49,11 @@
     <Compile Include="DataComparison\CommentRow.cs" />
     <Compile Include="DataComparison\DataComparer.cs" />
     <Compile Include="DataComparison\RowComparison.cs" />
+    <Compile Include="DataComparison\Templates.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Templates.resx</DependentUpon>
+    </Compile>
     <Compile Include="DifferenceEngine\Engine\DiffEngine.cs" />
     <Compile Include="DifferenceEngine\Engine\DiffEngineLevel.cs" />
     <Compile Include="DifferenceEngine\Implementations\DiffListString.cs" />
@@ -79,13 +84,18 @@
     <Compile Include="XmlSerialization.cs" />
   </ItemGroup>
   <ItemGroup>
-    <AdditionalFiles Include="DataComparison\ComparisonReportTemplate.html">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </AdditionalFiles>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="md files\Crypter\Crypter Guide.md" />
     <None Include="md files\Crypter\Modernization summary.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DataComparison\Templates.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Templates.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="DataComparison\ComparisonReportTemplate.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

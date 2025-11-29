@@ -349,7 +349,9 @@ namespace ZidUtilities.CommonCode
         NUMBER,//1234, 12.34, .34
         RESERVED //depending on the language: if, else, while, for, return, function, var, etc.
     };
-
+    /// <summary>
+    /// List of supported generic programming languages for tokenization.
+    /// </summary>
     public enum GenericLanguage
     {
         CSharp,

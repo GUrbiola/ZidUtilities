@@ -1041,22 +1041,8 @@ namespace ZidUtilities.CommonCode.DataComparison
             else
                 columncount = firstRow.Row2.Table.Columns.Count;
 
-            // Read the HTML template, from either the executing assembly location or the base directory
-            string templatePath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "DataComparison", "ComparisonReportTemplate.html");
-            if (!System.IO.File.Exists(templatePath))
-            {
-                templatePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ComparisonReportTemplate.html");
-            }
-
-            string htmlTemplate = "";
-            if(File.Exists(templatePath))
-            {
-                htmlTemplate = System.IO.File.ReadAllText(templatePath);
-            }
-            else
-            {
-                throw new Exception("HTML template file for comparison report not found.");
-            }
+            // Read the HTML template
+            string htmlTemplate = Templates.ComparisonReportTemplate;
 
             // Build dynamic content parts
             StringBuilder headerColumns = new StringBuilder();
@@ -1167,7 +1153,7 @@ namespace ZidUtilities.CommonCode.DataComparison
                     if (cellDiff != null)
                     {
                         // Cell has a difference - highlight it and add data attribute for tooltip
-                        string tooltip = $"Value on {System.Security.SecurityElement.Escape(Label1)} was '{System.Security.SecurityElement.Escape(cellDiff.Value1)}' and on {System.Security.SecurityElement.Escape(Label2)} was '{System.Security.SecurityElement.Escape(cellDiff.Value2)}'";
+                        string tooltip = $"Value on {System.Security.SecurityElement.Escape(Label1)} is '{System.Security.SecurityElement.Escape(cellDiff.Value1)}' and on {System.Security.SecurityElement.Escape(Label2)} is '{System.Security.SecurityElement.Escape(cellDiff.Value2)}'";
                         tableRows.AppendLine($"                            <td class=\"cell-difference\" data-tooltip=\"{tooltip}\">{escapedValue}</td>");
                     }
                     else

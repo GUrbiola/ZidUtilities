@@ -41,11 +41,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ErrorOnResponse.cs" />
     <Compile Include="SqlConnector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SqlResponse.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ActiveDirectory\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

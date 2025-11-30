@@ -81,6 +81,49 @@
     <Compile Include="Controls\DoubleBufferedPanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\Grid\GridFilter\DataFilter.cs" />
+    <Compile Include="Controls\Grid\GridFilter\DataGridFilterExtender.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\Grid\GridFilter\GridFilterCollection.cs" />
+    <Compile Include="Controls\Grid\GridFilter\GridFilterEvent.cs" />
+    <Compile Include="Controls\Grid\GridFilter\GridFilterFactories\DefaultGridFilterFactory.cs" />
+    <Compile Include="Controls\Grid\GridFilter\GridFilterFactories\GridFilterFactoryBase.cs" />
+    <Compile Include="Controls\Grid\GridFilter\GridFiltersControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\Grid\GridFilter\GridFilters\BoolGridFilter.cs" />
+    <Compile Include="Controls\Grid\GridFilter\GridFilters\DateGridFilter.cs" />
+    <Compile Include="Controls\Grid\GridFilter\GridFilters\DateGridFilterControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\Grid\GridFilter\GridFilters\DistinctValuesGridFilter.cs" />
+    <Compile Include="Controls\Grid\GridFilter\GridFilters\EmptyGridFilter.cs" />
+    <Compile Include="Controls\Grid\GridFilter\GridFilters\EnumerationGridFilter.cs" />
+    <Compile Include="Controls\Grid\GridFilter\GridFilters\EnumerationSources\IEnumerationSource.cs" />
+    <Compile Include="Controls\Grid\GridFilter\GridFilters\EnumerationSources\TypeEnumerationSource.cs" />
+    <Compile Include="Controls\Grid\GridFilter\GridFilters\GridFilterBase.cs" />
+    <Compile Include="Controls\Grid\GridFilter\GridFilters\NullGridFilter.cs" />
+    <Compile Include="Controls\Grid\GridFilter\GridFilters\NumericGridFilter.cs" />
+    <Compile Include="Controls\Grid\GridFilter\GridFilters\NumericGridFilterControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\Grid\GridFilter\GridFilters\TextGridFilter.cs" />
+    <Compile Include="Controls\Grid\GridFilter\IGridFilter.cs" />
+    <Compile Include="Controls\Grid\GridFilter\IGridFilterFactory.cs" />
+    <Compile Include="Controls\Grid\GridThemes.cs" />
+    <Compile Include="Controls\Grid\IZidGridPlugin.cs" />
+    <Compile Include="Controls\Grid\Plugins\DataExportPlugin.cs" />
+    <Compile Include="Controls\Grid\SamplePlugins\ExportToCSVPlugin.cs" />
+    <Compile Include="Controls\Grid\ZidGridMenuItem.cs" />
+    <Compile Include="Controls\Grid\ZidGridMenuItemCollection.cs" />
+    <Compile Include="Controls\Grid\ZidGridPluginCollection.cs" />
+    <Compile Include="Controls\Grid\ZidGrid.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\Grid\ZidGrid.Designer.cs">
+      <DependentUpon>ZidGrid.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ToastForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -93,12 +136,44 @@
     <Compile Include="Controls\VerticalProgressBar.Designer.cs">
       <DependentUpon>VerticalProgressBar.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\ComplexObjectSelectionDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ComplexObjectSelectionDialog.Designer.cs">
+      <DependentUpon>ComplexObjectSelectionDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\DialogStyle.cs" />
+    <Compile Include="Forms\MultiSelectionDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\MultiSelectionDialog.Designer.cs">
+      <DependentUpon>MultiSelectionDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ProcessingDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ProcessingDialog.Designer.cs">
+      <DependentUpon>ProcessingDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\SingleSelectionDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\SingleSelectionDialog.Designer.cs">
+      <DependentUpon>SingleSelectionDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\SqlConnectForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\SqlConnectForm.designer.cs">
       <DependentUpon>SqlConnectForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\TextInputDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\TextInputDialog.Designer.cs">
+      <DependentUpon>TextInputDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\TextInputFormat.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controls\Diff\SideToSideLineComparer.cs">
       <SubType>UserControl</SubType>
@@ -128,6 +203,21 @@
     <EmbeddedResource Include="Controls\Diff\SideToSideLineComparer.resx">
       <DependentUpon>SideToSideLineComparer.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\Grid\GridFilter\DataGridFilterExtender.resx">
+      <DependentUpon>DataGridFilterExtender.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\Grid\GridFilter\GridFiltersControl.resx">
+      <DependentUpon>GridFiltersControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\Grid\GridFilter\GridFilters\DateGridFilterControl.resx">
+      <DependentUpon>DateGridFilterControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\Grid\GridFilter\GridFilters\NumericGridFilterControl.resx">
+      <DependentUpon>NumericGridFilterControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\Grid\ZidGrid.resx">
+      <DependentUpon>ZidGrid.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\ToastForm.resx">
       <DependentUpon>ToastForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -147,6 +237,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CommonCode.Files\CommonCode.Files.csproj">
+      <Project>{bd979760-04c5-4080-82bb-11137dffeb20}</Project>
+      <Name>CommonCode.Files</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CommonCode.ICSharpTextEditor\CommonCode.ICSharpTextEditor.csproj">
       <Project>{4589c723-b947-4f35-9e45-e4dee0fbac16}</Project>
       <Name>CommonCode.ICSharpTextEditor</Name>

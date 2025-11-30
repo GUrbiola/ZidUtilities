@@ -22,10 +22,48 @@ namespace ZidUtilities.CommonCode.Win.Forms
         /// </summary>
         SqlConnectionStringBuilder StrBuilder;
 
+        private DialogStyle _style = DialogStyle.Default;
+
         /// <summary>
         /// Gets the currently selected database name from the connection string builder.
         /// </summary>
         public string SelectedDB { get { return StrBuilder.InitialCatalog; } }
+
+        /// <summary>
+        /// Gets or sets the dialog style (color scheme).
+        /// </summary>
+        public DialogStyle Style
+        {
+            get { return _style; }
+            set
+            {
+                _style = value;
+                ApplyStyle();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the dialog title.
+        /// </summary>
+        public string DialogTitle
+        {
+            get { return lblTitle.Text; }
+            set { lblTitle.Text = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the banner image displayed at the top of the form.
+        /// When set to null, the banner is hidden.
+        /// </summary>
+        public Image BannerImage
+        {
+            get { return picBanner.Image; }
+            set
+            {
+                picBanner.Image = value;
+                pnlBanner.Visible = (value != null);
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlConnectForm"/> class.
@@ -35,6 +73,22 @@ namespace ZidUtilities.CommonCode.Win.Forms
         {
             InitializeComponent();
             StrBuilder = new SqlConnectionStringBuilder();
+            ApplyStyle();
+        }
+
+        /// <summary>
+        /// Applies the selected style to the dialog.
+        /// </summary>
+        private void ApplyStyle()
+        {
+            Color headerColor = DialogStyleHelper.GetHeaderColor(_style);
+            Color headerTextColor = DialogStyleHelper.GetHeaderTextColor(_style);
+            Color accentColor = DialogStyleHelper.GetAccentColor(_style);
+
+            pnlHeader.BackColor = headerColor;
+            lblTitle.ForeColor = headerTextColor;
+            Conectar.BackColor = accentColor;
+            Conectar.ForeColor = Color.White;
         }
 
         /// <summary>

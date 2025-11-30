@@ -27,7 +27,11 @@ namespace ZidUtilities.CommonCode.Files
         /// <summary>
         /// Text file, separated by commas
         /// </summary>
-        CSV
+        CSV,
+        /// <summary>
+        /// HTML file with filterable table
+        /// </summary>
+        HTML
     };
     /// <summary>
     /// Predefined workbook style themes.
@@ -128,6 +132,11 @@ namespace ZidUtilities.CommonCode.Files
         /// </summary>
         public ExcelStyle ExportExcelStyle { get; set; }
         /// <summary>
+        /// HTML style theme to apply when exporting to HTML.
+        /// Uses the same ExcelStyle enum for consistency.
+        /// </summary>
+        public ExcelStyle ExportHtmlStyle { get; set; }
+        /// <summary>
         /// Separator string used for text exports when <see cref="DelimitedByLenght"/> is false.
         /// </summary>
         public string Separator { get; set; }
@@ -195,6 +204,7 @@ namespace ZidUtilities.CommonCode.Files
             ExportWithStyles = true;
             UseAlternateRowStyles = true;
             ExportExcelStyle = ExcelStyle.Default;
+            ExportHtmlStyle = ExcelStyle.Default;
             Separator = "\t";
             Remarks = new List<CellRemark>();
             DelimitedByLenght = false;
@@ -270,6 +280,14 @@ namespace ZidUtilities.CommonCode.Files
                             ResCsv.CopyStream(file);
                         }
                         break;
+                    case ExportTo.HTML:
+                        Stream ResHtml = CreateHTML(Data);
+                        ResHtml.Seek(0, SeekOrigin.Begin);
+                        using (Stream file = File.OpenWrite(FilePath))
+                        {
+                            ResHtml.CopyStream(file);
+                        }
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -334,6 +352,10 @@ namespace ZidUtilities.CommonCode.Files
                         Stream ResCsv = CreateCSV(Data);
                         ResCsv.Seek(0, SeekOrigin.Begin);
                         return ResCsv;
+                    case ExportTo.HTML:
+                        Stream ResHtml = CreateHTML(Data);
+                        ResHtml.Seek(0, SeekOrigin.Begin);
+                        return ResHtml;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -423,6 +445,22 @@ namespace ZidUtilities.CommonCode.Files
                     else
                     {
                         ThStream = CreateCSV(ThDataSet);
+                        ThStream.Seek(0, SeekOrigin.Begin);
+                    }
+                    break;
+                case ExportTo.HTML:
+                    if (!ThIsStream)
+                    {
+                        using (Stream file = File.OpenWrite(ThFilePath))
+                        {
+                            Stream ResHtml = CreateHTML(ThDataSet);
+                            ResHtml.Seek(0, SeekOrigin.Begin);
+                            ResHtml.CopyStream(file);
+                        }
+                    }
+                    else
+                    {
+                        ThStream = CreateHTML(ThDataSet);
                         ThStream.Seek(0, SeekOrigin.Begin);
                     }
                     break;
@@ -948,6 +986,554 @@ namespace ZidUtilities.CommonCode.Files
             }
             tw.Flush();
             return memoryStream;
+        }
+        #endregion
+
+        #region Code to generate the HTML file
+        /// <summary>
+        /// Create an HTML file stream (MemoryStream) with filterable table from the given dataset.
+        /// The generated HTML includes JavaScript for client-side filtering and displays total/filtered row counts.
+        /// </summary>
+        /// <param name="dataSet">Dataset to convert to HTML format.</param>
+        /// <returns>A <see cref="Stream"/> (MemoryStream) containing the produced HTML.</returns>
+        private Stream CreateHTML(DataSet dataSet)
+        {
+            MemoryStream memoryStream = new MemoryStream();
+            TextWriter tw = new StreamWriter(memoryStream, Encoding.UTF8);
+
+            // Start HTML document
+            tw.WriteLine("<!DOCTYPE html>");
+            tw.WriteLine("<html lang=\"en\">");
+            tw.WriteLine("<head>");
+            tw.WriteLine("    <meta charset=\"UTF-8\">");
+            tw.WriteLine("    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
+            tw.WriteLine("    <title>ZidGrid Html Data Export</title>");
+
+            // Add styles
+            WriteHtmlStyles(tw);
+
+            tw.WriteLine("</head>");
+            tw.WriteLine("<body>");
+
+            // Header
+            tw.WriteLine("    <div class=\"header\">");
+            tw.WriteLine("        <h1>ZidGrid Html Data Export</h1>");
+            tw.WriteLine($"        <div class=\"export-info\">Generated: {DateTime.Now:yyyy-MM-dd HH:mm:ss}</div>");
+            tw.WriteLine("    </div>");
+
+            // Process each table in the dataset
+            int tableIndex = 0;
+            foreach (DataTable table in dataSet.Tables)
+            {
+                string tableName = UseDefaultSheetNames ? "Data" + (tableIndex > 0 ? " " + tableIndex.ToString() : "") : table.TableName;
+
+                tw.WriteLine("    <div class=\"container\">");
+                if (!string.IsNullOrEmpty(tableName))
+                {
+                    tw.WriteLine($"        <h2>{System.Security.SecurityElement.Escape(tableName)}</h2>");
+                }
+
+                // Filter controls
+                tw.WriteLine("        <div class=\"filter-container\">");
+                tw.WriteLine($"            <div style=\"display: flex; gap: 10px; flex: 1;\">");
+                tw.WriteLine($"                <input type=\"text\" id=\"filter{tableIndex}\" class=\"filter-input\" placeholder=\"Enter search text...\">");
+                tw.WriteLine($"                <button class=\"filter-button\" onclick=\"filterTable({tableIndex})\">Filter</button>");
+                tw.WriteLine($"                <button class=\"filter-button\" onclick=\"clearFilter({tableIndex})\">Clear</button>");
+                tw.WriteLine($"            </div>");
+                tw.WriteLine($"            <div class=\"row-count\" id=\"rowCount{tableIndex}\"></div>");
+                tw.WriteLine("        </div>");
+
+                // Table
+                tw.WriteLine($"        <table id=\"dataTable{tableIndex}\" class=\"data-table\">");
+
+                // Headers
+                if (WriteHeaders)
+                {
+                    tw.WriteLine("            <thead>");
+                    tw.WriteLine("                <tr>");
+                    foreach (DataColumn col in table.Columns)
+                    {
+                        string colName = String.IsNullOrEmpty(col.Caption) ? col.ColumnName : col.Caption;
+                        if (IgnoredColumns != null && IgnoredColumns.Count > 0 && IgnoredColumns.IsStringOnList(colName, false))
+                            continue;
+
+                        tw.WriteLine($"                    <th>{System.Security.SecurityElement.Escape(colName)}</th>");
+                    }
+                    tw.WriteLine("                </tr>");
+                    tw.WriteLine("            </thead>");
+                }
+
+                // Body
+                tw.WriteLine("            <tbody>");
+                int rowCount = table.Rows.Count;
+                for (int rowNum = 0; rowNum < rowCount; rowNum++)
+                {
+                    tw.WriteLine("                <tr>");
+                    for (int colNum = 0; colNum < table.Columns.Count; colNum++)
+                    {
+                        string colName = table.Columns[colNum].ColumnName;
+                        if (IgnoredColumns != null && IgnoredColumns.Count > 0 && IgnoredColumns.IsStringOnList(colName, false))
+                            continue;
+
+                        string cellValue = "";
+                        if (table.Rows[rowNum][colNum] != null && table.Rows[rowNum][colNum] != DBNull.Value)
+                        {
+                            cellValue = System.Security.SecurityElement.Escape(table.Rows[rowNum][colNum].ToString());
+                        }
+
+                        tw.WriteLine($"                    <td>{cellValue}</td>");
+                    }
+                    tw.WriteLine("                </tr>");
+
+                    ThCurrentRecord++;
+                    if (AsyncExporter != null && AsyncExporter.IsBusy)
+                    {
+                        if (ThRecordCount > 100)
+                        {
+                            if (ThCurrentRecord % (ThRecordCount / 100) == 0)
+                            {
+                                AsyncExporter.ReportProgress(((ThCurrentRecord) * 100) / ThRecordCount);
+                                ThCurPercentage = ((ThCurrentRecord) * 100) / ThRecordCount;
+                            }
+                        }
+                    }
+                }
+                tw.WriteLine("            </tbody>");
+                tw.WriteLine("        </table>");
+                tw.WriteLine("    </div>");
+
+                tableIndex++;
+            }
+
+            // Add JavaScript for filtering
+            WriteHtmlScript(tw, tableIndex);
+
+            tw.WriteLine("</body>");
+            tw.WriteLine("</html>");
+            tw.Flush();
+
+            return memoryStream;
+        }
+
+        /// <summary>
+        /// Writes the CSS styles for the HTML export based on the selected theme.
+        /// </summary>
+        /// <param name="tw">TextWriter to write the styles to.</param>
+        private void WriteHtmlStyles(TextWriter tw)
+        {
+            // Get theme colors
+            var colors = GetHtmlThemeColors(ExportHtmlStyle);
+
+            tw.WriteLine("    <style>");
+            tw.WriteLine("        * {");
+            tw.WriteLine("            margin: 0;");
+            tw.WriteLine("            padding: 0;");
+            tw.WriteLine("            box-sizing: border-box;");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            tw.WriteLine("        body {");
+            tw.WriteLine("            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;");
+            tw.WriteLine("            background-color: #f5f5f5;");
+            tw.WriteLine("            padding: 20px;");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            tw.WriteLine("        .header {");
+            tw.WriteLine("            background: linear-gradient(135deg, " + colors.HeaderBg + ", " + colors.HeaderBgSecondary + ");");
+            tw.WriteLine("            color: " + colors.HeaderFg + ";");
+            tw.WriteLine("            padding: 30px;");
+            tw.WriteLine("            border-radius: 8px;");
+            tw.WriteLine("            margin-bottom: 30px;");
+            tw.WriteLine("            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            tw.WriteLine("        .header h1 {");
+            tw.WriteLine("            font-size: 32px;");
+            tw.WriteLine("            margin-bottom: 10px;");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            tw.WriteLine("        .export-info {");
+            tw.WriteLine("            font-size: 14px;");
+            tw.WriteLine("            opacity: 0.9;");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            tw.WriteLine("        .container {");
+            tw.WriteLine("            background: white;");
+            tw.WriteLine("            border-radius: 8px;");
+            tw.WriteLine("            padding: 30px;");
+            tw.WriteLine("            margin-bottom: 30px;");
+            tw.WriteLine("            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            tw.WriteLine("        .container h2 {");
+            tw.WriteLine("            color: " + colors.HeaderBg + ";");
+            tw.WriteLine("            margin-bottom: 20px;");
+            tw.WriteLine("            font-size: 24px;");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            tw.WriteLine("        .filter-container {");
+            tw.WriteLine("            margin-bottom: 20px;");
+            tw.WriteLine("            display: flex;");
+            tw.WriteLine("            justify-content: space-between;");
+            tw.WriteLine("            align-items: center;");
+            tw.WriteLine("            gap: 15px;");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            tw.WriteLine("        .filter-input {");
+            tw.WriteLine("            flex: 1;");
+            tw.WriteLine("            padding: 12px 16px;");
+            tw.WriteLine("            border: 2px solid " + colors.BorderColor + ";");
+            tw.WriteLine("            border-radius: 6px;");
+            tw.WriteLine("            font-size: 14px;");
+            tw.WriteLine("            transition: border-color 0.3s;");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            tw.WriteLine("        .filter-input:focus {");
+            tw.WriteLine("            outline: none;");
+            tw.WriteLine("            border-color: " + colors.HeaderBg + ";");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            tw.WriteLine("        .filter-button {");
+            tw.WriteLine("            padding: 12px 24px;");
+            tw.WriteLine("            background-color: " + colors.HeaderBg + ";");
+            tw.WriteLine("            color: " + colors.HeaderFg + ";");
+            tw.WriteLine("            border: none;");
+            tw.WriteLine("            border-radius: 6px;");
+            tw.WriteLine("            font-size: 14px;");
+            tw.WriteLine("            font-weight: 600;");
+            tw.WriteLine("            cursor: pointer;");
+            tw.WriteLine("            transition: background-color 0.3s, transform 0.1s;");
+            tw.WriteLine("            white-space: nowrap;");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            tw.WriteLine("        .filter-button:hover {");
+            tw.WriteLine("            background-color: " + colors.HeaderBgSecondary + ";");
+            tw.WriteLine("            transform: translateY(-1px);");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            tw.WriteLine("        .filter-button:active {");
+            tw.WriteLine("            transform: translateY(0);");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            tw.WriteLine("        .row-count {");
+            tw.WriteLine("            font-size: 14px;");
+            tw.WriteLine("            color: #666;");
+            tw.WriteLine("            font-weight: 500;");
+            tw.WriteLine("            white-space: nowrap;");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            tw.WriteLine("        .data-table {");
+            tw.WriteLine("            width: 100%;");
+            tw.WriteLine("            border-collapse: collapse;");
+            tw.WriteLine("            font-size: 14px;");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            tw.WriteLine("        .data-table thead tr {");
+            tw.WriteLine("            background-color: " + colors.HeaderBg + ";");
+            tw.WriteLine("            color: " + colors.HeaderFg + ";");
+            tw.WriteLine("            text-align: left;");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            tw.WriteLine("        .data-table th {");
+            tw.WriteLine("            padding: 14px 12px;");
+            tw.WriteLine("            font-weight: 600;");
+            tw.WriteLine("            border-bottom: 2px solid " + colors.BorderColor + ";");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            tw.WriteLine("        .data-table td {");
+            tw.WriteLine("            padding: 12px;");
+            tw.WriteLine("            border-bottom: 1px solid " + colors.BorderColor + ";");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            if (UseAlternateRowStyles)
+            {
+                tw.WriteLine("        .data-table tbody tr:nth-child(even) {");
+                tw.WriteLine("            background-color: " + colors.AlternateRowBg + ";");
+                tw.WriteLine("        }");
+                tw.WriteLine("        ");
+            }
+            tw.WriteLine("        .data-table tbody tr:hover {");
+            tw.WriteLine("            background-color: " + colors.HoverRowBg + ";");
+            tw.WriteLine("            transition: background-color 0.2s;");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            tw.WriteLine("        @media (max-width: 768px) {");
+            tw.WriteLine("            .header h1 {");
+            tw.WriteLine("                font-size: 24px;");
+            tw.WriteLine("            }");
+            tw.WriteLine("            ");
+            tw.WriteLine("            .container {");
+            tw.WriteLine("                padding: 15px;");
+            tw.WriteLine("            }");
+            tw.WriteLine("            ");
+            tw.WriteLine("            .filter-container {");
+            tw.WriteLine("                flex-direction: column;");
+            tw.WriteLine("                align-items: stretch;");
+            tw.WriteLine("            }");
+            tw.WriteLine("            ");
+            tw.WriteLine("            .data-table {");
+            tw.WriteLine("                font-size: 12px;");
+            tw.WriteLine("            }");
+            tw.WriteLine("            ");
+            tw.WriteLine("            .data-table th,");
+            tw.WriteLine("            .data-table td {");
+            tw.WriteLine("                padding: 8px 6px;");
+            tw.WriteLine("            }");
+            tw.WriteLine("        }");
+            tw.WriteLine("    </style>");
+        }
+
+        /// <summary>
+        /// Writes the JavaScript code for table filtering functionality.
+        /// </summary>
+        /// <param name="tw">TextWriter to write the script to.</param>
+        /// <param name="tableCount">Number of tables in the document.</param>
+        private void WriteHtmlScript(TextWriter tw, int tableCount)
+        {
+            tw.WriteLine("    <script>");
+            tw.WriteLine("        // Cache for row text content to avoid repeated DOM access");
+            tw.WriteLine("        var tableCache = {};");
+            tw.WriteLine("        ");
+            tw.WriteLine("        function filterTable(tableIndex) {");
+            tw.WriteLine("            const input = document.getElementById('filter' + tableIndex);");
+            tw.WriteLine("            const filter = input.value.toLowerCase().trim();");
+            tw.WriteLine("            ");
+            tw.WriteLine("            if (!filter) {");
+            tw.WriteLine("                clearFilter(tableIndex);");
+            tw.WriteLine("                return;");
+            tw.WriteLine("            }");
+            tw.WriteLine("            ");
+            tw.WriteLine("            const table = document.getElementById('dataTable' + tableIndex);");
+            tw.WriteLine("            const tbody = table.getElementsByTagName('tbody')[0];");
+            tw.WriteLine("            const tr = tbody.getElementsByTagName('tr');");
+            tw.WriteLine("            const totalCount = tr.length;");
+            tw.WriteLine("            ");
+            tw.WriteLine("            // Build cache if not exists");
+            tw.WriteLine("            if (!tableCache[tableIndex]) {");
+            tw.WriteLine("                tableCache[tableIndex] = [];");
+            tw.WriteLine("                for (let i = 0; i < totalCount; i++) {");
+            tw.WriteLine("                    const cells = tr[i].getElementsByTagName('td');");
+            tw.WriteLine("                    let rowText = '';");
+            tw.WriteLine("                    for (let j = 0; j < cells.length; j++) {");
+            tw.WriteLine("                        rowText += (cells[j].textContent || cells[j].innerText).toLowerCase() + ' ';");
+            tw.WriteLine("                    }");
+            tw.WriteLine("                    tableCache[tableIndex][i] = rowText;");
+            tw.WriteLine("                }");
+            tw.WriteLine("            }");
+            tw.WriteLine("            ");
+            tw.WriteLine("            // Perform filtering using cached text");
+            tw.WriteLine("            let visibleCount = 0;");
+            tw.WriteLine("            for (let i = 0; i < totalCount; i++) {");
+            tw.WriteLine("                if (tableCache[tableIndex][i].indexOf(filter) > -1) {");
+            tw.WriteLine("                    tr[i].style.display = '';");
+            tw.WriteLine("                    visibleCount++;");
+            tw.WriteLine("                } else {");
+            tw.WriteLine("                    tr[i].style.display = 'none';");
+            tw.WriteLine("                }");
+            tw.WriteLine("            }");
+            tw.WriteLine("            ");
+            tw.WriteLine("            updateRowCount(tableIndex, visibleCount, totalCount);");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            tw.WriteLine("        function clearFilter(tableIndex) {");
+            tw.WriteLine("            const input = document.getElementById('filter' + tableIndex);");
+            tw.WriteLine("            input.value = '';");
+            tw.WriteLine("            ");
+            tw.WriteLine("            const table = document.getElementById('dataTable' + tableIndex);");
+            tw.WriteLine("            const tbody = table.getElementsByTagName('tbody')[0];");
+            tw.WriteLine("            const tr = tbody.getElementsByTagName('tr');");
+            tw.WriteLine("            const totalCount = tr.length;");
+            tw.WriteLine("            ");
+            tw.WriteLine("            // Show all rows");
+            tw.WriteLine("            for (let i = 0; i < totalCount; i++) {");
+            tw.WriteLine("                tr[i].style.display = '';");
+            tw.WriteLine("            }");
+            tw.WriteLine("            ");
+            tw.WriteLine("            updateRowCount(tableIndex, totalCount, totalCount);");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            tw.WriteLine("        function updateRowCount(tableIndex, visible, total) {");
+            tw.WriteLine("            const rowCountDiv = document.getElementById('rowCount' + tableIndex);");
+            tw.WriteLine("            if (visible === total) {");
+            tw.WriteLine("                rowCountDiv.textContent = 'Total Rows: ' + total;");
+            tw.WriteLine("            } else {");
+            tw.WriteLine("                rowCountDiv.textContent = 'Showing: ' + visible + ' of ' + total + ' rows';");
+            tw.WriteLine("            }");
+            tw.WriteLine("        }");
+            tw.WriteLine("        ");
+            tw.WriteLine("        // Initialize row counts on page load");
+            tw.WriteLine("        window.addEventListener('DOMContentLoaded', function() {");
+            for (int i = 0; i < tableCount; i++)
+            {
+                tw.WriteLine($"            const table{i} = document.getElementById('dataTable{i}');");
+                tw.WriteLine($"            if (table{i}) {{");
+                tw.WriteLine($"                const rowCount{i} = table{i}.getElementsByTagName('tbody')[0].getElementsByTagName('tr').length;");
+                tw.WriteLine($"                updateRowCount({i}, rowCount{i}, rowCount{i});");
+                tw.WriteLine($"            }}");
+            }
+            tw.WriteLine("        });");
+            tw.WriteLine("    </script>");
+        }
+
+        /// <summary>
+        /// Gets the color scheme for HTML export based on the selected theme.
+        /// </summary>
+        /// <param name="style">The theme style to use.</param>
+        /// <returns>An object containing color values for the theme.</returns>
+        private dynamic GetHtmlThemeColors(ExcelStyle style)
+        {
+            switch (style)
+            {
+                case ExcelStyle.Default:
+                    return new
+                    {
+                        HeaderBg = "#000080",
+                        HeaderBgSecondary = "#003366",
+                        HeaderFg = "#FFFFFF",
+                        AlternateRowBg = "#E0F2FF",
+                        HoverRowBg = "#CCE6FF",
+                        BorderColor = "#CCCCCC"
+                    };
+                case ExcelStyle.Simple:
+                    return new
+                    {
+                        HeaderBg = "#FFFFFF",
+                        HeaderBgSecondary = "#F5F5F5",
+                        HeaderFg = "#000000",
+                        AlternateRowBg = "#F9F9F9",
+                        HoverRowBg = "#F0F0F0",
+                        BorderColor = "#DDDDDD"
+                    };
+                case ExcelStyle.Ocean:
+                    return new
+                    {
+                        HeaderBg = "#003366",
+                        HeaderBgSecondary = "#0066CC",
+                        HeaderFg = "#FFFFFF",
+                        AlternateRowBg = "#CCE5FF",
+                        HoverRowBg = "#B3D9FF",
+                        BorderColor = "#0066CC"
+                    };
+                case ExcelStyle.Forest:
+                    return new
+                    {
+                        HeaderBg = "#22572C",
+                        HeaderBgSecondary = "#4C9900",
+                        HeaderFg = "#FFFFFF",
+                        AlternateRowBg = "#DCE1C8",
+                        HoverRowBg = "#C8D4AC",
+                        BorderColor = "#4C9900"
+                    };
+                case ExcelStyle.Sunset:
+                    return new
+                    {
+                        HeaderBg = "#E65C00",
+                        HeaderBgSecondary = "#FF8000",
+                        HeaderFg = "#FFFFFF",
+                        AlternateRowBg = "#FFE0B2",
+                        HoverRowBg = "#FFCC99",
+                        BorderColor = "#FF8000"
+                    };
+                case ExcelStyle.Monochrome:
+                    return new
+                    {
+                        HeaderBg = "#333333",
+                        HeaderBgSecondary = "#666666",
+                        HeaderFg = "#FFFFFF",
+                        AlternateRowBg = "#F5F5F5",
+                        HoverRowBg = "#EEEEEE",
+                        BorderColor = "#999999"
+                    };
+                case ExcelStyle.Corporate:
+                    return new
+                    {
+                        HeaderBg = "#4472C4",
+                        HeaderBgSecondary = "#2F5496",
+                        HeaderFg = "#FFFFFF",
+                        AlternateRowBg = "#D9E1F2",
+                        HoverRowBg = "#C5D0E6",
+                        BorderColor = "#2F5496"
+                    };
+                case ExcelStyle.Mint:
+                    return new
+                    {
+                        HeaderBg = "#00B08A",
+                        HeaderBgSecondary = "#00CC99",
+                        HeaderFg = "#FFFFFF",
+                        AlternateRowBg = "#C6EFCE",
+                        HoverRowBg = "#ADE7BC",
+                        BorderColor = "#00CC99"
+                    };
+                case ExcelStyle.Lavender:
+                    return new
+                    {
+                        HeaderBg = "#7030A0",
+                        HeaderBgSecondary = "#8E44AD",
+                        HeaderFg = "#FFFFFF",
+                        AlternateRowBg = "#EAD9F4",
+                        HoverRowBg = "#DEC5ED",
+                        BorderColor = "#8E44AD"
+                    };
+                case ExcelStyle.Autumn:
+                    return new
+                    {
+                        HeaderBg = "#8C5225",
+                        HeaderBgSecondary = "#BF5700",
+                        HeaderFg = "#FFFFFF",
+                        AlternateRowBg = "#F4E0B0",
+                        HoverRowBg = "#EBCE8F",
+                        BorderColor = "#BF5700"
+                    };
+                case ExcelStyle.Steel:
+                    return new
+                    {
+                        HeaderBg = "#607D8B",
+                        HeaderBgSecondary = "#455A64",
+                        HeaderFg = "#FFFFFF",
+                        AlternateRowBg = "#ECEFF1",
+                        HoverRowBg = "#CFD8DC",
+                        BorderColor = "#455A64"
+                    };
+                case ExcelStyle.Cherry:
+                    return new
+                    {
+                        HeaderBg = "#C00000",
+                        HeaderBgSecondary = "#880015",
+                        HeaderFg = "#FFFFFF",
+                        AlternateRowBg = "#FFCDD2",
+                        HoverRowBg = "#FFABBA",
+                        BorderColor = "#880015"
+                    };
+                case ExcelStyle.Sky:
+                    return new
+                    {
+                        HeaderBg = "#039BE5",
+                        HeaderBgSecondary = "#0277BD",
+                        HeaderFg = "#FFFFFF",
+                        AlternateRowBg = "#E1F5FE",
+                        HoverRowBg = "#B3E5FC",
+                        BorderColor = "#0277BD"
+                    };
+                case ExcelStyle.Charcoal:
+                    return new
+                    {
+                        HeaderBg = "#263238",
+                        HeaderBgSecondary = "#37474F",
+                        HeaderFg = "#FFFFFF",
+                        AlternateRowBg = "#ECEFF1",
+                        HoverRowBg = "#CFD8DC",
+                        BorderColor = "#000000"
+                    };
+                default:
+                    return new
+                    {
+                        HeaderBg = "#000080",
+                        HeaderBgSecondary = "#003366",
+                        HeaderFg = "#FFFFFF",
+                        AlternateRowBg = "#E0F2FF",
+                        HoverRowBg = "#CCE6FF",
+                        BorderColor = "#CCCCCC"
+                    };
+            }
         }
         #endregion
 

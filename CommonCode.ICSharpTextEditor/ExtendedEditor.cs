@@ -203,7 +203,9 @@ namespace ZidUtilities.CommonCode.ICSharpTextEditor
         [Description("Determines if the control should track key press for toolbar shortcuts and implicit shortcuts.")]
         public bool TrackToolbarShortcuts { get; set; }
 
-        #region Properties that represent the toolbar buttons, so they can be customized at design time
+
+
+        #region Properties that represent the toolbar buttons, class has an event to track changes so they can be customized at design time
         private ToolbarOption _btnRun = new ToolbarOption("Run", "Executes selected/all code (F5)", Content.Play, true) { Enabled = true, ShortCut = Keys.F5 };
         [Category("Custom Properties")]
         [Description("Button to execute code")]
@@ -432,7 +434,7 @@ namespace ZidUtilities.CommonCode.ICSharpTextEditor
         public ImplicitShortcut ImpToggleOutlining { get; set; } = new ImplicitShortcut("ToggleOutlining") { ShortCut = Keys.Control | Keys.O, ThenShortCut = Keys.Control | Keys.T };
         #endregion
 
-        #region Properties that represent toolbar text boxes, so they can be customized at design time
+        #region Properties that represent toolbar text boxes, class has an eveant to track changes so they can be customized at design time
         private ToolbarTextBox _txt01Helper = new ToolbarTextBox("TextBoxHelper1", true);
         [Category("Custom Properties")]
         [Description("Input box that can be used to disply some text.")]
@@ -452,11 +454,12 @@ namespace ZidUtilities.CommonCode.ICSharpTextEditor
             get { return _txt02Helper; }
             set { _txt02Helper = value; }
         }
+        #endregion
+        
         [Category("Custom Properties")]
         [Description("Sets the control to read only mode.")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
         public bool IsReadOnly { get { return Editor.IsReadOnly; } set { Editor.IsReadOnly = value; } }
-        #endregion
 
         public ExtendedEditor()
         {

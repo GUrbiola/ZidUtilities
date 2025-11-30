@@ -27,10 +27,6 @@ namespace ZidUtilities.CommonCode.Win.Controls.Diff
         [Category("Custom Properties")]
         [Description("Text on the lower text editor.")]
         public string LowerText { get { return Line2.EditorText; } set { Line2.Text = value; } }
-        [Category("Custom Properties")]
-        [Description("Sets the control to read only mode.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public bool IsReadOnly { get { return Line1.IsReadOnly; } set { Line1.IsReadOnly = Line2.IsReadOnly = value; } }
 
         public SideToSideLineComparer()
         {
@@ -138,7 +134,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Diff
             {
                 buff.Append(t.Item1);
             }
-            txtEditor.Text = buff.ToString();
+            txtEditor.Editor.Text = buff.ToString();
 
 
             for (int i = 0; i < diffResults.Count; i++)
@@ -146,7 +142,11 @@ namespace ZidUtilities.CommonCode.Win.Controls.Diff
                 switch (diffResults[i].Item2)
                 {
                     case DiffHighlight.Add:
+                        txtEditor.Editor.SetMarker(i, 1, Color.PeachPuff);
+                        break;
                     case DiffHighlight.Remove:
+                        txtEditor.Editor.SetMarker(i, 1, Color.LightGreen);
+                        break;
                     case DiffHighlight.Update:
                         txtEditor.Editor.SetMarker(i, 1, Color.Khaki);
                         break;

@@ -36,6 +36,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -53,6 +54,10 @@
       <DependentUpon>Control.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\AddressBar\FileSystemNode.cs" />
+    <Compile Include="Controls\AddressBar\GenericNode.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\AddressBar\GenericNodeCollection.cs" />
     <Compile Include="Controls\AddressBar\IAddressNode.cs" />
     <Compile Include="Controls\AnimatedWaitTextBox.cs">
       <SubType>UserControl</SubType>
@@ -61,17 +66,38 @@
       <DependentUpon>AnimatedWaitTextBox.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\Diff\DiffHighlight.cs" />
+    <Compile Include="Controls\Diff\DiffInspector.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\Diff\DiffInspector.Designer.cs">
+      <DependentUpon>DiffInspector.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\Diff\SideToSideTextComparer.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\Diff\SideToSideTextComparer.Designer.cs">
       <DependentUpon>SideToSideTextComparer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\LoadingInfo.cs">
+    <Compile Include="Controls\DoubleBufferedPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ToastForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\ToastForm.Designer.cs">
+      <DependentUpon>ToastForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\VerticalProgressBar.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\LoadingInfo.designer.cs">
-      <DependentUpon>LoadingInfo.cs</DependentUpon>
+    <Compile Include="Controls\VerticalProgressBar.Designer.cs">
+      <DependentUpon>VerticalProgressBar.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\SqlConnectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\SqlConnectForm.designer.cs">
+      <DependentUpon>SqlConnectForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controls\Diff\SideToSideLineComparer.cs">
@@ -93,23 +119,30 @@
     <EmbeddedResource Include="Controls\AnimatedWaitTextBox.resx">
       <DependentUpon>AnimatedWaitTextBox.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\Diff\DiffInspector.resx">
+      <DependentUpon>DiffInspector.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\Diff\SideToSideTextComparer.resx">
       <DependentUpon>SideToSideTextComparer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\LoadingInfo.resx">
-      <DependentUpon>LoadingInfo.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Controls\Diff\SideToSideLineComparer.resx">
       <DependentUpon>SideToSideLineComparer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ToastForm.resx">
+      <DependentUpon>ToastForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\VerticalProgressBar.resx">
+      <DependentUpon>VerticalProgressBar.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\SqlConnectForm.resx">
+      <DependentUpon>SqlConnectForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Forms\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
@@ -122,6 +155,31 @@
       <Project>{e03d978a-06db-4a36-82fb-8184408e33dd}</Project>
       <Name>CommonCode</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\info.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\info %281%29.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\check.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\checkmark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\warning.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\warning-sign.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\message.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\Book_32.png" />
+    <Content Include="Resources\close_32x32.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

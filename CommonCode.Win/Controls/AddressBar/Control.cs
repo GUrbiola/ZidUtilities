@@ -1,65 +1,31 @@
-#region Using Statements
-
-#region .NET Namespace
-
 using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
-
-#endregion
-
-#endregion
-
 namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
 {
-    /*
-     * There is some extra error handling in most of the methods that (in theory) is redundant. 
-     * For performance reasons, you could remove alot of this information.
-     * 
-     * Additionally, the event handling code is still a bit messy. Particularly NodeButtonClicked.
-     * 
-     * Finally, a big performance bottleneck is present in the AddToolStripItemUpdate method.
-     * When it first generates the drop down menus, it hits a bottleneck in creating the collecting of items.
-     * 
-     * Not sure how to resolve this, as I'm still unsure of how this control meets with the rest of Shinobi :)
-     * 
-     * -James
-     */
 
     /// <summary>
-    /// Custom Control that acts as a Vista Style Address bar.
-    /// 
-    /// Author : James Strain
-    /// Email : leon_STARS@hotmail.com
-    /// Tested Platforms : Windows Vista Ultimate x64 / WinXP  Pro 32-bit
-    /// 
-    /// Additional Work Needed :
-    /// 
-    /// Optimization for UI Performance
-    /// Re-factoring of code based on any optimization
-    /// Possible removal of 'redundant' error coding to speed up method calls
-    /// Change caching system to reduce un-used DropDownMenus after period of time (currently retains them forever)
-    /// Re-organize the "update" algorithm to not re-generate all of the nodes every upadte. Should only insert new nodes and push old ones into the overflow.
-    /// 
+    /// Address bar control that presents a hierarchical path of IAddressNode instances
+    /// and allows navigation via tool strip buttons and drop-down menus.
     /// </summary>
     public partial class AddressBar : UserControl
     {
         #region Delegates
 
         /// <summary>
-        /// Delegate for handling when a new node is selected
+        /// Delegate for handling when a new node is selected.
         /// </summary>
-        /// <param name="sender">Sender of this event</param>
-        /// <param name="nca">Event Arguments</param>
+        /// <param name="sender">Sender of this event.</param>
+        /// <param name="nca">Event Arguments containing the unique id of the selected node.</param>
         public delegate void SelectionChanged(object sender, NodeChangedArgs nca);
 
         /// <summary>
         /// Delegate for handling a node double click event.
         /// </summary>
-        /// <param name="sender">Sender of this event</param>
-        /// <param name="nca">Event arguments</param>
+        /// <param name="sender">Sender of this event.</param>
+        /// <param name="nca">Event arguments containing the unique id of the double-clicked node.</param>
         public delegate void NodeDoubleClicked(object sender, NodeChangedArgs nca);
 
         #endregion
@@ -67,12 +33,12 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         #region Event Declaration
 
         /// <summary>
-        /// Stores the callback function for when the selected node changes
+        /// Stores the callback function for when the selected node changes.
         /// </summary>
         public event SelectionChanged SelectionChange = null;
 
         /// <summary>
-        /// Stores the callback function for when the selected node changes
+        /// Stores the callback function for when a node is double-clicked.
         /// </summary>
         public event NodeDoubleClicked NodeDoubleClick = null;
 
@@ -110,7 +76,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         #region Properties
 
         /// <summary>
-        /// Gets/Sets the font style for when a node is selected
+        /// Gets/Sets the font style for when a node is selected.
         /// </summary>
         public FontStyle SelectedStyle
         {
@@ -119,8 +85,12 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         }
 
         /// <summary>
-        /// Gets/Sets the currently selected node. Validates upon set and updates the bar
+        /// Gets/Sets the currently selected node. Validates upon set and updates the bar.
+        /// When set, this property updates the visual bar and raises the SelectionChange event.
         /// </summary>
+        /// <remarks>
+        /// Setting to null is supported but UpdateBar will reset to root if necessary.
+        /// </remarks>
         public IAddressNode CurrentNode
         {
             get { return this.currentNode; }
@@ -139,7 +109,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         }
 
         /// <summary>
-        /// Gets/Sets the root node. Upon setting the root node, it resets the hierarchy.
+        /// Gets/Sets the root node. Upon setting the root node, the control resets its hierarchy and visuals.
         /// </summary>
         public IAddressNode RootNode
         {
@@ -152,7 +122,8 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         #region Constructor/s
 
         /// <summary>
-        /// Base contructor for the AddressBarExt Control.
+        /// Base constructor for the AddressBar control.
+        /// Initializes component and captures the base font used for item rendering.
         /// </summary>
         public AddressBar()
         {
@@ -168,9 +139,11 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         #region Initialization
 
         /// <summary>
-        /// Initializes this AddressBarExt with a given root node
+        /// Initializes this AddressBar with a given root node.
+        /// Clears existing items, clones the provided root node, forces an update,
+        /// sets the current node to the root and updates the visual bar.
         /// </summary>
-        /// <param name="rootNode"></param>
+        /// <param name="rootNode">The root IAddressNode to initialize the control with. If null, control is cleared.</param>
         public void InitializeRoot(IAddressNode rootNode)
         {
             //remove all items
@@ -198,10 +171,12 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         #region Event Handlers
 
         /// <summary>
-        /// Method to handle when a child has been selected from a node
+        /// Handles selection when a child item in the tool strip or drop-down is clicked.
+        /// Sets the current node to the node stored in the clicked item's Tag, updates the bar,
+        /// and raises the SelectionChange event.
         /// </summary>
-        /// <param name="sender">Sender of this Event</param>
-        /// <param name="e">Event Arguments</param>
+        /// <param name="sender">The clicked ToolStripMenuItem or ToolStripButton.</param>
+        /// <param name="e">Event arguments.</param>
         private void NodeButtonClicked(Object sender, EventArgs e)
         {
             if (sender.GetType() == typeof(ToolStripMenuItem) || sender.GetType() == typeof(ToolStripButton))
@@ -232,10 +207,11 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         }
 
         /// <summary>
-        /// Method to handle when a node is double clicked
+        /// Handles double-clicks on tool strip buttons representing nodes.
+        /// When invoked, sets the current node from the sender's Tag and raises the NodeDoubleClick event.
         /// </summary>
-        /// <param name="sender">Sender of this event</param>
-        /// <param name="e">Event arguments</param>
+        /// <param name="sender">The ToolStripButton that was double-clicked.</param>
+        /// <param name="e">Event arguments.</param>
         private void NodeDoubleClickHandler(Object sender, EventArgs e)
         {
             //check we are handlign the double click event
@@ -253,20 +229,22 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         }
 
         /// <summary>
-        /// Method to handle when the bar is double clicked
+        /// Handles double-clicks on the address bar surface (not individual nodes).
+        /// Propagates the double-click by calling OnDoubleClick so external double-click handlers can respond.
         /// </summary>
-        /// <param name="sender">Sender of this event</param>
-        /// <param name="e">Event arguments</param>
+        /// <param name="sender">Sender of the event.</param>
+        /// <param name="e">Event arguments.</param>
         private void BarDoubleClickHandler(object sender, EventArgs e)
         {
             this.OnDoubleClick(e);
         }
 
         /// <summary>
-        /// Handles when the overflow menu should be entirely destroyed
+        /// Handles the OwnerChanged event for overflow drop-down buttons.
+        /// If the overflow button becomes invisible, clears the overflow menu items to free references.
         /// </summary>
-        /// <param name="sender">Sender of this Event</param>
-        /// <param name="e">Event arguments</param>
+        /// <param name="sender">The ToolStripDropDownButton whose owner changed.</param>
+        /// <param name="e">Event arguments.</param>
         private void OverflowDestroyed(Object sender, EventArgs e)
         {
             //check we have the right type
@@ -283,10 +261,12 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         }
 
         /// <summary>
-        /// Method handler using the middle mouse wheel to scroll the drop down menus
+        /// Attempts to handle mouse wheel scrolling within a ToolStripDropDownMenu.
+        /// This method tries to adjust the AutoScrollOffset based on the wheel delta.
+        /// Note: behavior may be limited by ToolStrip implementation.
         /// </summary>
-        /// <param name="sender">Sender of this event</param>
-        /// <param name="e">Event arguments</param>
+        /// <param name="sender">The ToolStripDropDownMenu receiving the wheel event.</param>
+        /// <param name="e">Mouse event arguments containing the wheel delta.</param>
         private void ScrollDropDownMenu(Object sender, MouseEventArgs e)
         {
             //if we have the right type
@@ -302,10 +282,10 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         }
 
         /// <summary>
-        /// Method that puts focus onto a given ToolStripDropDownMenu
+        /// Ensures the provided ToolStripDropDownMenu receives keyboard focus when the mouse enters it.
         /// </summary>
-        /// <param name="sender">Sender of this event</param>
-        /// <param name="e">Event Arguments</param>
+        /// <param name="sender">The ToolStripDropDownMenu that should receive focus.</param>
+        /// <param name="e">Event arguments.</param>
         private void GiveToolStripDropDownMenuFocus(Object sender, EventArgs e)
         {
             if (sender.GetType() == typeof(ToolStripDropDownMenu))
@@ -320,10 +300,15 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         #region Update
 
         /// <summary>
-        /// Creates a new tool strip menu item based on a given node
+        /// Creates and inserts ToolStrip items (button and optionally a drop-down) for the provided node.
+        /// The method updates the node, creates a ToolStripButton and, if the node has children,
+        /// creates or reuses a ToolStripDropDownMenu cached in the node.Tag. The created items are inserted
+        /// into the control's tool strip at a position determined by the 'position' parameter.
         /// </summary>
-        /// <param name="node">The node to base the item on</param>
-        /// <returns>Built ToolStripItem. Returns Null if method failed</returns>
+        /// <param name="node">Reference to the IAddressNode to represent visually. The node's Tag may be used to cache drop-down menu.</param>
+        /// <param name="position">
+        /// If negative, the new items are appended at the end; otherwise items are inserted at the beginning.
+        /// This parameter controls placement within the tool strip.</param>
         private void AddToolStripItemUpdate(ref IAddressNode node, int position)
         {
             //variables needed for our toolstrip
@@ -463,7 +448,9 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         }
 
         /// <summary>
-        /// Updates the address bar
+        /// Rebuilds the visual address bar to reflect the current node and root node.
+        /// Traverses from the current node up to the root, clears existing tool strip items,
+        /// creates items for each node in the chain, and handles overflow creation when necessary.
         /// </summary>
         private void UpdateBar()
         {
@@ -531,7 +518,9 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         }
 
         /// <summary>
-        /// Method to create the overflow element for handling
+        /// Constructs or clears the overflow ToolStripDropDownMenu and moves the leftmost items
+        /// into it while the address bar still overflows. This method modifies the tool strip items
+        /// to ensure currently visible items fit without overflow.
         /// </summary>
         private void CreateOverflowDropDown()
         {
@@ -617,7 +606,8 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         }
 
         /// <summary>
-        /// Method adds the overflow menu to the drop down list
+        /// Adds or updates the overflow button on the main tool strip so the overflow menu becomes accessible.
+        /// If an overflow already exists as a drop-down button at index 0, the method does nothing.
         /// </summary>
         private void AddOrUpdateOverflow()
         {
@@ -646,9 +636,10 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         }
 
         /// <summary>
-        /// Method that calculates if we have too many nodes in our address bar
+        /// Determines whether the last item in the tool strip has been pushed to overflow, indicating
+        /// that there are too many nodes to display in the visible area.
         /// </summary>
-        /// <returns>Boolean indicating </returns>
+        /// <returns>True if the last displayed item is on overflow; otherwise false.</returns>
         private bool TooManyNodes()
         {
             //check if the last item has overflowed
@@ -660,7 +651,8 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
     }
 
     /// <summary>
-    /// Custom Event Arguments for when a node has been changed
+    /// Custom Event Arguments for when a node has been changed.
+    /// Carries the unique identifier associated with the newly selected node.
     /// </summary>
     public class NodeChangedArgs : EventArgs
     {
@@ -676,7 +668,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         #region Properties
 
         /// <summary>
-        /// Gets the UniqueID from the newly opened node
+        /// Gets the UniqueID from the newly opened node.
         /// </summary>
         public object OUniqueID
         {
@@ -688,9 +680,9 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         #region Constructor
 
         /// <summary>
-        /// Base constructor for when a node selection is changed
+        /// Constructs a new NodeChangedArgs with the provided unique identifier.
         /// </summary>
-        /// <param name="uniqueId">Unique Identifier for this node. Controled by IAddressNode implementation used.</param>
+        /// <param name="uniqueId">Unique Identifier for this node. Controlled by the IAddressNode implementation used.</param>
         public NodeChangedArgs(object uniqueId)
         {
             //set the values for the args

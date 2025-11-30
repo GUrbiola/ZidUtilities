@@ -1,32 +1,12 @@
-#region Using Statements
-
-#region .NET Namespace
-
 using System;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
-#endregion
-
-#endregion
-
-
 namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
 {
-    /// <summary>
-    /// Class that implements the IAddressNode Interface to allow for parsing a file system in the Address Bar.
-    /// 
-    /// Author : James Strain
-    /// Email : leon_STARS@hotmail.com
-    /// Tested Platforms : Windows Vista Ultimate x64 / WinXP  Pro 32-bit
-    /// 
-    /// Additional Work Needed :
-    /// 
-    /// None that I am aware of...
-    /// 
-    /// </summary>
+
     public class FileSystemNode : IAddressNode
     {
         #region Class Variables
@@ -121,18 +101,25 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         #region Constructor
 
         /// <summary>
-        /// Basic Constructor, initializes this node to start at the root of the first drive found on the disk. ONLY USE THIS FOR ROOT NODES
+        /// Basic Constructor, initializes this node to start at the root of the first drive found on the disk.
         /// </summary>
+        /// <remarks>
+        /// Only use this constructor for root nodes representing "My Computer".
+        /// This constructor will populate the immediate child drive entries.
+        /// </remarks>
         public FileSystemNode()
         {
             GenerateRootNode();
         }
 
         /// <summary>
-        /// Creates a File System node with a given path
+        /// Creates a File System node with a given path.
         /// </summary>
-        /// <param name="path">Path that this node represents</param>
-        /// <param name="depth">Integer represnting how deep in the hierarchy this node is</param>
+        /// <param name="path">Path that this node represents. May be an empty string to represent the root node.</param>
+        /// <param name="parent">Parent FileSystemNode instance for this node. May be null for a root node.</param>
+        /// <remarks>
+        /// The constructor stores the path and parent, then calls GenerateNodeDisplayDetails to populate the icon and display name.
+        /// </remarks>
         public FileSystemNode(string path, FileSystemNode parent)
         {
             //fill in the relevant details
@@ -147,6 +134,13 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
 
         #region Destructor
 
+        /// <summary>
+        /// Finalizer for FileSystemNode.
+        /// </summary>
+        /// <remarks>
+        /// Cleans up managed icon resources if present and clears children references.
+        /// Note: Finalizers are non-deterministic; call Dispose on contained icons if deterministic cleanup is required.
+        /// </remarks>
         ~FileSystemNode()
         {
             if (children != null)
@@ -168,8 +162,14 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         #region Node Update
 
         /// <summary>
-        /// Updates the contents of this node.
+        /// Updates the contents of this node by enumerating subdirectories.
         /// </summary>
+        /// <remarks>
+        /// If this node's children have not been allocated, this method will call Directory.GetDirectories on this.fullPath
+        /// and create child FileSystemNode instances for each subdirectory.
+        /// Any exceptions thrown during enumeration are caught and written to standard error.
+        /// This method does not refresh existing children if they are already allocated.
+        /// </remarks>
         public void UpdateNode()
         {
             try
@@ -206,14 +206,17 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         #region General
 
         /// <summary>
-        /// Returns an individual child node, based on a given unique ID. NOT IMPLEMENTED.
+        /// Returns an individual child node, based on a given unique ID.
         /// </summary>
-        /// <param name="uniqueID">Unique Object to identify the child</param>
-        /// <param name="recursive">Indicates whether we should recursively search child nodes</param>
-        /// <returns>Returns a child node. Returns null if method fails.</returns>
+        /// <param name="uniqueID">Unique Object to identify the child. Usually this is the child's full path string.</param>
+        /// <param name="recursive">Indicates whether to perform a recursive search through descendants. This sample implementation does not support recursion.</param>
+        /// <returns>
+        /// Returns a matching child node if found; otherwise returns null.
+        /// If <paramref name="recursive"/> is true, this implementation returns null (not implemented).
+        /// </returns>
         public IAddressNode GetChild(object uniqueID, bool recursive)
         {
-            //sample version doesn't support recursive search ;)
+            //sample version doesn't support recursive search ;
             if(recursive)
                 return null;
 
@@ -227,9 +230,13 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         }
 
         /// <summary>
-        /// Creates a clone of this node
+        /// Creates a clone of this node.
         /// </summary>
-        /// <returns>Cloned Node</returns>
+        /// <returns>
+        /// A cloned IAddressNode instance representing the same path as this node.
+        /// If this node represents the root (empty fullPath), a new root FileSystemNode is returned.
+        /// Otherwise a new FileSystemNode with the same fullPath and parent reference is returned.
+        /// </returns>
         public IAddressNode Clone()
         {
             if (this.fullPath.Length == 0)
@@ -239,8 +246,13 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         }
 
         /// <summary>
-        /// Populates this node as a root node representing "My Computer"
+        /// Populates this node as a root node representing "My Computer".
         /// </summary>
+        /// <remarks>
+        /// This method enumerates logical drives using Environment.GetLogicalDrives and creates child FileSystemNode
+        /// instances for each drive. It also calls GenerateNodeDisplayDetails to populate the display name and icon.
+        /// If children are already allocated, the method returns immediately.
+        /// </remarks>
         private void GenerateRootNode()
         {
             // if we have data, we can't become a root node.
@@ -268,8 +280,14 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         }
 
         /// <summary>
-        /// Sets the icon for the given path
+        /// Sets the icon and display name for the current path represented by this node.
         /// </summary>
+        /// <remarks>
+        /// - If this.fullPath is non-empty, SHGetFileInfo is called with the path to obtain the icon and display name.
+        /// - If this.fullPath is empty, SHGetSpecialFolderLocation is used to obtain a PIDL for "My Computer" and the SHGetFileInfo overload for PIDL is used.
+        /// - The native icon handle returned in SHFILEINFO.hIcon is converted to a managed Icon and cloned; the native handle is then destroyed.
+        /// - This method only sets the icon/display name once (when this.icon is null).
+        /// </remarks>
         private void GenerateNodeDisplayDetails()
         {
             //if the path exists
@@ -313,18 +331,43 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
 
     #region Win32 Interop for Icons
 
+    /// <summary>
+    /// Holds information about a file returned by SHGetFileInfo.
+    /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     public struct SHFILEINFO
     {
+        /// <summary>
+        /// Handle to the icon that represents the file. Caller is responsible for destroying the icon handle when done (DestroyIcon).
+        /// </summary>
         public IntPtr hIcon;
+
+        /// <summary>
+        /// Index of the icon image within the system image list.
+        /// </summary>
         public int iIcon;
+
+        /// <summary>
+        /// File attributes.
+        /// </summary>
         public uint dwAttributes;
+
+        /// <summary>
+        /// Display name for the file.
+        /// </summary>
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
         public string szDisplayName;
+
+        /// <summary>
+        /// Type name for the file.
+        /// </summary>
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
         public string szTypeName;
     };
 
+    /// <summary>
+    /// Helper class containing Win32 constants and P/Invoke declarations used to obtain file icons and special folder locations.
+    /// </summary>
     class Win32
     {
         public const uint SHGFI_ICON = 0x100;
@@ -336,6 +379,15 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
         public const uint CSIDL_DRIVES = 0x11;
 
 
+        /// <summary>
+        /// Retrieves information about an object in the file system, given a path.
+        /// </summary>
+        /// <param name="pszPath">Path to the file or folder.</param>
+        /// <param name="dwFileAttributes">File attribute flags (can be 0).</param>
+        /// <param name="psfi">Reference to a SHFILEINFO structure that receives the file information.</param>
+        /// <param name="cbSizeFileInfo">Size of the SHFILEINFO structure in bytes (use Marshal.SizeOf).</param>
+        /// <param name="uFlags">Flags that specify the file information to retrieve (e.g., icon, display name).</param>
+        /// <returns>Returns an IntPtr result; historically returns a handle or pointer value (not used in this managed wrapper).</returns>
         [DllImport("shell32.dll")]
         public static extern IntPtr SHGetFileInfo(string pszPath,
                                     uint dwFileAttributes,
@@ -343,6 +395,15 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
                                     uint cbSizeFileInfo,
                                     uint uFlags);
 
+        /// <summary>
+        /// Retrieves information about an object in the file system, given a PIDL (pointer to an item ID list).
+        /// </summary>
+        /// <param name="pidl">Pointer to an item ID list (PIDL) identifying the file system object.</param>
+        /// <param name="dwFileAttributes">File attribute flags (can be 0).</param>
+        /// <param name="psfi">Reference to a SHFILEINFO structure that receives the file information.</param>
+        /// <param name="cbSizeFileInfo">Size of the SHFILEINFO structure in bytes (use Marshal.SizeOf).</param>
+        /// <param name="uFlags">Flags that specify the file information to retrieve (e.g., SHGFI_PIDL to indicate pidl parameter).</param>
+        /// <returns>Returns an IntPtr result; historically returns a handle or pointer value (not used directly here).</returns>
         [DllImport("shell32.dll")]
         public static extern IntPtr SHGetFileInfo(IntPtr pidl,
                                     uint dwFileAttributes,
@@ -350,11 +411,23 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
                                     uint cbSizeFileInfo,
                                     uint uFlags);
 
+        /// <summary>
+        /// Retrieves a pointer to an item identifier list (PIDL) that identifies a special folder.
+        /// </summary>
+        /// <param name="hwndOwner">Window handle of the owner (can be 0).</param>
+        /// <param name="nSpecialFolder">CSIDL value that identifies the special folder (e.g., CSIDL_DRIVES).</param>
+        /// <param name="pidl">Reference to an IntPtr that receives the PIDL. Caller must free the PIDL using CoTaskMemFree or Marshal.FreeCoTaskMem.</param>
+        /// <returns>Returns S_OK (0) on success or a non-zero HRESULT on failure.</returns>
         [DllImport("shell32.dll")]
         public static extern int SHGetSpecialFolderLocation(int hwndOwner,
                                     uint nSpecialFolder,
                                     ref IntPtr pidl);
 
+        /// <summary>
+        /// Destroys an icon and frees any associated system resources.
+        /// </summary>
+        /// <param name="hIcon">Handle to the icon to destroy.</param>
+        /// <returns>True if the icon was successfully destroyed; otherwise false.</returns>
         [DllImport("user32.dll")]
         public static extern bool DestroyIcon(IntPtr hIcon);
     }

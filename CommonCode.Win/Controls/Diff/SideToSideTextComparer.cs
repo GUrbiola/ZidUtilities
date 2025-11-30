@@ -13,7 +13,7 @@ using ZidUtilities.CommonCode.ICSharpTextEditor;
 using ZidUtilities.CommonCode.Win.Controls.Diff;
 using static System.Windows.Forms.LinkLabel;
 
-namespace Ez_SQL.Custom_Controls
+namespace ZidUtilities.CommonCode.Win.Controls.Diff
 {
     public delegate void LineClicked(string TxtLeft, string TxtRight);
     public partial class SideToSideTextComparer : UserControl
@@ -43,11 +43,14 @@ namespace Ez_SQL.Custom_Controls
             get { return LabTxt2.Text; }
             set { LabTxt2.Text = value; }
         }
-        [Category("Custom Properties")]
-        [Description("Sets the control to read only mode.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public bool IsReadOnly { get { return LeftText.IsReadOnly; } set { LeftText.IsReadOnly = RightText.IsReadOnly = value; } }
 
+        [Browsable(false)]
+        public TextEditorControl LeftEditor { get { return LeftText.Editor; } }
+        [Browsable(false)]
+        public TextEditorControl RightEditor { get { return RightText.Editor; } }
+
+        public List<Color> LoadedDiffsLeft;
+        public List<Color> LoadedDiffsRight;
 
         public SideToSideTextComparer()
         {
@@ -56,8 +59,8 @@ namespace Ez_SQL.Custom_Controls
             LeftText.Text = "";
             RightText.Text = "";
 
-            LeftText.IsReadOnly = true;
-            RightText.IsReadOnly = true;
+            LeftText.Editor.IsReadOnly = true;
+            RightText.Editor.IsReadOnly = true;
 
             LeftText.Editor.ActiveTextAreaControl.VScrollBar.ValueChanged += new EventHandler(Txt1VerticalScrollChange);
             RightText.Editor.ActiveTextAreaControl.VScrollBar.ValueChanged += new EventHandler(Txt2VerticalScrollChange);
@@ -169,39 +172,52 @@ namespace Ez_SQL.Custom_Controls
                 }
             }
 
-            LoadDiffResults(LeftText, finalT1);
-            LoadDiffResults(RightText, finalT2);
+            LoadedDiffsLeft = LoadDiffResults(LeftText, finalT1);
+            LoadedDiffsRight = LoadDiffResults(RightText, finalT2);
 
             LeftText.Refresh();
             RightText.Refresh();
 
         }
 
-        private void LoadDiffResults(ExtendedEditor txtEditor, List<Tuple<string, DiffHighlight>> diffResults)
+        private List<Color> LoadDiffResults(ExtendedEditor txtEditor, List<Tuple<string, DiffHighlight>> diffResults)
         {
             StringBuilder buff = new StringBuilder();
+            List<Color> lineColors = new List<Color>();
             foreach (Tuple<string, DiffHighlight> t in diffResults)
             {
                 buff.Append(t.Item1);
             }
-            txtEditor.Text = buff.ToString();
+            txtEditor.Editor.Text = buff.ToString();
             for (int i = 0; i < diffResults.Count; i++)
             {
                 switch (diffResults[i].Item2)
                 {
                     case DiffHighlight.Add:
+                        lineColors.Add(Color.PeachPuff);
+                        txtEditor.Editor.MarkLine(i, Color.PeachPuff);
+                        break;  
                     case DiffHighlight.Remove:
+                        lineColors.Add(Color.LightGreen);
+                        txtEditor.Editor.MarkLine(i, Color.LightGreen);
+                        break;
                     case DiffHighlight.Update:
+                        lineColors.Add(Color.Khaki);
                         txtEditor.Editor.MarkLine(i, Color.Khaki);
                         break;
                     case DiffHighlight.Missing:
+                        lineColors.Add(Color.Gainsboro);
                         txtEditor.Editor.MarkLine(i, Color.Gainsboro);
                         break;
                     case DiffHighlight.None:
+                        lineColors.Add(Color.White);
+                        break;
                     default:
+                        lineColors.Add(Color.Navy);
                         break;
                 }
             }
+            return lineColors;
         }
 
         public void Clean()

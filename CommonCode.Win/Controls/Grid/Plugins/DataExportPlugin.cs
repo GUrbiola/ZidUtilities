@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -17,7 +18,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
     {
         public string MenuText => "Export Data...";
 
-        public Image MenuImage => null; // You can set an icon here
+        public Image MenuImage => Resources.Export32; // You can set an icon here
 
         public bool Enabled => true;
 
@@ -31,7 +32,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             }
 
             // Show export options dialog
-            using (var exportDialog = new ExportOptionsDialog())
+            using (var exportDialog = new ExportOptionsDialog(context.Theme))
             {
                 if (exportDialog.ShowDialog() == DialogResult.OK)
                 {
@@ -45,37 +46,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
                         return;
                     }
 
-                    bool success = false;
-                    string errorMessage = null;
-                    string filePath = exportDialog.SelectedFilePath;
-
-                    // Create processing dialog manager (runs on separate UI thread)
-                    using (var dialogManager = new ProcessingDialogManager(
-                        "Exporting Data",
-                        "Preparing export...",
-                        DialogStyle.Information,
-                        null,
-                        true))
-                    {
-                        // Perform the export using DataExporter with progress reporting
-                        PerformExportWithProgress(dataTable, exportDialog.SelectedFormat,
-                            exportDialog.SelectedFilePath, dialogManager,
-                            out success, out errorMessage);
-
-                        // Dialog will be closed when dialogManager is disposed
-                    }
-
-                    // Show result
-                    if (success)
-                    {
-                        MessageBox.Show($"Data exported successfully to:\n{filePath}",
-                            "Export Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    else
-                    {
-                        MessageBox.Show($"Error exporting data:\n{errorMessage}", "Export Data",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    PerformExport(dataTable, exportDialog.SelectedFormat, exportDialog.SelectedFilePath);
                 }
             }
         }
@@ -85,10 +56,102 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
         /// </summary>
         private DataTable GetDataTableFromGrid(ZidGridPluginContext context)
         {
-            // If we have a DataSource, try to use it
+            // If context or DataGridView is missing, fallback to original DataSource handling
+            if (context == null)
+                return null;
+
+            DataGridView grid = context.DataGridView;
+
+            // If we have a grid, build table from what's currently displayed to respect sorting/filtering/column order
+            if (grid != null)
+            {
+                // Get visible columns ordered by display index (this respects user column reordering)
+                var visibleColumns = new System.Collections.Generic.List<DataGridViewColumn>();
+                foreach (DataGridViewColumn col in grid.Columns)
+                {
+                    if (col.Visible)
+                        visibleColumns.Add(col);
+                }
+                visibleColumns.Sort((a, b) => a.DisplayIndex.CompareTo(b.DisplayIndex));
+
+                DataTable table = new DataTable("GridData");
+
+                // Add columns with unique names; prefer HeaderText then Name
+                foreach (DataGridViewColumn col in visibleColumns)
+                {
+                    string baseName = string.IsNullOrWhiteSpace(col.HeaderText) ? col.Name ?? $"Column{col.Index}" : col.HeaderText;
+                    string columnName = baseName;
+                    int suffix = 1;
+                    while (table.Columns.Contains(columnName))
+                    {
+                        columnName = $"{baseName}_{suffix}";
+                        suffix++;
+                    }
+
+                    // Try to set a sensible type: use the column's ValueType if available, otherwise string
+                    Type columnType = col.ValueType ?? typeof(string);
+
+                    // Use string as fallback if columnType is Object to avoid schema problems for heterogeneous cells
+                    if (columnType == typeof(object))
+                        columnType = typeof(string);
+
+                    table.Columns.Add(columnName, columnType);
+                }
+
+                // Add rows in the order they appear in the grid (this respects sorting and filtering)
+                foreach (DataGridViewRow row in grid.Rows)
+                {
+                    if (row.IsNewRow)
+                        continue;
+
+                    // Some filters / bindings may keep rows but mark them not visible; skip invisible rows
+                    if (!row.Visible)
+                        continue;
+
+                    DataRow dtRow = table.NewRow();
+                    for (int i = 0; i < visibleColumns.Count; i++)
+                    {
+                        DataGridViewColumn col = visibleColumns[i];
+
+                        // Access cell by column index to get the bound value
+                        DataGridViewCell cell = row.Cells[col.Index];
+                        object value = cell?.Value;
+
+                        // Convert DBNull/ null appropriately
+                        if (value == null)
+                            dtRow[i] = DBNull.Value;
+                        else
+                        {
+                            // If DataTable column expects string but value is not string, convert to string
+                            Type expected = table.Columns[i].DataType;
+                            try
+                            {
+                                if (value == DBNull.Value)
+                                    dtRow[i] = DBNull.Value;
+                                else if (expected == typeof(string))
+                                    dtRow[i] = value.ToString();
+                                else if (expected.IsInstanceOfType(value))
+                                    dtRow[i] = value;
+                                else
+                                    dtRow[i] = Convert.ChangeType(value, expected);
+                            }
+                            catch
+                            {
+                                // Fallback to string representation on conversion failure
+                                dtRow[i] = value.ToString();
+                            }
+                        }
+                    }
+
+                    table.Rows.Add(dtRow);
+                }
+
+                return table;
+            }
+
+            // If no grid is available, fall back to previous DataSource conversions
             if (context.DataSource != null)
             {
-                // Try to convert various data source types to DataTable
                 if (context.DataSource is DataTable dt)
                 {
                     return dt.Copy();
@@ -101,94 +164,78 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
                 {
                     return ds.Tables[0].Copy();
                 }
-            }
-
-            // Fallback: manually construct DataTable from grid
-            DataTable table = new DataTable("GridData");
-
-            // Add columns
-            foreach (DataGridViewColumn column in context.DataGridView.Columns)
-            {
-                if (column.Visible)
+                else if (context.DataSource is System.Windows.Forms.BindingSource bs)
                 {
-                    table.Columns.Add(column.HeaderText ?? column.Name, typeof(string));
+                    // Try to extract DataView/DataTable from BindingSource
+                    if (bs.List is DataView bsDv)
+                        return bsDv.ToTable();
+                    if (bs.DataSource is DataTable bsDt)
+                        return bsDt.Copy();
+                    if (bs.DataSource is DataSet bsDs && bsDs.Tables.Count > 0)
+                        return bsDs.Tables[0].Copy();
                 }
             }
 
-            // Add rows
-            foreach (DataGridViewRow row in context.DataGridView.Rows)
-            {
-                if (!row.IsNewRow)
-                {
-                    DataRow dataRow = table.NewRow();
-                    int columnIndex = 0;
-
-                    foreach (DataGridViewColumn column in context.DataGridView.Columns)
-                    {
-                        if (column.Visible)
-                        {
-                            object cellValue = row.Cells[column.Index].Value;
-                            dataRow[columnIndex] = cellValue != null ? cellValue.ToString() : "";
-                            columnIndex++;
-                        }
-                    }
-
-                    table.Rows.Add(dataRow);
-                }
-            }
-
-            return table;
+            // Nothing available
+            return null;
         }
 
         /// <summary>
         /// Performs the export using the DataExporter class with progress reporting.
-        /// Uses ProcessingDialogManager for proper thread-safe dialog updates.
         /// </summary>
-        private void PerformExportWithProgress(DataTable data, ExportTo format, string filePath,
-            ProcessingDialogManager dialogManager, out bool success, out string errorMessage)
+        private void PerformExport(DataTable data, ExportTo format, string filePath)
         {
-            success = false;
-            errorMessage = null;
-
-            try
+            using 
+            (
+                var dialogManager = new ProcessingDialogManager
+                (
+                    "Exporting Data",
+                    "Preparing export...",
+                    DialogStyle.Information, 
+                    false
+                )
+            )
             {
-                // Create and configure DataExporter
-                DataExporter exporter = new DataExporter();
-                exporter.ExportType = format;
-                exporter.WriteHeaders = true;
-                exporter.ExportWithStyles = true;
-                exporter.UseAlternateRowStyles = true;
-                // Always use Simple style for clean, professional output
-                exporter.ExportExcelStyle = ExcelStyle.Simple;
-                exporter.ExportHtmlStyle = ExcelStyle.Simple;
-
-                // Hook up progress events for real-time updates
-                exporter.OnStartExportation += (firedAt, records, progress, exportType) =>
+                try
                 {
-                    dialogManager.UpdateMessage($"Exporting {records} rows...");
-                    dialogManager.UpdateProgress(0);
-                };
+                    // Create and configure DataExporter
+                    var exporter = new DataExporter
+                    {
+                        ExportType = format,
+                        WriteHeaders = true,
+                        ExportWithStyles = true,
+                        UseAlternateRowStyles = true,
+                        ExportExcelStyle = ExcelStyle.Simple,
+                        ExportHtmlStyle = ExcelStyle.Simple
+                    };
 
-                exporter.OnProgress += (firedAt, records, progress, exportType) =>
+                    // Hook up progress events
+                    exporter.OnStartExportation += (firedAt, records, progress, exportType) =>
+                    {
+                        dialogManager.Update($"Exporting {records:N0} rows...", 0);
+                    };
+
+                    exporter.OnProgress += (firedAt, records, progress, exportType) =>
+                    {
+                        int percentage = records > 0 ? (int)((progress * 100.0) / records) : 0;
+                        dialogManager.Update($"Exporting row {progress:N0} of {records:N0}...", percentage);
+                    };
+
+                    exporter.OnCompletedExportation += (firedAt, records, exportType, streamResult, pathResult) =>
+                    {
+                        dialogManager.Update("Export completed successfully!", 100);
+                    };
+
+                    // Perform the export
+                    exporter.ExportToFile(filePath, data, false);
+
+                    Thread.Sleep(500); // Brief pause to show completion message
+                }
+                catch (Exception ex)
                 {
-                    int percentage = records > 0 ? (int)((progress * 100.0) / records) : 0;
-                    dialogManager.Update($"Exporting row {progress} of {records}...", percentage);
-                };
-
-                // Perform synchronous export
-                // The DataExporter will fire progress events which update the dialog
-                exporter.ExportToFile(filePath, data, false);
-
-                // Success
-                dialogManager.UpdateMessage("Export completed successfully!");
-                Thread.Sleep(500); // Brief pause to show completion message
-                success = true;
-            }
-            catch (Exception ex)
-            {
-                errorMessage = ex.Message;
-                dialogManager.UpdateMessage($"Export failed: {ex.Message}");
-                Thread.Sleep(1000); // Show error message
+                    MessageBox.Show($"Error exporting data:\n{ex.Message}",
+                        "Export Data", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
     }
@@ -205,51 +252,68 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
         private Button btnCancel;
         private Label lblFormat;
         private Label lblFilePath;
+        private Panel pnlHeader;
+        private Label lblTitle;
+        private GridThemeHelper.ThemeColors _themeColors;
 
         public ExportTo SelectedFormat { get; private set; }
         public string SelectedFilePath { get; private set; }
 
-        public ExportOptionsDialog()
+        public ExportOptionsDialog(ZidThemes theme)
         {
+            _themeColors = GridThemeHelper.GetThemeColors(theme);
             InitializeComponent();
+            ApplyTheme();
             PopulateFormats();
         }
 
         private void InitializeComponent()
         {
             this.Text = "Export Data";
-            this.Size = new Size(500, 215);
+            this.Size = new Size(500, 280);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.StartPosition = FormStartPosition.CenterParent;
 
+            // Header panel
+            pnlHeader = new Panel();
+            pnlHeader.Dock = DockStyle.Top;
+            pnlHeader.Height = 50;
+
+            lblTitle = new Label();
+            lblTitle.Text = "Export Grid Data";
+            lblTitle.Font = new Font("Verdana", 10f, FontStyle.Bold);
+            lblTitle.Location = new Point(15, 15);
+            lblTitle.AutoSize = true;
+            pnlHeader.Controls.Add(lblTitle);
+
             // Format label and combo
             lblFormat = new Label();
             lblFormat.Text = "Export Format:";
-            lblFormat.Location = new Point(20, 20);
+            lblFormat.Location = new Point(20, 65);
             lblFormat.AutoSize = true;
 
             cmbFormat = new ComboBox();
             cmbFormat.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbFormat.Location = new Point(20, 45);
+            cmbFormat.Location = new Point(20, 90);
             cmbFormat.Size = new Size(440, 25);
             cmbFormat.SelectedIndexChanged += CmbFormat_SelectedIndexChanged;
 
             // File path label, textbox, and browse button
             lblFilePath = new Label();
             lblFilePath.Text = "Save to:";
-            lblFilePath.Location = new Point(20, 80);
+            lblFilePath.Location = new Point(20, 125);
             lblFilePath.AutoSize = true;
 
             txtFilePath = new TextBox();
-            txtFilePath.Location = new Point(20, 105);
+            txtFilePath.Location = new Point(20, 150);
             txtFilePath.Size = new Size(360, 25);
             txtFilePath.ReadOnly = true;
 
             btnBrowse = new Button();
             btnBrowse.Text = "Browse...";
-            btnBrowse.Location = new Point(385, 103);
+            btnBrowse.Location = new Point(385, 148);
             btnBrowse.Size = new Size(75, 27);
             btnBrowse.Click += BtnBrowse_Click;
 
@@ -257,17 +321,18 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             btnOK = new Button();
             btnOK.Text = "Export";
             btnOK.DialogResult = DialogResult.OK;
-            btnOK.Location = new Point(295, 140);
+            btnOK.Location = new Point(295, 200);
             btnOK.Size = new Size(80, 30);
             btnOK.Enabled = false;
 
             btnCancel = new Button();
             btnCancel.Text = "Cancel";
             btnCancel.DialogResult = DialogResult.Cancel;
-            btnCancel.Location = new Point(380, 140);
+            btnCancel.Location = new Point(380, 200);
             btnCancel.Size = new Size(80, 30);
 
             this.Controls.AddRange(new Control[] {
+                pnlHeader,
                 lblFormat, cmbFormat,
                 lblFilePath, txtFilePath, btnBrowse,
                 btnOK, btnCancel
@@ -275,6 +340,45 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
 
             this.AcceptButton = btnOK;
             this.CancelButton = btnCancel;
+        }
+
+        private void ApplyTheme()
+        {
+            // Apply theme to header panel
+            pnlHeader.BackColor = _themeColors.HeaderBackColor;
+            lblTitle.ForeColor = _themeColors.HeaderForeColor;
+
+            // Apply theme to form
+            this.BackColor = _themeColors.BackgroundColor;
+
+            // Apply theme to labels
+            lblFormat.ForeColor = _themeColors.DefaultForeColor;
+            lblFormat.Font = _themeColors.CellFont;
+            lblFilePath.ForeColor = _themeColors.DefaultForeColor;
+            lblFilePath.Font = _themeColors.CellFont;
+
+            // Apply theme to controls
+            cmbFormat.BackColor = _themeColors.DefaultBackColor;
+            cmbFormat.ForeColor = _themeColors.DefaultForeColor;
+            cmbFormat.Font = _themeColors.CellFont;
+
+            txtFilePath.BackColor = _themeColors.DefaultBackColor;
+            txtFilePath.ForeColor = _themeColors.DefaultForeColor;
+            txtFilePath.Font = _themeColors.CellFont;
+
+            // Apply theme to buttons
+            btnBrowse.BackColor = _themeColors.DefaultBackColor;
+            btnBrowse.ForeColor = _themeColors.DefaultForeColor;
+            btnBrowse.FlatStyle = FlatStyle.Flat;
+
+            btnOK.BackColor = _themeColors.HeaderBackColor;
+            btnOK.ForeColor = _themeColors.HeaderForeColor;
+            btnOK.FlatStyle = FlatStyle.Flat;
+            btnOK.Font = new Font(_themeColors.HeaderFont.FontFamily, 9f, FontStyle.Bold);
+
+            btnCancel.BackColor = _themeColors.DefaultBackColor;
+            btnCancel.ForeColor = _themeColors.DefaultForeColor;
+            btnCancel.FlatStyle = FlatStyle.Flat;
         }
 
         private void PopulateFormats()

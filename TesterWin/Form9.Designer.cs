@@ -67,11 +67,12 @@
             this.zidGrid1.CustomMenuItems.Add(zidGridMenuItem2);
             this.zidGrid1.CustomMenuItems.Add(zidGridMenuItem3);
             this.zidGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.zidGrid1.FilterText = "Filters";
             this.zidGrid1.Location = new System.Drawing.Point(0, 38);
             this.zidGrid1.Name = "zidGrid1";
             this.zidGrid1.Size = new System.Drawing.Size(1071, 684);
             this.zidGrid1.TabIndex = 5;
-            this.zidGrid1.Theme = ZidUtilities.CommonCode.Win.Controls.Grid.GridThemes.None;
+            this.zidGrid1.Theme = ZidUtilities.CommonCode.Win.ZidThemes.Forest;
             this.zidGrid1.TitleFont = new System.Drawing.Font("Verdana", 9.25F, System.Drawing.FontStyle.Bold);
             // 
             // Form9

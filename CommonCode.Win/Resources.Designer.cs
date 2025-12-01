@@ -93,9 +93,39 @@ namespace ZidUtilities.CommonCode.Win {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ColumnPick32 {
+            get {
+                object obj = ResourceManager.GetObject("ColumnPick32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Export32 {
+            get {
+                object obj = ResourceManager.GetObject("Export32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Info64 {
             get {
                 object obj = ResourceManager.GetObject("Info64", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap InProgress {
+            get {
+                object obj = ResourceManager.GetObject("InProgress", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -1,9 +1,9 @@
 using System;
 using System.Data;
 using System.Windows.Forms;
+using ZidUtilities.CommonCode.Win;
 using ZidUtilities.CommonCode.Win.Controls.Grid;
 using ZidUtilities.CommonCode.Win.Controls.Grid.Plugins;
-using ZidUtilities.CommonCode.Win.Controls.Grid.SamplePlugins;
 
 namespace ZidUtilities.TesterWin
 {
@@ -23,7 +23,7 @@ namespace ZidUtilities.TesterWin
         {
             // Add plugins to the grid
             zidGrid1.Plugins.Add(new DataExportPlugin());
-            zidGrid1.Plugins.Add(new ExportToCSVPlugin());
+            zidGrid1.Plugins.Add(new ColumnVisibilityPlugin());
 
             // Add custom menu items (these would normally be configured in the designer)
             var sortAscMenuItem = new ZidGridMenuItem
@@ -68,7 +68,7 @@ namespace ZidUtilities.TesterWin
             dt.Rows.Add(5, "Charlie Brown", "IT", 72000, new DateTime(2020, 11, 30));
 
             zidGrid1.DataSource = dt;
-            zidGrid1.Theme = GridThemes.Blue;
+            zidGrid1.Theme = ZidThemes.Blue;
         }
 
         private void CustomMenuItem_SortAscending(object sender, ZidGridMenuItemClickEventArgs e)

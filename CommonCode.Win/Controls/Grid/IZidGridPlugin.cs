@@ -55,5 +55,10 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
         /// Gets the column header where the context menu was triggered (if applicable).
         /// </summary>
         public DataGridViewColumn Column { get; internal set; }
+
+        /// <summary>
+        /// Gets the current grid theme applied to the ZidGrid.
+        /// </summary>
+        public ZidThemes Theme { get; internal set; }
     }
 }

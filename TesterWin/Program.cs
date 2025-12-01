@@ -17,8 +17,7 @@ namespace ZidUtilities.TesterWin
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new FormZidGridMenuTest());
-            Application.Run(new Form9());
+            Application.Run(new FormMainMenu());
         }
     }
 }

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ZidUtilities.CommonCode.DataAccess;
+using ZidUtilities.CommonCode.Win;
 using ZidUtilities.CommonCode.Win.Controls.Grid;
 
 namespace ZidUtilities.TesterWin
@@ -18,8 +19,8 @@ namespace ZidUtilities.TesterWin
         public Form9()
         {
             InitializeComponent();
-            foreach (var item in Enum.GetValues(typeof(GridThemes)))
-                cmbThemes.Items.Add(new ComboBoxItem() { Text = item.ToString(), Theme = (GridThemes)item });
+            foreach (var item in Enum.GetValues(typeof(ZidThemes)))
+                cmbThemes.Items.Add(new ComboBoxItem() { Text = item.ToString(), Theme = (ZidThemes)item });
 
 
             //cmbThemes.Items.Add(new ComboBoxItem() { Text = "Black and White", Theme = GridThemes.BlackAndWhite});
@@ -29,6 +30,7 @@ namespace ZidUtilities.TesterWin
             //cmbThemes.Items.Add(new ComboBoxItem() { Text = "Violet... manly violet -_-", Theme = GridThemes.Violet });
 
             zidGrid1.Plugins.Add(new ZidUtilities.CommonCode.Win.Controls.Grid.Plugins.DataExportPlugin());
+            zidGrid1.Plugins.Add(new ZidUtilities.CommonCode.Win.Controls.Grid.Plugins.ColumnVisibilityPlugin());
 
             cmbThemes.SelectedIndex = 0;
             cmbThemes.SelectedValueChanged += new EventHandler(cmbThemes_SelectedValueChanged);
@@ -60,7 +62,7 @@ namespace ZidUtilities.TesterWin
     public class ComboBoxItem
     {
         public string Text { get; set; }
-        public GridThemes Theme { get; set; }
+        public ZidThemes Theme { get; set; }
 
         public override string ToString()
         {

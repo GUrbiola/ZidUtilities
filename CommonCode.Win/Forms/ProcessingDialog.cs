@@ -14,6 +14,7 @@ namespace ZidUtilities.CommonCode.Win.Forms
         #region Fields
 
         private DialogStyle _style = DialogStyle.Default;
+        private ZidThemes? _theme = null;
         private object _lockObject = new object();
 
         #endregion
@@ -74,6 +75,7 @@ namespace ZidUtilities.CommonCode.Win.Forms
             set
             {
                 _style = value;
+                _theme = null; // Clear theme when style is set
                 if (this.InvokeRequired)
                 {
                     this.Invoke(new Action(() => ApplyStyle()));
@@ -81,6 +83,26 @@ namespace ZidUtilities.CommonCode.Win.Forms
                 else
                 {
                     ApplyStyle();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the ZidTheme (color scheme).
+        /// </summary>
+        public ZidThemes Theme
+        {
+            get { return _theme ?? ZidThemes.Default; }
+            set
+            {
+                _theme = value;
+                if (this.InvokeRequired)
+                {
+                    this.Invoke(new Action(() => ApplyTheme()));
+                }
+                else
+                {
+                    ApplyTheme();
                 }
             }
         }
@@ -211,13 +233,15 @@ namespace ZidUtilities.CommonCode.Win.Forms
             {
                 this.Invoke(new Action(() =>
                 {
-                    IsIndeterminate = false;
+                    if (IsIndeterminate)
+                        IsIndeterminate = false;
                     SetProgress(percentage);
                 }));
             }
             else
             {
-                IsIndeterminate = false;
+                if (IsIndeterminate)
+                    IsIndeterminate = false;
                 SetProgress(percentage);
             }
         }
@@ -232,14 +256,16 @@ namespace ZidUtilities.CommonCode.Win.Forms
                 this.Invoke(new Action(() =>
                 {
                     lblMessage.Text = message;
-                    IsIndeterminate = false;
+                    if (IsIndeterminate)
+                        IsIndeterminate = false;
                     SetProgress(percentage);
                 }));
             }
             else
             {
                 lblMessage.Text = message;
-                IsIndeterminate = false;
+                if (IsIndeterminate)
+                    IsIndeterminate = false;
                 SetProgress(percentage);
             }
         }
@@ -275,6 +301,23 @@ namespace ZidUtilities.CommonCode.Win.Forms
             pnlHeader.BackColor = headerColor;
             lblMessage.ForeColor = headerTextColor;
             progressBar.ForeColor = accentColor;
+        }
+
+        /// <summary>
+        /// Applies the selected theme to the dialog.
+        /// </summary>
+        private void ApplyTheme()
+        {
+            if (_theme.HasValue)
+            {
+                Color headerColor = DialogStyleHelper.GetHeaderColor(_theme.Value);
+                Color headerTextColor = DialogStyleHelper.GetHeaderTextColor(_theme.Value);
+                Color accentColor = DialogStyleHelper.GetAccentColor(_theme.Value);
+
+                pnlHeader.BackColor = headerColor;
+                lblMessage.ForeColor = headerTextColor;
+                progressBar.ForeColor = accentColor;
+            }
         }
 
         /// <summary>
@@ -327,7 +370,7 @@ namespace ZidUtilities.CommonCode.Win.Forms
         /// <param name="image">Optional image.</param>
         /// <param name="isIndeterminate">Whether to show indeterminate progress.</param>
         public ProcessingDialogManager(string title, string message,
-            DialogStyle style = DialogStyle.Default, Image image = null, bool isIndeterminate = true)
+            DialogStyle style, Image image = null, bool isIndeterminate = true)
         {
             _dialogThread = new Thread(() =>
             {
@@ -336,6 +379,100 @@ namespace ZidUtilities.CommonCode.Win.Forms
                 _dialog.Message = message;
                 _dialog.Style = style;
                 _dialog.DialogImage = image;
+                _dialog.IsIndeterminate = isIndeterminate;
+
+                _dialogReady.Set();
+                Application.Run(_dialog);
+            });
+
+            _dialogThread.SetApartmentState(ApartmentState.STA);
+            _dialogThread.IsBackground = true;
+            _dialogThread.Start();
+
+            // Wait for dialog to be created
+            _dialogReady.WaitOne();
+        }
+
+        /// <summary>
+        /// Shows a processing dialog on a separate UI thread.
+        /// </summary>
+        /// <param name="title">Dialog title.</param>
+        /// <param name="message">Initial message.</param>
+        /// <param name="style">Dialog style.</param>
+        /// <param name="isIndeterminate">Whether to show indeterminate progress.</param>
+        public ProcessingDialogManager(string title, string message,
+            DialogStyle style, bool isIndeterminate = true)
+        {
+            _dialogThread = new Thread(() =>
+            {
+                _dialog = new ProcessingDialog();
+                _dialog.DialogTitle = title;
+                _dialog.Message = message;
+                _dialog.Style = style;
+                _dialog.DialogImage = Resources.InProgress;
+                _dialog.IsIndeterminate = isIndeterminate;
+
+                _dialogReady.Set();
+                Application.Run(_dialog);
+            });
+
+            _dialogThread.SetApartmentState(ApartmentState.STA);
+            _dialogThread.IsBackground = true;
+            _dialogThread.Start();
+
+            // Wait for dialog to be created
+            _dialogReady.WaitOne();
+        }
+
+        /// <summary>
+        /// Shows a processing dialog on a separate UI thread.
+        /// </summary>
+        /// <param name="title">Dialog title.</param>
+        /// <param name="message">Initial message.</param>
+        /// <param name="theme">ZidTheme to apply.</param>
+        /// <param name="image">Optional image.</param>
+        /// <param name="isIndeterminate">Whether to show indeterminate progress.</param>
+        public ProcessingDialogManager(string title, string message,
+            ZidThemes theme, Image image = null, bool isIndeterminate = true)
+        {
+            _dialogThread = new Thread(() =>
+            {
+                _dialog = new ProcessingDialog();
+                _dialog.DialogTitle = title;
+                _dialog.Message = message;
+                _dialog.Theme = theme;
+                _dialog.DialogImage = image;
+                _dialog.IsIndeterminate = isIndeterminate;
+
+                _dialogReady.Set();
+                Application.Run(_dialog);
+            });
+
+            _dialogThread.SetApartmentState(ApartmentState.STA);
+            _dialogThread.IsBackground = true;
+            _dialogThread.Start();
+
+            // Wait for dialog to be created
+            _dialogReady.WaitOne();
+        }
+
+        /// <summary>
+        /// Shows a processing dialog on a separate UI thread.
+        /// </summary>
+        /// <param name="title">Dialog title.</param>
+        /// <param name="message">Initial message.</param>
+        /// <param name="theme">ZidTheme to apply.</param>
+        /// <param name="isIndeterminate">Whether to show indeterminate progress.</param>
+        public ProcessingDialogManager(string title, string message,
+            ZidThemes theme, bool isIndeterminate = true)
+        {
+            _dialogThread = new Thread(() =>
+            {
+                _dialog = new ProcessingDialog();
+                _dialog.DialogTitle = title;
+                _dialog.Message = message;
+                _dialog.Theme = theme;
+                _dialog.DialogImage = Resources.InProgress;
                 _dialog.IsIndeterminate = isIndeterminate;
 
                 _dialogReady.Set();

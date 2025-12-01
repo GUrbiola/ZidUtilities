@@ -38,13 +38,14 @@
             // 
             // GridView
             // 
-            this.GridView.AllowUserToResizeColumns = false;
+            this.GridView.AllowUserToAddRows = false;
             this.GridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.GridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.GridView.Location = new System.Drawing.Point(3, 21);
             this.GridView.Name = "GridView";
+            this.GridView.ReadOnly = true;
             this.GridView.Size = new System.Drawing.Size(480, 392);
             this.GridView.TabIndex = 0;
             // 

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ZidUtilities.Win.Controls.Grid.GridFilter;
 
 namespace ZidUtilities.CommonCode.Win.Controls.Grid
 {
@@ -40,106 +41,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
         {
             SetRowCount();
         }
-        #region first attempts from Claude to handle binary data columns
-        /*
-        void GridView_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
-        {
-            // Check if this is a binary column using the tag
-            if (e.ColumnIndex >= 0 && e.ColumnIndex < GridView.Columns.Count)
-            {
-                var column = GridView.Columns[e.ColumnIndex];
-
-                // If column is tagged as binary, always show placeholder
-                if (column.Tag != null && column.Tag.ToString() == "BinaryColumn")
-                {
-                    e.Value = "<Binary Data>";
-                    e.FormattingApplied = true;
-                    return;
-                }
-            }
-
-            // Handle binary data cells to prevent display exceptions
-            if (e.Value != null && e.Value != DBNull.Value)
-            {
-                Type valueType = e.Value.GetType();
-
-                // Check for byte array (most common binary type)
-                if (valueType == typeof(byte[]))
-                {
-                    e.Value = "<Binary Data>";
-                    e.FormattingApplied = true;
-                    return;
-                }
-
-                // Check for System.Data.SqlTypes.SqlBinary
-                if (valueType.FullName == "System.Data.SqlTypes.SqlBinary")
-                {
-                    e.Value = "<Binary Data>";
-                    e.FormattingApplied = true;
-                    return;
-                }
-
-                // Check for System.Data.Linq.Binary
-                if (valueType.FullName == "System.Data.Linq.Binary")
-                {
-                    e.Value = "<Binary Data>";
-                    e.FormattingApplied = true;
-                    return;
-                }
-
-                // Check if type name contains "Binary"
-                if (valueType.Name.Contains("Binary"))
-                {
-                    e.Value = "<Binary Data>";
-                    e.FormattingApplied = true;
-                    return;
-                }
-            }
-
-            // Also check column ValueType for binary types
-            if (e.RowIndex >= 0 && e.ColumnIndex >= 0 && e.ColumnIndex < GridView.Columns.Count)
-            {
-                var column = GridView.Columns[e.ColumnIndex];
-                if (column.ValueType != null)
-                {
-                    if (column.ValueType == typeof(byte[]) ||
-                        column.ValueType.FullName == "System.Data.SqlTypes.SqlBinary" ||
-                        column.ValueType.FullName == "System.Data.Linq.Binary" ||
-                        column.ValueType.Name.Contains("Binary"))
-                    {
-                        e.Value = "<Binary Data>";
-                        e.FormattingApplied = true;
-                    }
-                }
-            }
-        }
-
-        void GridView_DataError(object sender, DataGridViewDataErrorEventArgs e)
-        {
-            // Suppress errors for binary data columns
-            if (e.ColumnIndex >= 0 && e.ColumnIndex < GridView.Columns.Count)
-            {
-                var column = GridView.Columns[e.ColumnIndex];
-                if (column.ValueType != null)
-                {
-                    if (column.ValueType == typeof(byte[]) ||
-                        column.ValueType.FullName == "System.Data.SqlTypes.SqlBinary" ||
-                        column.ValueType.FullName == "System.Data.Linq.Binary" ||
-                        column.ValueType.Name.Contains("Binary"))
-                    {
-                        // Suppress the error for binary columns
-                        e.ThrowException = false;
-                        e.Cancel = true;
-                        return;
-                    }
-                }
-            }
-
-            // For other data errors, allow default handling but don't throw
-            e.ThrowException = false;
-        }
-        */
-        #endregion
+        
         void GridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
             // Handle binary columns after data binding is complete
@@ -214,7 +116,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
             }
         }
 
-        [Browsable(true), DefaultValue(null)]
+        [Category("Custom Property"), Browsable(true), DefaultValue(null)]
         [Description("The IBindingListView which should be initially displayed.")]
         public Object DataSource
         {
@@ -288,8 +190,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
         /// Gets the collection of custom menu items for the header context menu.
         /// These items are configurable in the Visual Studio designer.
         /// </summary>
-        [Category("Behavior")]
-        [Description("Custom menu items that appear in the header context menu.")]
+        [Category("Custom Property"), Description("Custom menu items that appear in the header context menu.")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
         public ZidGridMenuItemCollection CustomMenuItems
         {
@@ -308,48 +209,50 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
         }
 
         private Font _CellFont;
-        [Browsable(true)]
+        [Category("Custom Property"), Browsable(true)]
         [Description("The Font that must be used for the values on the grid")]
         public Font CellFont
         {
             get
             {
                 if (_CellFont == null)
-                    _CellFont = new Font("Verdana", 9f);
+                    _CellFont = new Font("Calibri", 9f);
                 return _CellFont;
             }
             set
             {
                 if (value == null)
-                    _CellFont = new Font("Verdana", 9f);
+                    _CellFont = new Font("Calibri", 9f);
                 else
                     _CellFont = value;
             }
         }
 
         private Font _TitleFont;
-        [Browsable(true)]
+        [Category("Custom Property"), Browsable(true)]
         [Description("The Font that must be used for the headers on the grid")]
         public Font TitleFont
         {
             get
             {
                 if (_TitleFont == null)
-                    _TitleFont = new Font("Verdana", 9.25f, FontStyle.Bold);
+                    _TitleFont = new Font("Calibri", 9.25f, FontStyle.Bold);
                 return _TitleFont;
             }
             set
             {
                 if (value == null)
-                    _TitleFont = new Font("Verdana", 9.25f, FontStyle.Bold);
+                    _TitleFont = new Font("Calibri", 9.25f, FontStyle.Bold);
                 else
                     _TitleFont = value;
             }
         }
 
         #region Code for the theme of the DataGridView
-        private GridThemes _Theme;
-        public GridThemes Theme
+        private ZidThemes _Theme;
+        [Category("Theme"), Browsable(true), DefaultValue(ZidThemes.None)]
+        [Description("Gets or sets the theme of the control.")]
+        public ZidThemes Theme
         {
             get { return _Theme; }
             set
@@ -360,8 +263,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
         }
 
         private bool _EnableAlternatingRows = true;
-        [Browsable(true)]
-        [DefaultValue(true)]
+        [Category("Theme"), Browsable(true), DefaultValue(true)]
         [Description("Enable or disable alternating row colors in the grid")]
         public bool EnableAlternatingRows
         {
@@ -372,7 +274,40 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                 SetGridTheme(this.GridView, _Theme);
             }
         }
-        private void SetGridTheme(DataGridView srcGrid, GridThemes SelectedTheme)
+        [Category("Filtering")]
+        [Browsable(true), DefaultValue(FilterPosition.Top)]
+        [Description("Gets or sets the position of the filter controls")]
+        public FilterPosition FilterBoxPosition
+        {
+            get { return filterExtender.FilterBoxPosition; }
+            set
+            {
+                filterExtender.FilterBoxPosition = value;
+                RepositionGrid();
+            }
+        }
+        /// <summary>
+        /// Gets and sets the text for the filter label.
+        /// </summary>
+        [Category("Filtering")]
+        [Browsable(true), DefaultValue("Filter")]
+        [Description("Text shown on top of the grid")]
+        public string FilterText
+        {
+            get { return filterExtender.FilterText; }
+            set { filterExtender.FilterText = value; }
+        }
+
+        [Category("Filtering")]
+        [Browsable(true), DefaultValue(true)]
+        [Description("Determines if the text on the top of the grid will be visible")]
+        public bool FilterTextVisible
+        {
+            get { return filterExtender.FilterTextVisible; }
+            set { filterExtender.FilterTextVisible = value; }
+        }
+
+        private void SetGridTheme(DataGridView srcGrid, ZidThemes SelectedTheme)
         {
             DataGridView grid = srcGrid;
 
@@ -382,7 +317,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
             grid.SuspendLayout();
             switch (SelectedTheme)
             {
-                case GridThemes.None:
+                case ZidThemes.None:
                     grid.EnableHeadersVisualStyles = true;
                     grid.AlternatingRowsDefaultCellStyle = null;
                     grid.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
@@ -401,7 +336,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowHeadersVisible = true;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.CodeProject:
+                case ZidThemes.CodeProject:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(255, 245, 238);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -426,7 +361,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.BlackAndWhite:
+                case ZidThemes.BlackAndWhite:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.White;
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -450,7 +385,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.Blue:
+                case ZidThemes.Blue:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(211, 226, 255);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -474,7 +409,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.Violet:
+                case ZidThemes.Violet:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(232, 223, 245);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -498,7 +433,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.Greenish:
+                case ZidThemes.Greenish:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(213, 245, 255);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -522,7 +457,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.DarkMode:
+                case ZidThemes.DarkMode:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(45, 45, 48);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.White;
@@ -547,7 +482,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.FromArgb(30, 30, 30);
                     break;
-                case GridThemes.Ocean:
+                case ZidThemes.Ocean:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(176, 224, 230);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -571,7 +506,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.Sunset:
+                case ZidThemes.Sunset:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(255, 218, 185);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -595,7 +530,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.Forest:
+                case ZidThemes.Forest:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(193, 225, 193);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -619,7 +554,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.Rose:
+                case ZidThemes.Rose:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(255, 228, 225);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -643,7 +578,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.Slate:
+                case ZidThemes.Slate:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(230, 230, 250);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -667,7 +602,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.Teal:
+                case ZidThemes.Teal:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(175, 238, 238);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -691,7 +626,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.Amber:
+                case ZidThemes.Amber:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(255, 248, 220);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -715,7 +650,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.Crimson:
+                case ZidThemes.Crimson:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(255, 228, 225);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -739,7 +674,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.Indigo:
+                case ZidThemes.Indigo:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(230, 230, 250);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -764,7 +699,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.Emerald:
+                case ZidThemes.Emerald:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(209, 255, 219);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -788,7 +723,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.Lavender:
+                case ZidThemes.Lavender:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(250, 240, 255);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -812,7 +747,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.Bronze:
+                case ZidThemes.Bronze:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(255, 239, 213);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -836,7 +771,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.Navy:
+                case ZidThemes.Navy:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(240, 248, 255);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -860,7 +795,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.Mint:
+                case ZidThemes.Mint:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(245, 255, 250);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -884,7 +819,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.Coral:
+                case ZidThemes.Coral:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(255, 240, 245);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -908,7 +843,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.Steel:
+                case ZidThemes.Steel:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(220, 220, 220);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -932,7 +867,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.Gold:
+                case ZidThemes.Gold:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(255, 250, 205);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -956,7 +891,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.Plum:
+                case ZidThemes.Plum:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(255, 240, 255);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -980,7 +915,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     grid.RowTemplate.Height = 26;
                     grid.BackgroundColor = Color.White;
                     break;
-                case GridThemes.Aqua:
+                case ZidThemes.Aqua:
                     grid.EnableHeadersVisualStyles = false;
                     grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(240, 255, 255);
                     grid.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black;
@@ -1035,6 +970,47 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
             }
         }
 
+        public int RecordCount
+        {
+            get { return GridView == null ? 0 : GridView.Rows.Count; }
+        }
+        public int FieldCount
+        {
+            get { return GridView == null ? 0 : GridView.Columns.Count; }
+        }
+        /// <summary>
+        /// Repositions the grid to match the new size
+        /// </summary>
+        /// <param name="e">event arguments</param>
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            RepositionGrid();
+        }
+        private void RepositionGrid()
+        {
+            int newTop = GridView.Top;
+            int newHeight = GridView.Height;
+            int newLeft = 0;
+            int newWidth = this.Width;
+            switch (filterExtender.FilterBoxPosition)
+            {
+                case FilterPosition.Off:
+                    newTop = 0;
+                    newHeight = this.Height;
+                    break;
+                case FilterPosition.Top:
+                    newTop = filterExtender.NeededControlHeight + 1;
+                    newHeight = this.Height - newTop - 1;
+                    break;
+                case FilterPosition.Bottom:
+                    newTop = 0;
+                    newHeight = this.Height - filterExtender.NeededControlHeight - 1;
+                    break;
+            }
+
+            GridView.SetBounds(newLeft, newTop, newWidth, newHeight, BoundsSpecified.All);
+        }
         #region Header Context Menu
 
         /// <summary>
@@ -1086,7 +1062,8 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                             ColumnIndex = columnIndex,
                             Column = columnIndex >= 0 && columnIndex < GridView.Columns.Count
                                 ? GridView.Columns[columnIndex]
-                                : null
+                                : null,
+                            Theme = this.Theme
                         };
                         clickedPlugin.Execute(context);
                     };
@@ -1137,5 +1114,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
         }
 
         #endregion
+
+        
     }
 }

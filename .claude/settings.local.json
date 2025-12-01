@@ -29,7 +29,12 @@
       "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"D:\\Just For Fun\\ZidUtilities\\CommonCode.Win\\CommonCode.Win.csproj\")",
       "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"D:\\Just For Fun\\ZidUtilities\\TesterWin\\TesterWin.csproj\")",
       "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"CommonCode.Win\\CommonCode.Win.csproj\")",
-      "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" ZidUtilities.sln /t:Build /v:minimal)"
+      "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" ZidUtilities.sln /t:Build /v:minimal)",
+      "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"D:\\Just For Fun\\ZidUtilities\\ZidUtilities.sln\" /t:Build /p:Configuration=Debug /v:minimal)",
+      "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" ZidUtilities.sln /t:Build /p:Configuration=Debug /v:minimal)",
+      "Bash(\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" \"ZidUtilities.sln\")",
+      "Bash(del ComponentsThemeManager.cs)",
+      "Bash(ping:*)"
     ],
     "deny": [],
     "ask": []

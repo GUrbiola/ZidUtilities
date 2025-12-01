@@ -256,6 +256,21 @@ namespace ZidUtilities.CommonCode.Files
             }
             else
             {
+                ThDataSet = Data;
+                ThFilePath = FilePath;
+                ThCurPercentage = 0;
+                ThCurrentRecord = 0;
+                ThRecordCount = 0;
+                ThIsStream = false;
+
+                foreach (DataTable table in Data.Tables)
+                {
+                    ThRecordCount += table.Rows.Count;
+                }
+
+                if (OnStartExportation != null)
+                    OnStartExportation(DateTime.Now, ThRecordCount, 0, ExportType);
+
                 if (File.Exists(FilePath))
                     File.Delete(FilePath);
 
@@ -291,6 +306,9 @@ namespace ZidUtilities.CommonCode.Files
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+
+                if( OnCompletedExportation != null)
+                    OnCompletedExportation(DateTime.Now, ThRecordCount, ExportType, null, FilePath);
             }
         }
         /// <summary>
@@ -338,27 +356,48 @@ namespace ZidUtilities.CommonCode.Files
             }
             else
             {
+                ThDataSet = Data;
+                ThFilePath = "";
+                ThCurPercentage = 0;
+                ThCurrentRecord = 0;
+                ThRecordCount = 0;
+                ThIsStream = false;
+
+                foreach (DataTable table in Data.Tables)
+                {
+                    ThRecordCount += table.Rows.Count;
+                }
+
+                if (OnStartExportation != null)
+                    OnStartExportation(DateTime.Now, ThRecordCount, 0, ExportType);
+
+                Stream back = null;
                 switch (ExportType)
                 {
                     case ExportTo.XLSX:
-                        Stream ResX = CreateXLSX(Data);
-                        ResX.Seek(0, SeekOrigin.Begin);
-                        return ResX;
+                        back = CreateXLSX(Data);
+                        back.Seek(0, SeekOrigin.Begin);
+                        break;
                     case ExportTo.TXT:
-                        Stream ResTxt = CreateTXT(Data);
-                        ResTxt.Seek(0, SeekOrigin.Begin);
-                        return ResTxt;
+                        back = CreateTXT(Data);
+                        back.Seek(0, SeekOrigin.Begin);
+                        break;
                     case ExportTo.CSV:
-                        Stream ResCsv = CreateCSV(Data);
-                        ResCsv.Seek(0, SeekOrigin.Begin);
-                        return ResCsv;
+                        back = CreateCSV(Data);
+                        back.Seek(0, SeekOrigin.Begin);
+                        break;
                     case ExportTo.HTML:
-                        Stream ResHtml = CreateHTML(Data);
-                        ResHtml.Seek(0, SeekOrigin.Begin);
-                        return ResHtml;
+                        back = CreateHTML(Data);
+                        back.Seek(0, SeekOrigin.Begin);
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+
+                if (OnCompletedExportation != null)
+                    OnCompletedExportation(DateTime.Now, ThRecordCount, ExportType, ThStream, ThFilePath);
+
+                return back;
             }
         }
 
@@ -784,6 +823,18 @@ namespace ZidUtilities.CommonCode.Files
                         }
                     }
                 }
+                else
+                {
+                    if (ThRecordCount > 100)
+                    {
+                        if (ThCurrentRecord % (ThRecordCount / 100) == 0)
+                        {
+                            if(OnProgress != null)
+                                OnProgress(DateTime.Now, ThRecordCount, ThCurrentRecord, ExportType);
+                        }
+                    }
+
+                }
 
                 curCol = 1;
                 curRow++;
@@ -864,6 +915,17 @@ namespace ZidUtilities.CommonCode.Files
                             }
                         }
                     }
+                    else
+                    {
+                        if (ThRecordCount > 100)
+                        {
+                            if (ThCurrentRecord % (ThRecordCount / 100) == 0)
+                            {
+                                if (OnProgress != null)
+                                    OnProgress(DateTime.Now, ThRecordCount, ThCurrentRecord, ExportType);
+                            }
+                        }
+                    }
                 }
                 tw.Flush();
                 #endregion
@@ -910,6 +972,17 @@ namespace ZidUtilities.CommonCode.Files
                             {
                                 AsyncExporter.ReportProgress(((ThCurrentRecord) * 100) / ThRecordCount);
                                 ThCurPercentage = ((ThCurrentRecord) * 100) / ThRecordCount;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (ThRecordCount > 100)
+                        {
+                            if (ThCurrentRecord % (ThRecordCount / 100) == 0)
+                            {
+                                if (OnProgress != null)
+                                    OnProgress(DateTime.Now, ThRecordCount, ThCurrentRecord, ExportType);
                             }
                         }
                     }
@@ -981,6 +1054,17 @@ namespace ZidUtilities.CommonCode.Files
                     {
                         AsyncExporter.ReportProgress(((ThCurrentRecord) * 100) / ThRecordCount);
                         ThCurPercentage = ((ThCurrentRecord) * 100) / ThRecordCount;
+                    }
+                }
+                else
+                {
+                    if (ThRecordCount > 100)
+                    {
+                        if (ThCurrentRecord % (ThRecordCount / 100) == 0)
+                        {
+                            if (OnProgress != null)
+                                OnProgress(DateTime.Now, ThRecordCount, ThCurrentRecord, ExportType);
+                        }
                     }
                 }
             }
@@ -1094,6 +1178,17 @@ namespace ZidUtilities.CommonCode.Files
                             {
                                 AsyncExporter.ReportProgress(((ThCurrentRecord) * 100) / ThRecordCount);
                                 ThCurPercentage = ((ThCurrentRecord) * 100) / ThRecordCount;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (ThRecordCount > 100)
+                        {
+                            if (ThCurrentRecord % (ThRecordCount / 100) == 0)
+                            {
+                                if (OnProgress != null)
+                                    OnProgress(DateTime.Now, ThRecordCount, ThCurrentRecord, ExportType);
                             }
                         }
                     }

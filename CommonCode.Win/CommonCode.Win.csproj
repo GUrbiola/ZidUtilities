@@ -111,10 +111,12 @@
     <Compile Include="Controls\Grid\GridFilter\GridFilters\TextGridFilter.cs" />
     <Compile Include="Controls\Grid\GridFilter\IGridFilter.cs" />
     <Compile Include="Controls\Grid\GridFilter\IGridFilterFactory.cs" />
+    <Compile Include="Controls\Grid\GridThemeHelper.cs" />
     <Compile Include="Controls\Grid\GridThemes.cs" />
+    <Compile Include="ZidThemes.cs" />
     <Compile Include="Controls\Grid\IZidGridPlugin.cs" />
+    <Compile Include="Controls\Grid\Plugins\ColumnVisibilityPlugin.cs" />
     <Compile Include="Controls\Grid\Plugins\DataExportPlugin.cs" />
-    <Compile Include="Controls\Grid\SamplePlugins\ExportToCSVPlugin.cs" />
     <Compile Include="Controls\Grid\ZidGridMenuItem.cs" />
     <Compile Include="Controls\Grid\ZidGridMenuItemCollection.cs" />
     <Compile Include="Controls\Grid\ZidGridPluginCollection.cs" />
@@ -135,6 +137,9 @@
     </Compile>
     <Compile Include="Controls\VerticalProgressBar.Designer.cs">
       <DependentUpon>VerticalProgressBar.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ThemeManager.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Forms\ComplexObjectSelectionDialog.cs">
       <SubType>Form</SubType>
@@ -224,6 +229,9 @@
     <EmbeddedResource Include="Controls\VerticalProgressBar.resx">
       <DependentUpon>VerticalProgressBar.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ProcessingDialog.resx">
+      <DependentUpon>ProcessingDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\SqlConnectForm.resx">
       <DependentUpon>SqlConnectForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -274,6 +282,7 @@
   <ItemGroup>
     <Content Include="Resources\Book_32.png" />
     <Content Include="Resources\close_32x32.png" />
+    <None Include="Resources\work-in-progress.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

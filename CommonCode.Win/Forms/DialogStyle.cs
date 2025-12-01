@@ -41,7 +41,7 @@ namespace ZidUtilities.CommonCode.Win.Forms
     }
 
     /// <summary>
-    /// Helper class to provide color schemes based on DialogStyle.
+    /// Helper class to provide color schemes based on DialogStyle or ZidThemes.
     /// </summary>
     internal static class DialogStyleHelper
     {
@@ -69,11 +69,29 @@ namespace ZidUtilities.CommonCode.Win.Forms
         }
 
         /// <summary>
+        /// Gets the header background color for the specified theme.
+        /// </summary>
+        public static Color GetHeaderColor(ZidThemes theme)
+        {
+            var colors = Controls.Grid.GridThemeHelper.GetThemeColors(theme);
+            return colors.HeaderBackColor;
+        }
+
+        /// <summary>
         /// Gets the header text color for the specified style.
         /// </summary>
         public static Color GetHeaderTextColor(DialogStyle style)
         {
             return Color.White;
+        }
+
+        /// <summary>
+        /// Gets the header text color for the specified theme.
+        /// </summary>
+        public static Color GetHeaderTextColor(ZidThemes theme)
+        {
+            var colors = Controls.Grid.GridThemeHelper.GetThemeColors(theme);
+            return colors.HeaderForeColor;
         }
 
         /// <summary>
@@ -97,6 +115,15 @@ namespace ZidUtilities.CommonCode.Win.Forms
                 default:
                     return Color.FromArgb(52, 152, 219);
             }
+        }
+
+        /// <summary>
+        /// Gets the accent color for the specified theme.
+        /// </summary>
+        public static Color GetAccentColor(ZidThemes theme)
+        {
+            var colors = Controls.Grid.GridThemeHelper.GetThemeColors(theme);
+            return colors.AccentColor;
         }
     }
 }

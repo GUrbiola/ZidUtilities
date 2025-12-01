@@ -44,7 +44,7 @@ namespace ZidUtilities.TesterWin
             this.zidGrid1.Name = "zidGrid1";
             this.zidGrid1.Size = new System.Drawing.Size(760, 368);
             this.zidGrid1.TabIndex = 0;
-            this.zidGrid1.Theme = ZidUtilities.CommonCode.Win.Controls.Grid.GridThemes.None;
+            this.zidGrid1.Theme = ZidUtilities.CommonCode.Win.ZidThemes.None;
             this.zidGrid1.TitleFont = new System.Drawing.Font("Verdana", 9.25F, System.Drawing.FontStyle.Bold);
             //
             // label1

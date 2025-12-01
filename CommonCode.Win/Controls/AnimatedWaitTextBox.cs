@@ -21,6 +21,7 @@ namespace ZidUtilities.CommonCode.Win.Controls
     /// <param name="Text">The secured text.</param>
     public delegate void TextSecured(string Text);
 
+    [ToolboxBitmap(@"D:\Just For Fun\ZidUtilities\CommonCode.Win\Controls\AnimatedWaitTextBox.ico")]
     /// <summary>
     /// A composite WinForms UserControl that shows an animated image when the text is edited,
     /// waits for a configurable interval of timer ticks, and raises events when the wait ends

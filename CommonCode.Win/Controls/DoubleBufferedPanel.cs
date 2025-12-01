@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using System.Windows.Forms;
 
 namespace ZidUtilities.CommonCode.Win.Controls
 {
+    [ToolboxBitmap(@"D:\Just For Fun\ZidUtilities\CommonCode.Win\Controls\DoubleBufferedPanel.ico")]
     /// <summary>
     /// A Windows Forms `Panel` derivative that enables double-buffered painting to reduce flicker.
     /// </summary>

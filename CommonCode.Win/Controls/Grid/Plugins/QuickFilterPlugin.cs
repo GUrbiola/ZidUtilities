@@ -18,6 +18,14 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
 
         public bool Enabled => true;
 
+        public event PluginExecuted OnPluginExecuted;
+
+        /// <summary>
+        /// Executes the plugin by validating the context and showing the quick filter dialog for the selected column.
+        /// </summary>
+        /// <param name="context">The plugin execution context containing the DataGridView, column, column index and theme.
+        /// Must contain a non-null DataGridView and a valid ColumnIndex.</param>
+        /// <returns>None. The method shows a modal dialog and returns after it is closed.</returns>
         public void Execute(ZidGridPluginContext context)
         {
             if (context.DataGridView == null || context.Column == null)
@@ -30,6 +38,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             using (var filterDialog = new QuickFilterDialog(context.DataGridView, context.ColumnIndex, context.Theme))
             {
                 filterDialog.ShowDialog();
+                OnPluginExecuted?.Invoke(context, "QuickFilterPlugin");
             }
         }
     }
@@ -51,6 +60,13 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
         private Label lblColumnName;
         private TextBox txtSearch;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="QuickFilterDialog"/> class.
+        /// Sets internal fields, constructs UI and loads the unique values for the specified column.
+        /// </summary>
+        /// <param name="grid">The DataGridView to operate on. Must not be null.</param>
+        /// <param name="columnIndex">Zero-based index of the column to filter.</param>
+        /// <param name="theme">Theme to apply to the dialog visuals.</param>
         public QuickFilterDialog(DataGridView grid, int columnIndex, ZidThemes theme)
         {
             _grid = grid;
@@ -60,6 +76,14 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             LoadUniqueValues();
         }
 
+        /// <summary>
+        /// Builds and configures all visual controls used by the dialog.
+        /// Attaches event handlers to controls (search box, buttons).
+        /// </summary>
+        /// <remarks>
+        /// This method configures sizes, locations, colors and basic styles for controls.
+        /// It does not return a value; it mutates the dialog's Controls collection.
+        /// </remarks>
         private void InitializeComponent()
         {
             this.Text = "Quick Filter";
@@ -203,6 +227,14 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             this.CancelButton = btnClose;
         }
 
+        /// <summary>
+        /// Scans the target column in the grid and populates the checklist with unique string representations
+        /// of cell values. Null or DB nulls are represented as "(Blank)". All items are checked by default.
+        /// </summary>
+        /// <remarks>
+        /// This method clears the checklist first and then adds sorted unique values.
+        /// It does not return a value.
+        /// </remarks>
         private void LoadUniqueValues()
         {
             chkValues.Items.Clear();
@@ -231,6 +263,13 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             }
         }
 
+        /// <summary>
+        /// Handles the TextChanged event for the search textbox. Filters the checklist items to only show
+        /// those that contain the search text (case-insensitive). Preserves checked state of matching items.
+        /// </summary>
+        /// <param name="sender">The textbox control that raised the event.</param>
+        /// <param name="e">Event arguments (unused).</param>
+        /// <returns>None. The method updates the checked list box in place.</returns>
         private void TxtSearch_TextChanged(object sender, EventArgs e)
         {
             string searchText = txtSearch.Text.ToLower();
@@ -268,6 +307,12 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             chkValues.EndUpdate();
         }
 
+        /// <summary>
+        /// Event handler that marks all items in the checklist as checked.
+        /// </summary>
+        /// <param name="sender">The button that was clicked.</param>
+        /// <param name="e">Click event arguments (unused).</param>
+        /// <returns>None. All items in the checklist will be checked after this call.</returns>
         private void BtnSelectAll_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < chkValues.Items.Count; i++)
@@ -276,6 +321,12 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             }
         }
 
+        /// <summary>
+        /// Event handler that marks all items in the checklist as unchecked.
+        /// </summary>
+        /// <param name="sender">The button that was clicked.</param>
+        /// <param name="e">Click event arguments (unused).</param>
+        /// <returns>None. All items in the checklist will be unchecked after this call.</returns>
         private void BtnDeselectAll_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < chkValues.Items.Count; i++)
@@ -284,6 +335,14 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             }
         }
 
+        /// <summary>
+        /// Event handler that applies the selected value filter to the DataGridView.
+        /// Collects selected values from the checklist and hides rows whose cell value does not match any selected value.
+        /// Shows informational or error messages as appropriate.
+        /// </summary>
+        /// <param name="sender">The button that was clicked.</param>
+        /// <param name="e">Click event arguments (unused).</param>
+        /// <returns>None. The grid row visibility is modified; dialog is closed with DialogResult.OK on success.</returns>
         private void BtnApply_Click(object sender, EventArgs e)
         {
             try
@@ -305,19 +364,109 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
                     return;
                 }
 
-                // Hide rows that don't match
+                // Determine a safe current cell: first row that will remain visible
+                int safeRowIndex = -1;
                 foreach (DataGridViewRow row in _grid.Rows)
                 {
                     if (row.IsNewRow)
                         continue;
 
-                    var cellValue = row.Cells[_columnIndex].Value;
-                    string displayValue = cellValue == null || cellValue == DBNull.Value
-                        ? "(Blank)"
-                        : cellValue.ToString();
-
-                    row.Visible = selectedValues.Contains(displayValue);
+                    string displayValue = GetDisplayValueForRow(row);
+                    if (selectedValues.Contains(displayValue))
+                    {
+                        safeRowIndex = row.Index;
+                        break;
+                    }
                 }
+
+                // Try to set a safe current cell before hiding rows to avoid InvalidOperationException
+                try
+                {
+                    if (safeRowIndex >= 0 && _grid.Columns.Count > 0)
+                    {
+                        // Prefer the same column cell to remain current if possible
+                        if (_grid.Rows[safeRowIndex].Cells.Count > _columnIndex)
+                        {
+                            _grid.CurrentCell = _grid.Rows[safeRowIndex].Cells[_columnIndex];
+                        }
+                        else if (_grid.Rows[safeRowIndex].Cells.Count > 0)
+                        {
+                            _grid.CurrentCell = _grid.Rows[safeRowIndex].Cells[0];
+                        }
+                    }
+                    else
+                    {
+                        // No row will remain visible; try to clear CurrentCell to allow hiding rows
+                        try
+                        {
+                            _grid.CurrentCell = null;
+                        }
+                        catch
+                        {
+                            // ignore; some bindings may not allow null CurrentCell
+                        }
+                    }
+                }
+                catch
+                {
+                    // If moving CurrentCell fails for some reason, proceed but be defensive when hiding rows
+                }
+
+                // Apply visibility changes safely
+                _grid.SuspendLayout();
+                _grid.ClearSelection();
+
+                foreach (DataGridViewRow row in _grid.Rows)
+                {
+                    if (row.IsNewRow)
+                        continue;
+
+                    try
+                    {
+                        string displayValue = GetDisplayValueForRow(row);
+                        bool shouldBeVisible = selectedValues.Contains(displayValue);
+
+                        // If the row is the current row and we're trying to hide it, skip or attempt to move current cell again
+                        if (!shouldBeVisible && _grid.CurrentCell != null && row.Index == _grid.CurrentCell.RowIndex)
+                        {
+                            // Try to move current cell to the safeRowIndex if it's still valid, otherwise try to clear it
+                            try
+                            {
+                                if (safeRowIndex >= 0 && safeRowIndex != row.Index && safeRowIndex < _grid.Rows.Count)
+                                {
+                                    if (_grid.Rows[safeRowIndex].Cells.Count > _columnIndex)
+                                        _grid.CurrentCell = _grid.Rows[safeRowIndex].Cells[_columnIndex];
+                                    else if (_grid.Rows[safeRowIndex].Cells.Count > 0)
+                                        _grid.CurrentCell = _grid.Rows[safeRowIndex].Cells[0];
+                                }
+                                else
+                                {
+                                    _grid.CurrentCell = null;
+                                }
+                            }
+                            catch
+                            {
+                                // If unable to move CurrentCell, skip hiding this row to avoid exception
+                                continue;
+                            }
+                        }
+
+                        row.Visible = shouldBeVisible;
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        // If making the row invisible fails, skip hiding this row to avoid crashing the UI.
+                        // This is a safe fallback; the user can try again or use Clear Filter which makes all rows visible.
+                        continue;
+                    }
+                    catch
+                    {
+                        // Any unexpected exception per-row: skip and continue
+                        continue;
+                    }
+                }
+
+                _grid.ResumeLayout();
 
                 MessageBox.Show($"Filter applied! Showing {selectedValues.Count} value(s).", "Quick Filter",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -332,15 +481,23 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             }
         }
 
+        /// <summary>
+        /// Event handler that clears any applied filter by making all rows visible again.
+        /// Shows a confirmation message and closes the dialog with DialogResult.OK on success.
+        /// </summary>
+        /// <param name="sender">The button that was clicked.</param>
+        /// <param name="e">Click event arguments (unused).</param>
+        /// <returns>None. All rows in the bound DataGridView are made visible.</returns>
         private void BtnClear_Click(object sender, EventArgs e)
         {
             try
             {
-                // Show all rows
+                _grid.SuspendLayout();
                 foreach (DataGridViewRow row in _grid.Rows)
                 {
                     row.Visible = true;
                 }
+                _grid.ResumeLayout();
 
                 MessageBox.Show("Filter cleared. All rows are now visible.", "Quick Filter",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -353,6 +510,12 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
                 MessageBox.Show("Error clearing filter: " + ex.Message, "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private string GetDisplayValueForRow(DataGridViewRow row)
+        {
+            var cellValue = row.Cells[_columnIndex].Value;
+            return cellValue == null || cellValue == DBNull.Value ? "(Blank)" : cellValue.ToString();
         }
     }
 }

@@ -15,6 +15,13 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
 
         public bool Enabled => true;
 
+        public event PluginExecuted OnPluginExecuted;
+
+        /// <summary>
+        /// Executes the plugin by displaying the Column Visibility dialog for the provided context.
+        /// </summary>
+        /// <param name="context">The plugin execution context containing the DataGridView and theme.</param>
+        /// <returns>This method does not return a value.</returns>
         public void Execute(ZidGridPluginContext context)
         {
             if (context.DataGridView == null || context.DataGridView.Columns.Count == 0)
@@ -27,6 +34,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             using (var dialog = new ColumnVisibilityDialog(context.DataGridView, context.Theme))
             {
                 dialog.ShowDialog();
+                OnPluginExecuted?.Invoke(context, "ColumnVisibilityPlugin");
             }
         }
     }
@@ -46,6 +54,12 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
         private DataGridView _grid;
         private GridThemeHelper.ThemeColors _themeColors;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ColumnVisibilityDialog"/> class.
+        /// </summary>
+        /// <param name="grid">The DataGridView whose columns will be presented for visibility toggling.</param>
+        /// <param name="theme">The theme to apply to the dialog UI.</param>
+        /// <returns>This constructor does not return a value.</returns>
         public ColumnVisibilityDialog(DataGridView grid, ZidThemes theme)
         {
             _grid = grid;
@@ -56,6 +70,11 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             PopulateColumns();
         }
 
+        /// <summary>
+        /// Creates and configures all UI controls used by the dialog.
+        /// This method sets sizes, positions, event handlers and dialog properties.
+        /// </summary>
+        /// <returns>This method does not return a value.</returns>
         private void InitializeComponent()
         {
             this.Text = "Column Visibility";
@@ -123,6 +142,10 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             this.CancelButton = btnCancel;
         }
 
+        /// <summary>
+        /// Applies the current theme colors and fonts to all dialog controls.
+        /// </summary>
+        /// <returns>This method does not return a value.</returns>
         private void ApplyTheme()
         {
             // Apply theme to header panel
@@ -159,6 +182,11 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             btnCancel.FlatStyle = FlatStyle.Flat;
         }
 
+        /// <summary>
+        /// Populates the checked list box with entries for each column in the grid.
+        /// Each item is represented by a ColumnItem and its checked state reflects column visibility.
+        /// </summary>
+        /// <returns>This method does not return a value.</returns>
         private void PopulateColumns()
         {
             chkListColumns.Items.Clear();
@@ -179,6 +207,12 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             }
         }
 
+        /// <summary>
+        /// Event handler that checks all items in the checked list box.
+        /// </summary>
+        /// <param name="sender">The control that sent the event (Select All button).</param>
+        /// <param name="e">Event arguments.</param>
+        /// <returns>This method does not return a value.</returns>
         private void BtnSelectAll_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < chkListColumns.Items.Count; i++)
@@ -187,6 +221,12 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             }
         }
 
+        /// <summary>
+        /// Event handler that unchecks all items in the checked list box.
+        /// </summary>
+        /// <param name="sender">The control that sent the event (Deselect All button).</param>
+        /// <param name="e">Event arguments.</param>
+        /// <returns>This method does not return a value.</returns>
         private void BtnDeselectAll_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < chkListColumns.Items.Count; i++)
@@ -195,6 +235,13 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             }
         }
 
+        /// <summary>
+        /// Event handler that applies the user's visibility selections to the underlying grid columns.
+        /// Iterates over checked list items and sets the corresponding column's Visible property.
+        /// </summary>
+        /// <param name="sender">The control that sent the event (Apply/OK button).</param>
+        /// <param name="e">Event arguments.</param>
+        /// <returns>This method does not return a value.</returns>
         private void BtnOK_Click(object sender, EventArgs e)
         {
             // Apply visibility changes
@@ -211,6 +258,10 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             public DataGridViewColumn Column { get; set; }
             public string DisplayName { get; set; }
 
+            /// <summary>
+            /// Returns the display name that will be shown in the checked list box.
+            /// </summary>
+            /// <returns>The display name string for this column item.</returns>
             public override string ToString()
             {
                 return DisplayName;

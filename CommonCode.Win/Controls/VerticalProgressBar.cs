@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace ZidUtilities.CommonCode.Win.Controls
 {
-
+    [ToolboxBitmap(@"D:\Just For Fun\ZidUtilities\CommonCode.Win\Controls\VerticalProgressBar.ico")]
     /// <summary>
     /// A vertical progress bar control composed of two panels: a top background and a bottom filled bar.
     /// Supports solid colors or linear gradients for both the filled portion and the background.

@@ -16,6 +16,7 @@ using ZidUtilities.CommonCode.Win.Controls.Diff;
 
 namespace ZidUtilities.CommonCode.Win.Controls.Diff
 {
+    [ToolboxBitmap(@"D:\Just For Fun\ZidUtilities\CommonCode.Win\Controls\Diff\SideToSideLineComparer.ico")]
     public partial class SideToSideLineComparer : UserControl
     {
         [Category("Custom Properties")]

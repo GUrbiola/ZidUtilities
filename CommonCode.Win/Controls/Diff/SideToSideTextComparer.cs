@@ -16,6 +16,7 @@ using static System.Windows.Forms.LinkLabel;
 namespace ZidUtilities.CommonCode.Win.Controls.Diff
 {
     public delegate void LineClicked(string TxtLeft, string TxtRight);
+    [ToolboxBitmap(@"D:\Just For Fun\ZidUtilities\CommonCode.Win\Controls\Diff\SideToSideTextComparer.ico")]
     public partial class SideToSideTextComparer : UserControl
     {
         public event LineClicked OnLineClicked;

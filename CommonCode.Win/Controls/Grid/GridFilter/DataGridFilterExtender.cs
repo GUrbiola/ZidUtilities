@@ -33,13 +33,14 @@ namespace ZidUtilities.Win.Controls.Grid.GridFilter
 		Off
 	}
 
-	#endregion
+    #endregion
 
-	/// <summary>
-	/// Component which allows <see cref="DataGridView"/>s to be extended with
-	/// autometed filter functionality.
-	/// </summary>
-	public class DataGridFilterExtender : System.ComponentModel.Component, System.ComponentModel.ISupportInitialize
+    [ToolboxBitmap(@"D:\Just For Fun\ZidUtilities\CommonCode.Win\Controls\Grid\GridFilter\DataGridFilterExtender.ico")]
+    /// <summary>
+    /// Component which allows <see cref="DataGridView"/>s to be extended with
+    /// autometed filter functionality.
+    /// </summary>
+    public class DataGridFilterExtender : System.ComponentModel.Component, System.ComponentModel.ISupportInitialize
 	{
 		#region Events
 

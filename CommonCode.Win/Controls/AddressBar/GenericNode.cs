@@ -12,6 +12,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
     /// </summary>
     [DesignerCategory("Component")]
     [ToolboxItem(true)]
+    [ToolboxBitmap(@"D:\Just For Fun\ZidUtilities\CommonCode.Win\Controls\AddressBar\GenericNode.ico")]
     public class GenericNode : Component, IAddressNode
     {
         #region Events

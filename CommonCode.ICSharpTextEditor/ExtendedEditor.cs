@@ -1,7 +1,4 @@
-﻿using ZidUtilities.CommonCode.ICSharpTextEditor.BracketMatching;
-using ZidUtilities.CommonCode.ICSharpTextEditor.FoldingStrategies;
-using ZidUtilities.CommonCode.ICSharpTextEditor.HelperForms;
-using ICSharpCode.TextEditor;
+﻿using ICSharpCode.TextEditor;
 using ICSharpCode.TextEditor.Document;
 using System;
 using System.CodeDom.Compiler;
@@ -9,18 +6,24 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ZidUtilities.CommonCode;
+using ZidUtilities.CommonCode.ICSharpTextEditor.BracketMatching;
+using ZidUtilities.CommonCode.ICSharpTextEditor.FoldingStrategies;
+using ZidUtilities.CommonCode.ICSharpTextEditor.HelperForms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace ZidUtilities.CommonCode.ICSharpTextEditor
 {
     public delegate void OnToolbarButtonClick(string selectedText, ToolbarOption btnClicked);
     public delegate void OnKeyPressOnEditor(Keys keyData);
+    
+    [ToolboxBitmap(@"D:\Just For Fun\ZidUtilities\CommonCode.ICSharpTextEditor\ExtendedEditor.ico")]
     public partial class ExtendedEditor : UserControl
     {
         [Category("Custom Event")]

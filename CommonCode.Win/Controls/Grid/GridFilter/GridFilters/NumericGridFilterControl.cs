@@ -7,11 +7,12 @@ using System.ComponentModel;
 
 namespace ZidUtilities.Win.Controls.Grid.GridFilter.GridFilters
 {
-	/// <summary>
-	/// A control with a <see cref="ComboBox"/> and two <see cref="TextBox"/>es
-	/// needed in the <see cref="NumericGridFilter"/>.
-	/// </summary>
-	public class NumericGridFilterControl : System.Windows.Forms.UserControl
+    [ToolboxItem(false)]
+    /// <summary>
+    /// A control with a <see cref="ComboBox"/> and two <see cref="TextBox"/>es
+    /// needed in the <see cref="NumericGridFilter"/>.
+    /// </summary>
+    public class NumericGridFilterControl : System.Windows.Forms.UserControl
 	{
 		#region Fields
 

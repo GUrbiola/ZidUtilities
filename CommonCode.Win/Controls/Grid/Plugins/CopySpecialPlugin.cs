@@ -12,12 +12,31 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
     /// </summary>
     public class CopySpecialPlugin : IZidGridPlugin
     {
+        /// <summary>
+        /// Gets the display text for the menu item.
+        /// </summary>
         public string MenuText => "Copy Special...";
 
+        /// <summary>
+        /// Gets the image/icon for the menu item (optional, can be null).
+        /// </summary>
         public Image MenuImage => Resources.Copy32;
 
+        /// <summary>
+        /// Gets whether the menu item is enabled.
+        /// </summary>
         public bool Enabled => true;
 
+        public event PluginExecuted OnPluginExecuted;
+
+        /// <summary>
+        /// Executes the plugin functionality by showing the Copy Special dialog.
+        /// </summary>
+        /// <param name="context">The plugin execution context containing grid and theme references.</param>
+        /// <remarks>
+        /// If the context does not contain a DataGridView, the method returns without action.
+        /// The dialog is shown modally using ShowDialog and disposed afterwards.
+        /// </remarks>
         public void Execute(ZidGridPluginContext context)
         {
             if (context.DataGridView == null)
@@ -27,24 +46,40 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             using (var copyDialog = new CopySpecialDialog(context.DataGridView, context.Theme))
             {
                 copyDialog.ShowDialog();
+                OnPluginExecuted?.Invoke(context, "CopySpecialPlugin");
             }
         }
     }
 
     /// <summary>
-    /// Copy format options
+    /// Copy format options enumeration.
     /// </summary>
     public enum CopyFormat
     {
+        /// <summary>
+        /// Plain text output, tab-delimited by default.
+        /// </summary>
         PlainText,
+        /// <summary>
+        /// CSV output (comma-separated values).
+        /// </summary>
         CSV,
+        /// <summary>
+        /// HTML table output.
+        /// </summary>
         HTML,
+        /// <summary>
+        /// JSON array output.
+        /// </summary>
         JSON,
+        /// <summary>
+        /// SQL INSERT statements output.
+        /// </summary>
         SQL
     }
 
     /// <summary>
-    /// Dialog for selecting copy format
+    /// Dialog for selecting copy format and options.
     /// </summary>
     internal class CopySpecialDialog : Form
     {
@@ -62,6 +97,11 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
         private Button btnCopy;
         private Button btnClose;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CopySpecialDialog"/> class.
+        /// </summary>
+        /// <param name="grid">The DataGridView whose data will be copied.</param>
+        /// <param name="theme">The theme to use for dialog styling.</param>
         public CopySpecialDialog(DataGridView grid, ZidThemes theme)
         {
             _grid = grid;
@@ -69,6 +109,13 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Initializes UI components of the dialog and applies theming.
+        /// </summary>
+        /// <remarks>
+        /// Builds the controls (radio buttons, checkboxes, buttons, etc.) and wires up event handlers.
+        /// This method sets control properties such as locations, sizes, colors, and fonts.
+        /// </remarks>
         private void InitializeComponent()
         {
             this.Text = "Copy Special";
@@ -243,6 +290,12 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             this.CancelButton = btnClose;
         }
 
+        /// <summary>
+        /// Handles changes to the selected output format radio buttons.
+        /// Shows or hides SQL-specific controls when SQL format is selected.
+        /// </summary>
+        /// <param name="sender">The radio button that triggered the event.</param>
+        /// <param name="e">Event data.</param>
         private void FormatChanged(object sender, EventArgs e)
         {
             // Show/hide table name for SQL format
@@ -251,6 +304,16 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             txtTableName.Visible = isSql;
         }
 
+        /// <summary>
+        /// Click handler for the "Copy to Clipboard" button.
+        /// Generates the output in the selected format and places it on the clipboard.
+        /// </summary>
+        /// <param name="sender">The button that was clicked.</param>
+        /// <param name="e">Event data.</param>
+        /// <remarks>
+        /// Displays informational or error messages to the user via MessageBox.
+        /// Sets DialogResult to OK on successful copy and closes the dialog.
+        /// </remarks>
         private void BtnCopy_Click(object sender, EventArgs e)
         {
             try
@@ -283,6 +346,10 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             }
         }
 
+        /// <summary>
+        /// Determines which copy format is currently selected by the user.
+        /// </summary>
+        /// <returns>The selected <see cref="CopyFormat"/> enum value. Defaults to <see cref="CopyFormat.PlainText"/>.</returns>
         private CopyFormat GetSelectedFormat()
         {
             if (rbPlainText.Checked) return CopyFormat.PlainText;
@@ -293,6 +360,13 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             return CopyFormat.PlainText;
         }
 
+        /// <summary>
+        /// Generates the output string in the requested format.
+        /// </summary>
+        /// <param name="format">The output format to generate.</param>
+        /// <param name="includeHeaders">Whether to include column headers in the output (if supported by format).</param>
+        /// <param name="selectedOnly">Whether to process only selected cells/rows.</param>
+        /// <returns>A string containing the formatted output ready to be copied to the clipboard.</returns>
         private string GenerateOutput(CopyFormat format, bool includeHeaders, bool selectedOnly)
         {
             switch (format)
@@ -312,6 +386,13 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             }
         }
 
+        /// <summary>
+        /// Generates plain-text or CSV output from the grid.
+        /// </summary>
+        /// <param name="includeHeaders">Whether to include column headers as the first line.</param>
+        /// <param name="selectedOnly">Whether to include only selected rows/cells.</param>
+        /// <param name="delimiter">The character used to separate values (e.g., '\t' for tab, ',' for CSV).</param>
+        /// <returns>A string with rows separated by newline and values separated by the specified delimiter.</returns>
         private string GeneratePlainText(bool includeHeaders, bool selectedOnly, char delimiter)
         {
             var sb = new StringBuilder();
@@ -346,6 +427,12 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Generates an HTML table representation of the grid data.
+        /// </summary>
+        /// <param name="includeHeaders">Whether to include table header row.</param>
+        /// <param name="selectedOnly">Whether to include only selected rows/cells.</param>
+        /// <returns>A string containing an HTML table with the grid data.</returns>
         private string GenerateHTML(bool includeHeaders, bool selectedOnly)
         {
             var sb = new StringBuilder();
@@ -386,6 +473,12 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Generates a JSON array representation of the grid data.
+        /// </summary>
+        /// <param name="includeHeaders">Whether headers should be considered (not used for JSON items names since headers are used as property names).</param>
+        /// <param name="selectedOnly">Whether to include only selected rows/cells.</param>
+        /// <returns>A string containing a JSON array where each element is an object representing a row.</returns>
         private string GenerateJSON(bool includeHeaders, bool selectedOnly)
         {
             var sb = new StringBuilder();
@@ -427,6 +520,11 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Generates SQL INSERT statements for the grid data.
+        /// </summary>
+        /// <param name="selectedOnly">Whether to include only selected rows/cells.</param>
+        /// <returns>A string containing one or more SQL INSERT statements for the selected or all rows.</returns>
         private string GenerateSQL(bool selectedOnly)
         {
             var sb = new StringBuilder();
@@ -472,6 +570,10 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Returns the visible columns from the grid ordered by display index.
+        /// </summary>
+        /// <returns>A list of visible <see cref="DataGridViewColumn"/> objects ordered by their DisplayIndex.</returns>
         private List<DataGridViewColumn> GetVisibleColumns()
         {
             return _grid.Columns.Cast<DataGridViewColumn>()
@@ -480,6 +582,14 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
                 .ToList();
         }
 
+        /// <summary>
+        /// Enumerates the rows to process based on whether only selected cells should be included.
+        /// </summary>
+        /// <param name="selectedOnly">
+        /// If true, only rows that contain selected cells are returned.
+        /// If false, all non-new rows in the grid are returned.
+        /// </param>
+        /// <returns>An enumerable of <see cref="DataGridViewRow"/> for processing.</returns>
         private IEnumerable<DataGridViewRow> GetRowsToProcess(bool selectedOnly)
         {
             if (selectedOnly && _grid.SelectedCells.Count > 0)
@@ -508,6 +618,11 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             }
         }
 
+        /// <summary>
+        /// Encodes text for safe inclusion in HTML by replacing special characters with HTML entities.
+        /// </summary>
+        /// <param name="text">The input text to encode. May be null or empty.</param>
+        /// <returns>The HTML-encoded string. If input is null or empty, the same value is returned.</returns>
         private string HtmlEncode(string text)
         {
             if (string.IsNullOrEmpty(text))
@@ -520,6 +635,14 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
                        .Replace("'", "&#39;");
         }
 
+        /// <summary>
+        /// Encodes an object value into a JSON-friendly string representation.
+        /// </summary>
+        /// <param name="value">The value to encode (may be null, string, bool, DateTime, or other).</param>
+        /// <returns>
+        /// A JSON literal as a string. For strings the result is quoted and escaped; for booleans it's "true"/"false";
+        /// for DateTime it's an ISO-like quoted string; for null returns "null"; otherwise uses ToString().
+        /// </returns>
         private string JsonEncode(object value)
         {
             if (value == null)

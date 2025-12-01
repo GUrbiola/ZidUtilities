@@ -23,18 +23,14 @@ namespace ZidUtilities.TesterWin
                 cmbThemes.Items.Add(new ComboBoxItem() { Text = item.ToString(), Theme = (ZidThemes)item });
 
 
-            //cmbThemes.Items.Add(new ComboBoxItem() { Text = "Black and White", Theme = GridThemes.BlackAndWhite});
-            //cmbThemes.Items.Add(new ComboBoxItem() { Text = "Blue", Theme = GridThemes.Blue });
-            //cmbThemes.Items.Add(new ComboBoxItem() { Text = "Code Project Style", Theme = GridThemes.CodeProject });
-            //cmbThemes.Items.Add(new ComboBoxItem() { Text = "Kind of green... maybe?", Theme = GridThemes.Greenish });
-            //cmbThemes.Items.Add(new ComboBoxItem() { Text = "Violet... manly violet -_-", Theme = GridThemes.Violet });
-
             zidGrid1.Plugins.Add(new ZidUtilities.CommonCode.Win.Controls.Grid.Plugins.DataExportPlugin());
             zidGrid1.Plugins.Add(new ZidUtilities.CommonCode.Win.Controls.Grid.Plugins.ColumnVisibilityPlugin());
             zidGrid1.Plugins.Add(new ZidUtilities.CommonCode.Win.Controls.Grid.Plugins.CopySpecialPlugin());
             zidGrid1.Plugins.Add(new ZidUtilities.CommonCode.Win.Controls.Grid.Plugins.FreezeColumnsPlugin());
             zidGrid1.Plugins.Add(new ZidUtilities.CommonCode.Win.Controls.Grid.Plugins.QuickFilterPlugin());
 
+            foreach (var option in zidGrid1.GetDefaultMenuOptions())
+                zidGrid1.CustomMenuItems.Add(option);
 
             cmbThemes.SelectedIndex = 0;
             cmbThemes.SelectedValueChanged += new EventHandler(cmbThemes_SelectedValueChanged);

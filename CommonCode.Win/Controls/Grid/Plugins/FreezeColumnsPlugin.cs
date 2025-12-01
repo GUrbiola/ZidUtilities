@@ -9,12 +9,34 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
     /// </summary>
     public class FreezeColumnsPlugin : IZidGridPlugin
     {
+        /// <summary>
+        /// Gets the display text for the plugin menu item.
+        /// </summary>
         public string MenuText => "Freeze/Unfreeze Columns";
 
+        /// <summary>
+        /// Gets the image/icon for the plugin menu item.
+        /// </summary>
         public Image MenuImage => Resources.Freeze32;
 
+        /// <summary>
+        /// Gets whether the plugin menu item is enabled.
+        /// </summary>
         public bool Enabled => true;
 
+        public event PluginExecuted OnPluginExecuted;
+
+        /// <summary>
+        /// Executes the plugin functionality by showing a dialog that allows the user
+        /// to freeze or unfreeze columns in the provided DataGridView.
+        /// </summary>
+        /// <param name="context">
+        /// The execution context containing the DataGridView to operate on and the current theme.
+        /// The method will return immediately if <see cref="ZidGridPluginContext.DataGridView"/> is null.
+        /// </param>
+        /// <returns>
+        /// This method does not return a value. It may show UI to the user and mutate the grid's column Frozen state.
+        /// </returns>
         public void Execute(ZidGridPluginContext context)
         {
             if (context.DataGridView == null)
@@ -24,6 +46,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             using (var freezeDialog = new FreezeColumnsDialog(context.DataGridView, context.Theme))
             {
                 freezeDialog.ShowDialog();
+                OnPluginExecuted?.Invoke(context, "FreezeColumnsPlugin");
             }
         }
     }
@@ -41,6 +64,11 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
         private Button btnClose;
         private Label lblInstructions;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FreezeColumnsDialog"/> class.
+        /// </summary>
+        /// <param name="grid">The DataGridView whose columns can be frozen or unfrozen by this dialog.</param>
+        /// <param name="theme">The theme to apply to the dialog UI elements.</param>
         public FreezeColumnsDialog(DataGridView grid, ZidThemes theme)
         {
             _grid = grid;
@@ -49,6 +77,10 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             LoadColumns();
         }
 
+        /// <summary>
+        /// Initializes and lays out UI components used by the dialog.
+        /// This sets up labels, list box for columns, and action buttons.
+        /// </summary>
         private void InitializeComponent()
         {
             this.Text = "Freeze Columns";
@@ -146,6 +178,13 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             this.CancelButton = btnClose;
         }
 
+        /// <summary>
+        /// Loads visible columns from the grid into the list box and selects any columns that are already frozen.
+        /// </summary>
+        /// <remarks>
+        /// The list displays each visible column using the format "HeaderText (Name)".
+        /// The selection indexes correspond to the visible columns order.
+        /// </remarks>
         private void LoadColumns()
         {
             lstColumns.Items.Clear();
@@ -165,6 +204,15 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             }
         }
 
+        /// <summary>
+        /// Handles the Click event for the Freeze Selected button.
+        /// Freezes columns from the left up to and including the rightmost selected visible column.
+        /// </summary>
+        /// <param name="sender">The button that raised the event.</param>
+        /// <param name="e">Event arguments for the click event.</param>
+        /// <returns>
+        /// None. On success the dialog sets its DialogResult to OK and closes. Shows message boxes for feedback or errors.
+        /// </returns>
         private void BtnFreeze_Click(object sender, EventArgs e)
         {
             if (lstColumns.SelectedIndices.Count == 0)
@@ -227,6 +275,12 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             }
         }
 
+        /// <summary>
+        /// Handles the Click event for the Unfreeze All button.
+        /// Unfreezes all columns in the associated DataGridView and refreshes the displayed column list.
+        /// </summary>
+        /// <param name="sender">The button that raised the event.</param>
+        /// <param name="e">Event arguments for the click event.</param>
         private void BtnUnfreezeAll_Click(object sender, EventArgs e)
         {
             try

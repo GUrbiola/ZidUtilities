@@ -6,10 +6,10 @@ using ZidUtilities.CommonCode.Win.Controls.Grid;
 
 namespace ZidUtilities.CommonCode.Win.Controls
 {
+    [ToolboxBitmap(@"D:\Just For Fun\ZidUtilities\CommonCode.Win\Controls\ThemeManager.ico")]
     /// <summary>
     /// Component that manages and applies themes to Windows Forms and their controls.
     /// </summary>
-    [ToolboxBitmap(typeof(ThemeManager), "ThemeManager.bmp")]
     public class ThemeManager : Component
     {
         private ZidThemes _theme = ZidThemes.None;

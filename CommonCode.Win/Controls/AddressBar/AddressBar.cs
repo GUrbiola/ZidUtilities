@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace ZidUtilities.CommonCode.Win.Controls.AddressBar
 {
-
+    [ToolboxBitmap(@"D:\Just For Fun\ZidUtilities\CommonCode.Win\Controls\AddressBar\AddressBar.ico")]
     /// <summary>
     /// Address bar control that presents a hierarchical path of IAddressNode instances
     /// and allows navigation via tool strip buttons and drop-down menus.

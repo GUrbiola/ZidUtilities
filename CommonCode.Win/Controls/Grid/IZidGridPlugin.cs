@@ -4,11 +4,13 @@ using System.Windows.Forms;
 
 namespace ZidUtilities.CommonCode.Win.Controls.Grid
 {
+    public delegate void PluginExecuted(ZidGridPluginContext context, string PluginName);
     /// <summary>
     /// Interface for ZidGrid plugins that appear as menu options in the header context menu.
     /// </summary>
     public interface IZidGridPlugin
     {
+        event PluginExecuted OnPluginExecuted;
         /// <summary>
         /// Gets the display text for the menu item.
         /// </summary>

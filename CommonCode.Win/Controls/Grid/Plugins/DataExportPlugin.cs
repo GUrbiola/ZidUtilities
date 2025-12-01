@@ -16,12 +16,28 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
     /// </summary>
     public class DataExportPlugin : IZidGridPlugin
     {
+        /// <summary>
+        /// Gets the display text for the menu item.
+        /// </summary>
         public string MenuText => "Export Data...";
 
+        /// <summary>
+        /// Gets the image/icon for the menu item (optional).
+        /// </summary>
         public Image MenuImage => Resources.Export32; // You can set an icon here
 
+        /// <summary>
+        /// Gets whether the menu item is enabled.
+        /// </summary>
         public bool Enabled => true;
 
+        public event PluginExecuted OnPluginExecuted;
+
+        /// <summary>
+        /// Executes the plugin: shows the export options dialog, converts the grid or datasource to a DataTable,
+        /// and performs the export to the user-selected file and format.
+        /// </summary>
+        /// <param name="context">The plugin execution context containing grid and data source references.</param>
         public void Execute(ZidGridPluginContext context)
         {
             if (context.DataGridView == null || context.DataGridView.Rows.Count == 0)
@@ -47,13 +63,21 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
                     }
 
                     PerformExport(dataTable, exportDialog.SelectedFormat, exportDialog.SelectedFilePath);
+                    OnPluginExecuted?.Invoke(context, "DataExportPlugin");
                 }
             }
         }
 
         /// <summary>
-        /// Extracts data from the DataGridView into a DataTable.
+        /// Extracts data from the DataGridView or fallback datasource into a DataTable.
+        /// Builds the DataTable based on visible columns (respecting display order),
+        /// converts cell values to appropriate types where possible, and skips new/invisible rows.
         /// </summary>
+        /// <param name="context">Plugin context holding the DataGridView and optional DataSource.</param>
+        /// <returns>
+        /// A DataTable representing the current grid view or a copy/converted table from the datasource;
+        /// returns null if no suitable data is available.
+        /// </returns>
         private DataTable GetDataTableFromGrid(ZidGridPluginContext context)
         {
             // If context or DataGridView is missing, fallback to original DataSource handling
@@ -181,8 +205,12 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
         }
 
         /// <summary>
-        /// Performs the export using the DataExporter class with progress reporting.
+        /// Performs the export using the DataExporter class with progress reporting shown in a ProcessingDialog.
+        /// Configures export options, attaches progress/completion handlers, and invokes the export to file.
         /// </summary>
+        /// <param name="data">The DataTable to export.</param>
+        /// <param name="format">The export format to use (XLSX/CSV/TXT/HTML).</param>
+        /// <param name="filePath">Destination file path where the exported file will be saved.</param>
         private void PerformExport(DataTable data, ExportTo format, string filePath)
         {
             using 
@@ -241,7 +269,8 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
     }
 
     /// <summary>
-    /// Dialog for selecting export format and options.
+    /// Dialog for selecting export format and target file path.
+    /// Presents format choices and allows browsing for a destination file.
     /// </summary>
     internal class ExportOptionsDialog : Form
     {
@@ -256,9 +285,20 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
         private Label lblTitle;
         private GridThemeHelper.ThemeColors _themeColors;
 
+        /// <summary>
+        /// Gets the user-selected export format.
+        /// </summary>
         public ExportTo SelectedFormat { get; private set; }
+
+        /// <summary>
+        /// Gets the user-selected file path to save the export.
+        /// </summary>
         public string SelectedFilePath { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the ExportOptionsDialog with the supplied theme.
+        /// </summary>
+        /// <param name="theme">Theme to apply to the dialog controls.</param>
         public ExportOptionsDialog(ZidThemes theme)
         {
             _themeColors = GridThemeHelper.GetThemeColors(theme);
@@ -267,6 +307,10 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             PopulateFormats();
         }
 
+        /// <summary>
+        /// Initializes and lays out dialog controls (labels, combo, textbox, buttons).
+        /// This method configures control properties and event handlers.
+        /// </summary>
         private void InitializeComponent()
         {
             this.Text = "Export Data";
@@ -342,6 +386,9 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             this.CancelButton = btnCancel;
         }
 
+        /// <summary>
+        /// Applies the provided theme colors and fonts to the dialog's controls.
+        /// </summary>
         private void ApplyTheme()
         {
             // Apply theme to header panel
@@ -381,6 +428,10 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             btnCancel.FlatStyle = FlatStyle.Flat;
         }
 
+        /// <summary>
+        /// Populates the format selection ComboBox with supported export formats.
+        /// Each entry includes a description, enum value and default extension.
+        /// </summary>
         private void PopulateFormats()
         {
             cmbFormat.Items.Add(new FormatItem("Excel Workbook (*.xlsx)", ExportTo.XLSX, "xlsx"));
@@ -390,6 +441,12 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             cmbFormat.SelectedIndex = 0;
         }
 
+        /// <summary>
+        /// Handles changes to the selected export format.
+        /// Clears any previously chosen file path and disables the Export button until a new file is selected.
+        /// </summary>
+        /// <param name="sender">Event sender (ComboBox).</param>
+        /// <param name="e">Event arguments.</param>
         private void CmbFormat_SelectedIndexChanged(object sender, EventArgs e)
         {
             // Clear file path when format changes
@@ -397,6 +454,12 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             btnOK.Enabled = false;
         }
 
+        /// <summary>
+        /// Opens a SaveFileDialog configured for the selected format, updates SelectedFormat and SelectedFilePath
+        /// when the user chooses a file, and enables the Export button.
+        /// </summary>
+        /// <param name="sender">Event sender (Browse button).</param>
+        /// <param name="e">Event arguments.</param>
         private void BtnBrowse_Click(object sender, EventArgs e)
         {
             if (cmbFormat.SelectedItem == null)
@@ -423,12 +486,33 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             }
         }
 
+        /// <summary>
+        /// Simple container for format ComboBox items.
+        /// Holds a user-facing description, the ExportTo value and the default file extension.
+        /// </summary>
         private class FormatItem
         {
+            /// <summary>
+            /// Description shown in the ComboBox (e.g. "Excel Workbook (*.xlsx)").
+            /// </summary>
             public string Description { get; set; }
+
+            /// <summary>
+            /// Export format enum value represented by this item.
+            /// </summary>
             public ExportTo Format { get; set; }
+
+            /// <summary>
+            /// Default file extension (without dot) for this format.
+            /// </summary>
             public string Extension { get; set; }
 
+            /// <summary>
+            /// Initializes a new FormatItem with the specified description, format and extension.
+            /// </summary>
+            /// <param name="description">User-visible description.</param>
+            /// <param name="format">ExportTo enum value.</param>
+            /// <param name="extension">Default file extension (e.g. "xlsx").</param>
             public FormatItem(string description, ExportTo format, string extension)
             {
                 Description = description;
@@ -436,6 +520,10 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
                 Extension = extension;
             }
 
+            /// <summary>
+            /// Returns the description to display in the ComboBox.
+            /// </summary>
+            /// <returns>The Description property.</returns>
             public override string ToString()
             {
                 return Description;

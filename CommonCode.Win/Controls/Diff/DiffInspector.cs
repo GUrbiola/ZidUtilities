@@ -12,6 +12,7 @@ using static System.Windows.Forms.LinkLabel;
 
 namespace ZidUtilities.CommonCode.Win.Controls.Diff
 {
+    [ToolboxBitmap(@"D:\Just For Fun\ZidUtilities\CommonCode.Win\Controls\Diff\DiffInspector.ico")]
     public partial class DiffInspector : UserControl
     {
         [Category("Custom Properties")]

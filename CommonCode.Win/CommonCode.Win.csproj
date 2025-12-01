@@ -47,11 +47,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\AddressBar\Control.cs">
+    <Compile Include="Controls\AddressBar\AddressBar.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\AddressBar\Control.Designer.cs">
-      <DependentUpon>Control.cs</DependentUpon>
+    <Compile Include="Controls\AddressBar\AddressBar.Designer.cs">
+      <DependentUpon>AddressBar.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\AddressBar\FileSystemNode.cs" />
     <Compile Include="Controls\AddressBar\GenericNode.cs">
@@ -113,6 +113,7 @@
     <Compile Include="Controls\Grid\GridFilter\IGridFilterFactory.cs" />
     <Compile Include="Controls\Grid\GridThemeHelper.cs" />
     <Compile Include="Controls\Grid\GridThemes.cs" />
+    <Compile Include="Forms\DialogStyle.cs" />
     <Compile Include="ZidThemes.cs" />
     <Compile Include="Controls\Grid\IZidGridPlugin.cs" />
     <Compile Include="Controls\Grid\Plugins\ColumnVisibilityPlugin.cs" />
@@ -150,7 +151,6 @@
     <Compile Include="Forms\ComplexObjectSelectionDialog.Designer.cs">
       <DependentUpon>ComplexObjectSelectionDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\DialogStyle.cs" />
     <Compile Include="Forms\MultiSelectionDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -196,8 +196,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Controls\AddressBar\Control.resx">
-      <DependentUpon>Control.cs</DependentUpon>
+    <EmbeddedResource Include="Controls\AddressBar\AddressBar.resx">
+      <DependentUpon>AddressBar.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\AnimatedWaitTextBox.resx">
       <DependentUpon>AnimatedWaitTextBox.cs</DependentUpon>
@@ -243,7 +243,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Icons\" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
@@ -283,6 +285,17 @@
     <None Include="Resources\message.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Controls\AddressBar\GenericNode.ico" />
+    <Content Include="Controls\AddressBar\AddressBar.ico" />
+    <Content Include="Controls\Diff\DiffInspector.ico" />
+    <Content Include="Controls\Diff\SideToSideLineComparer.ico" />
+    <Content Include="Controls\Diff\SideToSideTextComparer.ico" />
+    <Content Include="Controls\Grid\GridFilter\DataGridFilterExtender.ico" />
+    <Content Include="Controls\Grid\ZidGrid.ico" />
+    <Content Include="Controls\ThemeManager.ico" />
+    <Content Include="Controls\VerticalProgressBar.ico" />
+    <Content Include="Controls\DoubleBufferedPanel.ico" />
+    <Content Include="Controls\AnimatedWaitTextBox.ico" />
     <Content Include="Resources\Book_32.png" />
     <Content Include="Resources\close_32x32.png" />
     <None Include="Resources\work-in-progress.png" />

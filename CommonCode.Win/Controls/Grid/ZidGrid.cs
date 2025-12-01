@@ -8,46 +8,25 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ZidUtilities.Win.Controls.Grid.GridFilter;
+using System.ComponentModel.Design; // keep for attribute reference if needed
 
 namespace ZidUtilities.CommonCode.Win.Controls.Grid
 {
+    [ToolboxBitmap(@"D:\Just For Fun\ZidUtilities\CommonCode.Win\Controls\Grid\ZidGrid.ico")]
     public partial class ZidGrid : UserControl
     {
         private int MaxRecordCount;
         private ZidGridMenuItemCollection _customMenuItems;
         private ZidGridPluginCollection _plugins;
 
-
-
         public ZidGrid()
         {
             InitializeComponent();
 
+            // keep the collection instance but DO NOT add defaults here
+            // adding defaults in the ctor causes duplication when designer rehydrates the control
             _customMenuItems = new ZidGridMenuItemCollection();
             _plugins = new ZidGridPluginCollection();
-
-            ZidGridMenuItem hideColumn = new ZidGridMenuItem();
-            hideColumn.Text = "Hide this column";
-            hideColumn.Image = Resources.ColumnHide32;
-            hideColumn.Click += HideColumn_Click;
-
-            _customMenuItems.Add(hideColumn);
-
-            ZidGridMenuItem toggleFilter = new ZidGridMenuItem();
-            toggleFilter.Text = "Show/Hide Filter Box";
-            toggleFilter.Image = Resources.FunnelNew32;
-            toggleFilter.Click += ToggleFilter_Click;
-
-            _customMenuItems.Add(toggleFilter);
-
-            ZidGridMenuItem resizeColumn = new ZidGridMenuItem();
-            resizeColumn.Text = "Adjust this column's width";
-            resizeColumn.Image = Resources.ResizeColumn32;
-            resizeColumn.Click += ResizeColumn_Click;
-
-            _customMenuItems.Add(resizeColumn);
-
-
 
             GridView.RowsAdded += new DataGridViewRowsAddedEventHandler(GridView_RowsAdded);
             GridView.RowsRemoved += new DataGridViewRowsRemovedEventHandler(GridView_RowsRemoved);
@@ -55,6 +34,34 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
             //GridView.DataError += new DataGridViewDataErrorEventHandler(GridView_DataError);//first attempts from Claude to handle binary data columns
             GridView.DataBindingComplete += new DataGridViewBindingCompleteEventHandler(GridView_DataBindingComplete);
             GridView.ColumnHeaderMouseClick += new DataGridViewCellMouseEventHandler(GridView_ColumnHeaderMouseClick);
+        }
+
+        public List<ZidGridMenuItem> GetDefaultMenuOptions()
+        {
+            List<ZidGridMenuItem> back = new List<ZidGridMenuItem>();
+            ZidGridMenuItem hideColumn = new ZidGridMenuItem();
+            hideColumn.Name = "HideColumn"; // stable id so we can wire at runtime
+            hideColumn.Text = "Hide this column";
+            hideColumn.Image = Resources.ColumnHide32;
+
+            hideColumn.Click += HideColumn_Click;
+            back.Add(hideColumn);
+
+            ZidGridMenuItem toggleFilter = new ZidGridMenuItem();
+            toggleFilter.Name = "ToggleFilter";
+            toggleFilter.Text = "Show/Hide Filter Box";
+            toggleFilter.Image = Resources.FunnelNew32;
+            toggleFilter.Click += ToggleFilter_Click;
+            back.Add(toggleFilter);
+
+            ZidGridMenuItem resizeColumn = new ZidGridMenuItem();
+            resizeColumn.Name = "ResizeColumn";
+            resizeColumn.Text = "Adjust this column's width";
+            resizeColumn.Image = Resources.ResizeColumn32;
+            resizeColumn.Click += ResizeColumn_Click;
+            back.Add(resizeColumn);
+
+            return back;    
         }
 
         private void ResizeColumn_Click(object sender, ZidGridMenuItemClickEventArgs e)
@@ -320,17 +327,6 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
         }
 
         /// <summary>
-        /// Gets the collection of custom menu items for the header context menu.
-        /// These items are configurable in the Visual Studio designer.
-        /// </summary>
-        [Category("Custom Property"), Description("Custom menu items that appear in the header context menu.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public ZidGridMenuItemCollection CustomMenuItems
-        {
-            get { return _customMenuItems; }
-        }
-
-        /// <summary>
         /// Gets the collection of plugins for the header context menu.
         /// Plugins appear at the top of the menu.
         /// </summary>
@@ -340,6 +336,11 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
         {
             get { return _plugins; }
         }
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public ZidGridMenuItemCollection CustomMenuItems { get { return _customMenuItems; } }
+
 
         private Font _CellFont;
         [Category("Custom Property"), Browsable(true)]
@@ -1239,6 +1240,10 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     };
 
                     contextMenu.Items.Add(pluginItem);
+                    plugin.OnPluginExecuted += (context, pluginName) =>
+                    {
+                        SetRowCount();
+                    };
                 }
             }
 
@@ -1286,6 +1291,5 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
 
         #endregion
 
-        
     }
 }

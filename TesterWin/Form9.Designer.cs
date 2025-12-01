@@ -28,9 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            ZidUtilities.CommonCode.Win.Controls.Grid.ZidGridMenuItem zidGridMenuItem1 = new ZidUtilities.CommonCode.Win.Controls.Grid.ZidGridMenuItem();
-            ZidUtilities.CommonCode.Win.Controls.Grid.ZidGridMenuItem zidGridMenuItem2 = new ZidUtilities.CommonCode.Win.Controls.Grid.ZidGridMenuItem();
-            ZidUtilities.CommonCode.Win.Controls.Grid.ZidGridMenuItem zidGridMenuItem3 = new ZidUtilities.CommonCode.Win.Controls.Grid.ZidGridMenuItem();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.cmbThemes = new System.Windows.Forms.ComboBox();
             this.zidGrid1 = new ZidUtilities.CommonCode.Win.Controls.Grid.ZidGrid();
@@ -62,18 +59,14 @@
             // 
             // zidGrid1
             // 
-            this.zidGrid1.CellFont = new System.Drawing.Font("Verdana", 9F);
-            this.zidGrid1.CustomMenuItems.Add(zidGridMenuItem1);
-            this.zidGrid1.CustomMenuItems.Add(zidGridMenuItem2);
-            this.zidGrid1.CustomMenuItems.Add(zidGridMenuItem3);
+            this.zidGrid1.CellFont = new System.Drawing.Font("Calibri", 9F);
+            this.zidGrid1.ContextMenuImageSize = new System.Drawing.Size(32, 32);
             this.zidGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.zidGrid1.FilterText = "Filters";
             this.zidGrid1.Location = new System.Drawing.Point(0, 38);
             this.zidGrid1.Name = "zidGrid1";
             this.zidGrid1.Size = new System.Drawing.Size(1071, 684);
             this.zidGrid1.TabIndex = 5;
-            this.zidGrid1.Theme = ZidUtilities.CommonCode.Win.ZidThemes.Forest;
-            this.zidGrid1.TitleFont = new System.Drawing.Font("Verdana", 9.25F, System.Drawing.FontStyle.Bold);
+            this.zidGrid1.TitleFont = new System.Drawing.Font("Calibri", 9.25F, System.Drawing.FontStyle.Bold);
             // 
             // Form9
             // 

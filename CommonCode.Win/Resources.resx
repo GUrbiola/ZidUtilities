@@ -145,7 +145,25 @@
   <data name="Export32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Export32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ColumnPick32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\ColumnPick32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ColumnHide32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\table_column_delete.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="FunnelNew32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\funnel_new.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Columns32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\table2_selection_column.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ResizeColumn32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\table_column_preferences.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Copy32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\copy.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Freeze32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\snowflake.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Flash32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\flash.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

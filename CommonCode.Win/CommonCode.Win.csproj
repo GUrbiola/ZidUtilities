@@ -116,7 +116,10 @@
     <Compile Include="ZidThemes.cs" />
     <Compile Include="Controls\Grid\IZidGridPlugin.cs" />
     <Compile Include="Controls\Grid\Plugins\ColumnVisibilityPlugin.cs" />
+    <Compile Include="Controls\Grid\Plugins\CopySpecialPlugin.cs" />
     <Compile Include="Controls\Grid\Plugins\DataExportPlugin.cs" />
+    <Compile Include="Controls\Grid\Plugins\FreezeColumnsPlugin.cs" />
+    <Compile Include="Controls\Grid\Plugins\QuickFilterPlugin.cs" />
     <Compile Include="Controls\Grid\ZidGridMenuItem.cs" />
     <Compile Include="Controls\Grid\ZidGridMenuItemCollection.cs" />
     <Compile Include="Controls\Grid\ZidGridPluginCollection.cs" />

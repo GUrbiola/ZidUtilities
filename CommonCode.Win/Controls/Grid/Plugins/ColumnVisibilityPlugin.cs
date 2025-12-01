@@ -11,7 +11,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
     {
         public string MenuText => "Column Visibility...";
 
-        public Image MenuImage => Resources.ColumnPick32;
+        public Image MenuImage => Resources.Columns32;
 
         public bool Enabled => true;
 

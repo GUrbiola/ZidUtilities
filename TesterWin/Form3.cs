@@ -25,8 +25,8 @@ namespace ZidUtilities.TesterWin
 
             diffInspector1.Highlighting = SyntaxHighlighting.TransactSQL;
 
-            sampleSQL1 = System.IO.File.ReadAllText(@"C:\Users\Gonzalo\Desktop\sample sql1.sql");
-            sampleSQL2 = System.IO.File.ReadAllText(@"C:\Users\Gonzalo\Desktop\sample sql2.sql");
+            sampleSQL1 = System.IO.File.ReadAllText(@"C:\Users\Gonzalo\Desktop\Extensions\sample sql1.sql");
+            sampleSQL2 = System.IO.File.ReadAllText(@"C:\Users\Gonzalo\Desktop\Extensions\sample sql2.sql");
 
             diffInspector1.LoadTexts(sampleSQL1, sampleSQL2);
         }

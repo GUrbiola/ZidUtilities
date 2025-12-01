@@ -17,6 +17,8 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
         private ZidGridMenuItemCollection _customMenuItems;
         private ZidGridPluginCollection _plugins;
 
+
+
         public ZidGrid()
         {
             InitializeComponent();
@@ -24,12 +26,143 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
             _customMenuItems = new ZidGridMenuItemCollection();
             _plugins = new ZidGridPluginCollection();
 
+            ZidGridMenuItem hideColumn = new ZidGridMenuItem();
+            hideColumn.Text = "Hide this column";
+            hideColumn.Image = Resources.ColumnHide32;
+            hideColumn.Click += HideColumn_Click;
+
+            _customMenuItems.Add(hideColumn);
+
+            ZidGridMenuItem toggleFilter = new ZidGridMenuItem();
+            toggleFilter.Text = "Show/Hide Filter Box";
+            toggleFilter.Image = Resources.FunnelNew32;
+            toggleFilter.Click += ToggleFilter_Click;
+
+            _customMenuItems.Add(toggleFilter);
+
+            ZidGridMenuItem resizeColumn = new ZidGridMenuItem();
+            resizeColumn.Text = "Adjust this column's width";
+            resizeColumn.Image = Resources.ResizeColumn32;
+            resizeColumn.Click += ResizeColumn_Click;
+
+            _customMenuItems.Add(resizeColumn);
+
+
+
             GridView.RowsAdded += new DataGridViewRowsAddedEventHandler(GridView_RowsAdded);
             GridView.RowsRemoved += new DataGridViewRowsRemovedEventHandler(GridView_RowsRemoved);
             //GridView.CellFormatting += new DataGridViewCellFormattingEventHandler(GridView_CellFormatting);//first attempts from Claude to handle binary data columns
             //GridView.DataError += new DataGridViewDataErrorEventHandler(GridView_DataError);//first attempts from Claude to handle binary data columns
             GridView.DataBindingComplete += new DataGridViewBindingCompleteEventHandler(GridView_DataBindingComplete);
             GridView.ColumnHeaderMouseClick += new DataGridViewCellMouseEventHandler(GridView_ColumnHeaderMouseClick);
+        }
+
+        private void ResizeColumn_Click(object sender, ZidGridMenuItemClickEventArgs e)
+        {
+            // Step 1: validate
+            if (GridView == null)
+                return;
+
+            int colIndex = e.ColumnIndex;
+            if (colIndex < 0 || colIndex >= GridView.Columns.Count)
+                return;
+
+            var column = GridView.Columns[colIndex];
+            if (!column.Visible)
+                return;
+
+            // Step 3: prepare fonts
+            Font headerFont = column.HeaderCell?.InheritedStyle?.Font
+                              ?? this.TitleFont
+                              ?? GridView.ColumnHeadersDefaultCellStyle?.Font
+                              ?? GridView.Font;
+
+            // We'll compute maximum width needed
+            int maxWidth = 0;
+
+            // Step 4: measure header text
+            string headerText = column.HeaderText ?? string.Empty;
+            var headerSize = TextRenderer.MeasureText(headerText, headerFont, new Size(int.MaxValue, int.MaxValue),
+                                                     TextFormatFlags.SingleLine | TextFormatFlags.NoPadding);
+            maxWidth = Math.Max(maxWidth, headerSize.Width);
+
+            // Step 5: iterate visible rows and measure cell text
+            foreach (DataGridViewRow row in GridView.Rows)
+            {
+                if (row == null || !row.Visible || row.IsNewRow)
+                    continue;
+
+                DataGridViewCell cell = row.Cells[colIndex];
+                if (cell == null)
+                    continue;
+
+                // prefer formatted value (what user sees); fallback to raw value
+                object fv = null;
+                try
+                {
+                    fv = cell.FormattedValue;
+                }
+                catch
+                {
+                    // ignore formatting exceptions and use Value
+                    fv = cell.Value;
+                }
+                if (fv == null)
+                    fv = cell.Value;
+
+                string text = fv?.ToString() ?? string.Empty;
+
+                Font cellFont = cell.InheritedStyle?.Font
+                                ?? column.DefaultCellStyle?.Font
+                                ?? this.CellFont
+                                ?? GridView.DefaultCellStyle?.Font
+                                ?? GridView.Font;
+
+                var textSize = TextRenderer.MeasureText(text, cellFont, new Size(int.MaxValue, int.MaxValue),
+                                                       TextFormatFlags.SingleLine | TextFormatFlags.NoPadding);
+                maxWidth = Math.Max(maxWidth, textSize.Width);
+            }
+
+            // Step 6: padding (cell padding + some extra room for sort glyphs/borders)
+            int padding = 16; // basic breathing room
+            var colPadding = column.DefaultCellStyle?.Padding ?? Padding.Empty;
+            if (colPadding != Padding.Empty)
+                padding += colPadding.Left + colPadding.Right;
+
+            // Add a bit more to account for gridlines / glyphs
+            padding += SystemInformation.BorderSize.Width + 6;
+
+            int desiredWidth = maxWidth + padding;
+
+            // Step 7: clamp to available width in grid
+            int available = GridView.ClientSize.Width - GridView.RowHeadersWidth - 4;
+            if (available < 20) available = 20;
+            if (desiredWidth > available)
+                desiredWidth = available;
+
+            // Ensure a sensible minimum
+            desiredWidth = Math.Max(desiredWidth, 20);
+
+            // Step 8: set width and refresh
+            try
+            {
+                column.Width = desiredWidth;
+                GridView.InvalidateColumn(colIndex);
+            }
+            catch
+            {
+                // if setting width fails for some reason, ignore silently
+            }
+        }
+
+        private void ToggleFilter_Click(object sender, ZidGridMenuItemClickEventArgs e)
+        {
+            this.FilterBoxPosition = this.FilterBoxPosition == FilterPosition.Top ? FilterPosition.Off : FilterPosition.Top;
+        }
+
+        private void HideColumn_Click(object sender, ZidGridMenuItemClickEventArgs e)
+        {
+            GridView.Columns[e.ColumnIndex].Visible = false;
         }
 
         void GridView_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e)
@@ -274,6 +407,33 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                 SetGridTheme(this.GridView, _Theme);
             }
         }
+        private ToolStripItemImageScaling _ContextMenuImageScaling = ToolStripItemImageScaling.SizeToFit;
+        [Category("Theme"), Browsable(true), DefaultValue(ToolStripItemImageScaling.SizeToFit)]
+        [Description("Gets or sets how images are scaled in the context menu")]
+        public ToolStripItemImageScaling ContextMenuImageScaling
+        {
+            get { return _ContextMenuImageScaling; }
+            set { _ContextMenuImageScaling = value; }
+        }
+
+        private Font _ContextMenuFont = null;
+        [Category("Theme"), Browsable(true), DefaultValue(null)]
+        [Description("Gets or sets the font for the context menu. If null, uses default menu font.")]
+        public Font ContextMenuFont
+        {
+            get { return _ContextMenuFont; }
+            set { _ContextMenuFont = value; }
+        }
+
+        private Size _ContextMenuImageSize = new Size(32, 32);
+        [Category("Theme"), Browsable(true)]
+        [Description("Gets or sets the size of images in the context menu")]
+        public Size ContextMenuImageSize
+        {
+            get { return _ContextMenuImageSize; }
+            set { _ContextMenuImageSize = value; }
+        }
+
         [Category("Filtering")]
         [Browsable(true), DefaultValue(FilterPosition.Top)]
         [Description("Gets or sets the position of the filter controls")]
@@ -1041,6 +1201,15 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
 
             ContextMenuStrip contextMenu = new ContextMenuStrip();
 
+            // Apply custom font if specified
+            if (_ContextMenuFont != null)
+            {
+                contextMenu.Font = _ContextMenuFont;
+            }
+
+            // Set image scaling size for better rendering
+            contextMenu.ImageScalingSize = _ContextMenuImageSize;
+
             // Add plugin menu items (top section)
             if (hasPlugins)
             {
@@ -1049,6 +1218,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     ToolStripMenuItem pluginItem = new ToolStripMenuItem();
                     pluginItem.Text = plugin.MenuText;
                     pluginItem.Image = plugin.MenuImage;
+                    pluginItem.ImageScaling = _ContextMenuImageScaling;
                     pluginItem.Enabled = plugin.Enabled;
                     pluginItem.Tag = plugin;
 
@@ -1086,6 +1256,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
                     ToolStripMenuItem menuItem = new ToolStripMenuItem();
                     menuItem.Text = customItem.Text;
                     menuItem.Image = customItem.Image;
+                    menuItem.ImageScaling = _ContextMenuImageScaling;
                     menuItem.Enabled = customItem.Enabled;
                     menuItem.Tag = customItem;
 

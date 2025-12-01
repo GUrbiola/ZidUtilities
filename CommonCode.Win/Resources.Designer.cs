@@ -93,9 +93,29 @@ namespace ZidUtilities.CommonCode.Win {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap ColumnPick32 {
+        internal static System.Drawing.Bitmap ColumnHide32 {
             get {
-                object obj = ResourceManager.GetObject("ColumnPick32", resourceCulture);
+                object obj = ResourceManager.GetObject("ColumnHide32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Columns32 {
+            get {
+                object obj = ResourceManager.GetObject("Columns32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Copy32 {
+            get {
+                object obj = ResourceManager.GetObject("Copy32", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -106,6 +126,36 @@ namespace ZidUtilities.CommonCode.Win {
         internal static System.Drawing.Bitmap Export32 {
             get {
                 object obj = ResourceManager.GetObject("Export32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Flash32 {
+            get {
+                object obj = ResourceManager.GetObject("Flash32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Freeze32 {
+            get {
+                object obj = ResourceManager.GetObject("Freeze32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap FunnelNew32 {
+            get {
+                object obj = ResourceManager.GetObject("FunnelNew32", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -136,6 +186,16 @@ namespace ZidUtilities.CommonCode.Win {
         internal static System.Drawing.Bitmap message {
             get {
                 object obj = ResourceManager.GetObject("message", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ResizeColumn32 {
+            get {
+                object obj = ResourceManager.GetObject("ResizeColumn32", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

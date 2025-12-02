@@ -15,7 +15,10 @@ namespace ZidUtilities.CommonCode.ICSharpTextEditor
         JavaScript,
         HTML,
         CSS,
-        Json
+        VBNET,
+        Json,
+        CPlusPlus,
+        Java
     }
 
     /// <summary>

@@ -393,9 +393,9 @@ namespace ZidUtilities.Tester
             {
                 var importer = new DataImporter();
 
-                Assert(importer.ImportType == DataImporter.ImportFrom.TXT, "Default import type should be TXT");
+                Assert(importer.ImportType == ImportFrom.TXT, "Default import type should be TXT");
                 Assert(importer.FileHeader == true, "FileHeader should be true by default");
-                Assert(importer.Separator == DataImporter.Delimiter.Tab, "Default separator should be Tab");
+                Assert(importer.Separator == Delimiter.Tab, "Default separator should be Tab");
                 Assert(importer.SeparatorChar == ',', "Default separator char should be comma");
                 Assert(importer.Errors != null, "Errors list should be initialized");
             });
@@ -412,7 +412,7 @@ namespace ZidUtilities.Tester
                 var importer = new DataImporter
                 {
                     FileName = csvPath,
-                    ImportType = DataImporter.ImportFrom.CSV,
+                    ImportType = ImportFrom.CSV,
                     FileHeader = true
                 };
 
@@ -435,9 +435,9 @@ namespace ZidUtilities.Tester
                 var importer = new DataImporter
                 {
                     FileName = txtPath,
-                    ImportType = DataImporter.ImportFrom.TXT,
+                    ImportType = ImportFrom.TXT,
                     FileHeader = true,
-                    Separator = DataImporter.Delimiter.Tab
+                    Separator = Delimiter.Tab
                 };
 
                 bool result = importer.ImportFromFile();
@@ -459,9 +459,9 @@ namespace ZidUtilities.Tester
                 var importer = new DataImporter
                 {
                     FileName = txtPath,
-                    ImportType = DataImporter.ImportFrom.TXT,
+                    ImportType = ImportFrom.TXT,
                     FileHeader = true,
-                    Separator = DataImporter.Delimiter.Separator,
+                    Separator = Delimiter.Separator,
                     SeparatorChar = '|'
                 };
 
@@ -486,7 +486,7 @@ namespace ZidUtilities.Tester
                 var importer = new DataImporter
                 {
                     FileName = xlsxPath,
-                    ImportType = DataImporter.ImportFrom.XLSX,
+                    ImportType = ImportFrom.XLSX,
                     FileHeader = true
                 };
 
@@ -506,14 +506,14 @@ namespace ZidUtilities.Tester
                 CreateSampleCSVFile(csvPath);
 
                 var dataStructure = new DataStructure();
-                dataStructure.Fields.Add(new Field("Name", true, DataImporter.FieldType.String));
-                dataStructure.Fields.Add(new Field("Age", true, DataImporter.FieldType.Integer));
-                dataStructure.Fields.Add(new Field("Salary", true, DataImporter.FieldType.FloatingPoint));
+                dataStructure.Fields.Add(new Field("Name", true, FieldType.String));
+                dataStructure.Fields.Add(new Field("Age", true, FieldType.Integer));
+                dataStructure.Fields.Add(new Field("Salary", true, FieldType.FloatingPoint));
 
                 var importer = new DataImporter
                 {
                     FileName = csvPath,
-                    ImportType = DataImporter.ImportFrom.CSV,
+                    ImportType = ImportFrom.CSV,
                     FileHeader = true,
                     DataStructure = dataStructure
                 };
@@ -533,14 +533,14 @@ namespace ZidUtilities.Tester
                 CreateSampleCSVFileWithoutHeaders(csvPath);
 
                 var dataStructure = new DataStructure();
-                dataStructure.Fields.Add(new Field("Column1", true, DataImporter.FieldType.String));
-                dataStructure.Fields.Add(new Field("Column2", true, DataImporter.FieldType.Integer));
-                dataStructure.Fields.Add(new Field("Column3", true, DataImporter.FieldType.FloatingPoint));
+                dataStructure.Fields.Add(new Field("Column1", true, FieldType.String));
+                dataStructure.Fields.Add(new Field("Column2", true, FieldType.Integer));
+                dataStructure.Fields.Add(new Field("Column3", true, FieldType.FloatingPoint));
 
                 var importer = new DataImporter
                 {
                     FileName = csvPath,
-                    ImportType = DataImporter.ImportFrom.CSV,
+                    ImportType = ImportFrom.CSV,
                     FileHeader = false,
                     DataStructure = dataStructure
                 };
@@ -558,7 +558,7 @@ namespace ZidUtilities.Tester
                 var importer = new DataImporter
                 {
                     FileName = "nonexistent_file.csv",
-                    ImportType = DataImporter.ImportFrom.CSV,
+                    ImportType = ImportFrom.CSV,
                     FileHeader = true
                 };
 
@@ -578,7 +578,7 @@ namespace ZidUtilities.Tester
                 var importer = new DataImporter
                 {
                     FileName = csvPath,
-                    ImportType = DataImporter.ImportFrom.CSV,
+                    ImportType = ImportFrom.CSV,
                     FileHeader = true
                 };
 
@@ -608,7 +608,7 @@ namespace ZidUtilities.Tester
                 var importer = new DataImporter
                 {
                     FileName = filePath,
-                    ImportType = DataImporter.ImportFrom.XLSX
+                    ImportType = ImportFrom.XLSX
                 };
                 importer.ImportFromFile();
 
@@ -633,7 +633,7 @@ namespace ZidUtilities.Tester
                 var importer = new DataImporter
                 {
                     FileName = filePath,
-                    ImportType = DataImporter.ImportFrom.CSV
+                    ImportType = ImportFrom.CSV
                 };
                 importer.ImportFromFile();
 
@@ -662,8 +662,8 @@ namespace ZidUtilities.Tester
                 var importer = new DataImporter
                 {
                     FileName = filePath,
-                    ImportType = DataImporter.ImportFrom.TXT,
-                    Separator = DataImporter.Delimiter.Tab
+                    ImportType = ImportFrom.TXT,
+                    Separator = Delimiter.Tab
                 };
                 importer.ImportFromFile();
 
@@ -688,7 +688,7 @@ namespace ZidUtilities.Tester
                 var importer = new DataImporter
                 {
                     FileName = filePath,
-                    ImportType = DataImporter.ImportFrom.XLSX
+                    ImportType = ImportFrom.XLSX
                 };
                 importer.ImportFromFile();
 

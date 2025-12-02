@@ -84,10 +84,6 @@
     <Compile Include="XmlSerialization.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="md files\Crypter\Crypter Guide.md" />
-    <None Include="md files\Crypter\Modernization summary.md" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="DataComparison\Templates.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Templates.Designer.cs</LastGenOutput>

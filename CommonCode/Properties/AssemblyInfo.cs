@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CommonCode")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("ZidUtilities.CommonCode")]
+[assembly: AssemblyDescription("Library containing most of the methods that I most often used in my projects, from extensions, to serialization, data comparisons, diffengine, etc.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CommonCode")]
+[assembly: AssemblyCompany("El Cid")]
+[assembly: AssemblyProduct("ZidUtilities.CommonCode")]
 [assembly: AssemblyCopyright("Copyright ©  2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

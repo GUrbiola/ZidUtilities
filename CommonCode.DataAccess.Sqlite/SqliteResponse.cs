@@ -198,6 +198,8 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
             if (this.Results == null)
                 this.Results = new List<T>();
             this.Results.Add(result);
+            if(String.IsNullOrEmpty(this.Message))
+                this.Message = "Success";
         }
 
         /// <summary>
@@ -209,6 +211,9 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
             if (this.Results == null)
                 this.Results = new List<T>();
             this.Results.AddRange(results);
+            if (String.IsNullOrEmpty(this.Message))
+                this.Message = "Success";
+
         }
 
         /// <summary>
@@ -217,7 +222,8 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
         /// <returns>The same response instance for chaining.</returns>
         public SqliteResponse<T> Fail()
         {
-            ExecutionTime = DateTime.Now;
+            this.ExecutionTime = DateTime.Now;
+            this.Message = "An error occurred while processing your request.";
             this.Errors.Add(new ErrorOnResponse(this.Message));
             return this;
         }
@@ -230,7 +236,8 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
         /// <returns>The same response instance for chaining.</returns>
         public SqliteResponse<T> Fail(string message, Exception ex = null)
         {
-            ExecutionTime = DateTime.Now;
+            this.ExecutionTime = DateTime.Now;
+            this.Message = message;
             if (ex != null)
             {
                 this.Errors.Add(new ErrorOnResponse(message, ex));
@@ -249,7 +256,8 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
         /// <returns>The same response instance for chaining.</returns>
         public SqliteResponse<T> Fail(Exception ex)
         {
-            ExecutionTime = DateTime.Now;
+            this.ExecutionTime = DateTime.Now;
+            this.Message = "An error occurred while processing your request.";
             if (ex == null)
             {
                 Fail("An error occurred while processing your request.");
@@ -266,10 +274,10 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
         /// </summary>
         /// <param name="message">Optional success message (default "Success").</param>
         /// <returns>The same response instance for chaining.</returns>
-        public SqliteResponse<T> Success(string message = "Success")
+        public SqliteResponse<T> Success()
         {
-            ExecutionTime = DateTime.Now;
-            this.Message = message;
+            this.ExecutionTime = DateTime.Now;
+            this.Message = "Success";
             return this;
         }
 
@@ -279,11 +287,11 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
         /// <param name="result">The result to store.</param>
         /// <param name="message">Optional success message.</param>
         /// <returns>The same response instance for chaining.</returns>
-        public SqliteResponse<T> Success(T result, string message = "Success")
+        public SqliteResponse<T> Success(T result)
         {
-            ExecutionTime = DateTime.Now;
+            this.ExecutionTime = DateTime.Now;
             this.Result = result;
-            this.Message = message;
+            this.Message = "Success";
             return this;
         }
 
@@ -293,11 +301,11 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
         /// <param name="results">The results to store.</param>
         /// <param name="message">Optional success message.</param>
         /// <returns>The same response instance for chaining.</returns>
-        public SqliteResponse<T> Success(List<T> results, string message = "Success")
+        public SqliteResponse<T> Success(List<T> results)
         {
-            ExecutionTime = DateTime.Now;
+            this.ExecutionTime = DateTime.Now;
             this.Results = results;
-            this.Message = message;
+            this.Message = "Success";
             return this;
         }
 
@@ -328,9 +336,9 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
         /// <param name="results">Results list.</param>
         /// <param name="message">Optional success message.</param>
         /// <returns>A new success SqliteResponse instance.</returns>
-        public static SqliteResponse<T> Successful(List<T> results, string message = "Success")
+        public static SqliteResponse<T> Successful(List<T> results)
         {
-            return new SqliteResponse<T>().Success(results, message);
+            return new SqliteResponse<T>().Success(results);
         }
 
         /// <summary>
@@ -339,9 +347,9 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
         /// <param name="result">Single result.</param>
         /// <param name="message">Optional success message.</param>
         /// <returns>A new success SqliteResponse instance.</returns>
-        public static SqliteResponse<T> Successful(T result, string message = "Success")
+        public static SqliteResponse<T> Successful(T result)
         {
-            return new SqliteResponse<T>().Success(result, message);
+            return new SqliteResponse<T>().Success(result);
         }
 
         /// <summary>
@@ -349,9 +357,9 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
         /// </summary>
         /// <param name="message">Optional success message.</param>
         /// <returns>A new success SqliteResponse instance.</returns>
-        public static SqliteResponse<T> Successful(string message = "Success")
+        public static SqliteResponse<T> Successful()
         {
-            return new SqliteResponse<T>().Success(message);
+            return new SqliteResponse<T>().Success();
         }
     }
 }

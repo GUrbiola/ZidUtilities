@@ -83,5 +83,34 @@ namespace ZidUtilities.CommonCode.Log4Net
             List<string> appenderNames = Appenders.Select(a => a.Name).ToList();
             File.WriteAllText(filePath, GetConfigXmlString(appenderNames));
         }
+
+        /// <summary>
+        /// Builds an in-memory stream containing the generated log4net configuration XML.
+        /// </summary>
+        /// <returns>
+        /// A readable <see cref="Stream"/> positioned at the beginning containing the
+        /// UTF-8 encoded log4net configuration XML. The caller is responsible for
+        /// disposing the returned stream.
+        /// </returns>
+        /// <remarks>
+        /// This method:
+        /// - Collects appender names from the <see cref="Appenders"/> collection,
+        /// - Generates the XML using <see cref="GetConfigXmlString"/>,
+        /// - Encodes the XML as UTF-8 and returns it as a <see cref="MemoryStream"/>.
+        /// The returned stream is non-writable and ready for immediate reading.
+        /// </remarks>
+        public Stream GetConfigXmlStream()
+        {
+            // Guard against null Appenders collection.
+            var appenderNames = (Appenders ?? new List<IAppender>()).Select(a => a.Name).ToList();
+
+            // Generate XML string.
+            string xmlString = GetConfigXmlString(appenderNames);
+
+            // Encode to UTF-8 bytes and return a MemoryStream positioned at 0.
+            // Use a non-writable MemoryStream backed by the byte array.
+            byte[] bytes = Encoding.UTF8.GetBytes(xmlString);
+            return new MemoryStream(bytes, writable: false);
+        }
     }
 }

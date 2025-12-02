@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <!-- <icon>icon.png</icon> -->
+    <projectUrl>https://github.com/GUrbiola/ZidUtilities</projectUrl>
+    <description>$description$</description>
+    <releaseNotes>First release version.</releaseNotes>
+    <copyright>$copyright$</copyright>
+    <tags>ZidUtilities Extensions CommonCode Helper DiffEngine ElCid Urbiola</tags>
+  </metadata>
+</package>

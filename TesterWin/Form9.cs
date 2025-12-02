@@ -34,6 +34,8 @@ namespace ZidUtilities.TesterWin
 
             cmbThemes.SelectedIndex = 0;
             cmbThemes.SelectedValueChanged += new EventHandler(cmbThemes_SelectedValueChanged);
+
+            GridThemeHelper.ApplyTheme(zidGrid1, ZidThemes.Professional);
         }
 
         private void cmbThemes_SelectedValueChanged(object sender, EventArgs e)

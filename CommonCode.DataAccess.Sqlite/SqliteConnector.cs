@@ -308,27 +308,35 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
         /// <param name="sql">The SQL text to execute.</param>
         /// <param name="autoTransact">If true, wraps execution in a transaction which is committed on success or rolled back on failure.</param>
         /// <returns>0 on success; -1 on failure.</returns>
-        public int ExecuteNonQuery(string sql, bool autoTransact = false)
+        public SqliteResponse<int> ExecuteNonQuery(string sql, Dictionary<string, string> ps = null, bool autoTransact = false)
         {
             int result = 0;
+            Sqlite.SqliteResponse<int> back = null;
             try
             {
                 cmd.Connection = Connection;
                 cmd.CommandText = sql;
                 cmd.CommandTimeout = TimeOut;
+
+                if (ps != null && ps.Count > 0)
+                {
+                    cmd.Parameters.Clear();
+                    foreach (var p in ps)
+                        cmd.Parameters.AddWithValue(p.Key, p.Value);
+                }
+
                 Executing = true;
                 cmd.Connection.Open();
                 if (autoTransact)
-                {
                     BeginTransaction();
-                }
+
                 cmd.CommandType = CommandType.Text;
 
                 RowsAffected = cmd.ExecuteNonQuery();
                 if (autoTransact)
-                {
                     CommitTransaction();
-                }
+                
+                back = Sqlite.SqliteResponse<int>.Successful(result);
                 LastMessage = "OK";
             }
             catch (SQLiteException sqlex)
@@ -340,6 +348,7 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
                 LastMessage = sqlex.Message;
                 LastSqliteException = sqlex;
                 result = -1;
+                back = Sqlite.SqliteResponse<int>.Failure(sqlex);
             }
             catch (Exception ex)
             {
@@ -350,6 +359,7 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
                 LastMessage = ex.Message;
                 LastException = ex;
                 result = -1;
+                back = Sqlite.SqliteResponse<int>.Failure(ex);
             }
             finally
             {
@@ -360,7 +370,7 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
                 }
                 Executing = false;
             }
-            return result;
+            return back;
         }
 
         /// <summary>
@@ -369,50 +379,61 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
         /// <param name="sql">The SQL text to execute.</param>
         /// <param name="autoTransact">If true, wraps execution in a transaction which is committed on success or rolled back on failure.</param>
         /// <returns>The scalar value returned by the query; null if failed.</returns>
-        public object ExecuteScalar(string sql, bool autoTransact = false)
+        public SqliteResponse<object> ExecuteScalar(string sql, Dictionary<string, string> ps = null, bool autoTransact = false)
         {
             object result = null;
+            SqliteResponse<object> back = null;
             try
             {
                 cmd.Connection = Connection;
                 cmd.CommandText = sql;
                 cmd.CommandTimeout = TimeOut;
+
+                if (ps != null && ps.Count > 0)
+                {
+                    cmd.Parameters.Clear();
+                    foreach (var p in ps)
+                        cmd.Parameters.AddWithValue(p.Key, p.Value);
+                }
+
                 Executing = true;
                 cmd.Connection.Open();
                 if (autoTransact)
-                {
                     BeginTransaction();
-                }
 
                 cmd.CommandType = CommandType.Text;
                 RowsRead = 0;
                 result = cmd.ExecuteScalar();
                 RowsRead++;
                 if (autoTransact)
-                {
                     CommitTransaction();
-                }
+
+                back = SqliteResponse<object>.Successful(result);
+
                 LastMessage = "OK";
             }
             catch (SQLiteException sqlex)
             {
                 if (autoTransact)
-                {
                     RollbackTransaction();
-                }
+
                 LastMessage = sqlex.Message;
                 LastSqliteException = sqlex;
                 result = null;
+
+                back = SqliteResponse<object>.Failure(sqlex);
             }
             catch (Exception ex)
             {
                 if (autoTransact)
-                {
                     RollbackTransaction();
-                }
+
+
                 LastMessage = ex.Message;
                 LastException = ex;
                 result = null;
+
+                back = SqliteResponse<object>.Failure(ex);
             }
             finally
             {
@@ -423,7 +444,7 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
                 }
                 Executing = false;
             }
-            return result;
+            return back;
         }
 
         /// <summary>
@@ -432,14 +453,23 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
         /// <param name="sql">The SQL text to execute.</param>
         /// <param name="autoTransact">If true, wraps execution in a transaction which is committed on success or rolled back on failure.</param>
         /// <returns>A DataSet with the results; null if failed.</returns>
-        public DataSet ExecuteDataSet(string sql, bool autoTransact = false)
+        public SqliteResponse<DataSet> ExecuteDataSet(string sql, Dictionary<string, string> ps = null, bool autoTransact = false)
         {
             DataSet result = new DataSet();
+            SqliteResponse<DataSet> back = null;
             try
             {
                 cmd.Connection = Connection;
                 cmd.CommandText = sql;
                 cmd.CommandTimeout = TimeOut;
+
+                if (ps != null && ps.Count > 0)
+                {
+                    cmd.Parameters.Clear();
+                    foreach (var p in ps)
+                        cmd.Parameters.AddWithValue(p.Key, p.Value);
+                }
+
                 da = new SQLiteDataAdapter(cmd);
                 Executing = true;
 
@@ -447,9 +477,8 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
 
                 da.SelectCommand.Connection.Open();
                 if (autoTransact)
-                {
                     BeginTransaction();
-                }
+
                 RowsRead = 0;
                 da.Fill(result);
                 foreach (DataTable tab in result.Tables)
@@ -457,30 +486,31 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
                         RowsRead = tab.Rows.Count;
 
                 if (autoTransact)
-                {
                     CommitTransaction();
-                }
+
+                back = SqliteResponse<DataSet>.Successful(result);
+
                 LastMessage = "OK";
             }
             catch (SQLiteException sqlex)
             {
                 if (autoTransact)
-                {
                     RollbackTransaction();
-                }
+
                 LastMessage = sqlex.Message;
                 LastSqliteException = sqlex;
                 result = null;
+                back = SqliteResponse<DataSet>.Failure(sqlex);
             }
             catch (Exception ex)
             {
                 if (autoTransact)
-                {
                     RollbackTransaction();
-                }
+
                 LastMessage = ex.Message;
                 LastException = ex;
                 result = null;
+                back = SqliteResponse<DataSet>.Failure(ex);
             }
             finally
             {
@@ -491,7 +521,7 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
                 }
                 Executing = false;
             }
-            return result;
+            return back;
         }
 
         /// <summary>
@@ -501,22 +531,36 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
         /// <param name="autoTransact">If true, wraps execution in a transaction which is committed on success or rolled back on failure.</param>
         /// <param name="tableName">Optional name to assign to the returned DataTable.</param>
         /// <returns>The first DataTable from the result; null if failed or no tables.</returns>
-        public DataTable ExecuteTable(string sql, bool autoTransact = false, string tableName = "")
+        public SqliteResponse<DataTable> ExecuteTable(string sql, Dictionary<string, string> ps = null, bool autoTransact = false, string tableName = "")
         {
-            DataTable aux = null;
-            DataSet info;
+            SqliteResponse<DataSet> tmp = null;
+            SqliteResponse<DataTable> back = null;
 
-            info = ExecuteDataSet(sql, autoTransact);
-            if (info != null && info.Tables.Count > 0)
+            tmp = ExecuteDataSet(sql, ps, autoTransact);
+            if (tmp.IsOK)
             {
-                if (!String.IsNullOrEmpty(tableName))
+                if (tmp?.Result != null && tmp.Result.Tables.Count > 0)
                 {
-                    info.Tables[0].TableName = tableName;
+                    DataTable table = tmp.Result.Tables[0];
+                    if (!String.IsNullOrEmpty(tableName))
+                        table.TableName = tableName; // Use 'table' instead of 'tmp.Result.Tables[0]'
+
+                    back = SqliteResponse<DataTable>.Successful(table);
                 }
-                aux = info.Tables[0];
+                else
+                {
+                    back = SqliteResponse<DataTable>.Successful(new DataTable());
+                }
+                LastMessage = "OK";
+            }
+            else
+            {
+                back = new SqliteResponse<DataTable>();
+                back.Errors.AddRange(tmp.Errors);
+                LastMessage = "Errors occurred during execution.";
             }
 
-            return aux;
+            return back;
         }
 
         /// <summary>
@@ -525,17 +569,37 @@ namespace ZidUtilities.CommonCode.DataAccess.Sqlite
         /// <param name="sql">The SQL text to execute.</param>
         /// <param name="autoTransact">If true, wraps execution in a transaction which is committed on success or rolled back on failure.</param>
         /// <returns>A list of string values from the first column; empty list on failure or no rows.</returns>
-        public List<string> ExecuteColumn(string sql, bool autoTransact = false)
+        public SqliteResponse<List<string>> ExecuteColumn(string sql, Dictionary<string, string> ps = null, bool autoTransact = false)
         {
-            List<string> back = new List<string>();
-            DataTable aux;
-            aux = ExecuteTable(sql, autoTransact);
-            if (!Error && aux != null && aux.Rows.Count > 0)
+            SqliteResponse<List<string>> back = new SqliteResponse<List<string>>();
+            SqliteResponse<DataTable> aux = ExecuteTable(sql, ps, autoTransact);
+
+            if (aux.IsOK)
             {
-                int rc = aux.Rows.Count;
-                for (int i = 0; i < rc; i++)
-                    back.Add(aux.Rows[i][0].ToString());
+                if (aux?.Result != null)
+                {
+                    DataTable table = (DataTable)aux.Result;
+                    List<string> list = new List<string>();
+                    int rc = table.Rows.Count;
+
+                    for (int i = 0; i < rc; i++)
+                        list.Add(table.Rows[i][0].ToString());
+
+                    back = SqliteResponse<List<string>>.Successful(list);
+                }
+                else
+                {
+                    back = SqliteResponse<List<string>>.Successful(new List<string>());
+                }
+                LastMessage = "OK";
             }
+            else
+            {
+                back = new SqliteResponse<List<string>>();
+                back.Errors.AddRange(aux.Errors);
+                LastMessage = "Errors occurred during execution.";
+            }
+
             return back;
         }
 

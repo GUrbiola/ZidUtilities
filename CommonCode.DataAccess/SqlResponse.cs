@@ -198,6 +198,8 @@ namespace ZidUtilities.CommonCode.DataAccess
             if (this.Results == null)
                 this.Results = new List<T>();
             this.Results.Add(result);
+            if (String.IsNullOrEmpty(this.Message))
+                this.Message = "Success";
         }
 
         /// <summary>
@@ -209,6 +211,8 @@ namespace ZidUtilities.CommonCode.DataAccess
             if (this.Results == null)
                 this.Results = new List<T>();
             this.Results.AddRange(results);
+            if (String.IsNullOrEmpty(this.Message))
+                this.Message = "Success";
         }
 
         /// <summary>
@@ -217,7 +221,8 @@ namespace ZidUtilities.CommonCode.DataAccess
         /// <returns>The same response instance for chaining.</returns>
         public SqlResponse<T> Fail()
         {
-            ExecutionTime = DateTime.Now;
+            this.ExecutionTime = DateTime.Now;
+            this.Message = "An error occurred while processing your request.";
             this.Errors.Add(new ErrorOnResponse(this.Message));
             return this;
         }
@@ -230,7 +235,8 @@ namespace ZidUtilities.CommonCode.DataAccess
         /// <returns>The same response instance for chaining.</returns>
         public SqlResponse<T> Fail(string message, Exception ex = null)
         {
-            ExecutionTime = DateTime.Now;
+            this.ExecutionTime = DateTime.Now;
+            this.Message = message;
             if (ex != null)
             {
                 this.Errors.Add(new ErrorOnResponse(message, ex));
@@ -249,7 +255,8 @@ namespace ZidUtilities.CommonCode.DataAccess
         /// <returns>The same response instance for chaining.</returns>
         public SqlResponse<T> Fail(Exception ex)
         {
-            ExecutionTime = DateTime.Now;
+            this.ExecutionTime = DateTime.Now;
+            this.Message = "An error occurred while processing your request.";
             if (ex == null)
             {
                 Fail("An error occurred while processing your request.");
@@ -266,10 +273,10 @@ namespace ZidUtilities.CommonCode.DataAccess
         /// </summary>
         /// <param name="message">Optional success message (default "Success").</param>
         /// <returns>The same response instance for chaining.</returns>
-        public SqlResponse<T> Success(string message = "Success")
+        public SqlResponse<T> Success()
         {
             ExecutionTime = DateTime.Now;
-            this.Message = message;
+            this.Message = "Success";
             return this;
         }
 
@@ -279,11 +286,11 @@ namespace ZidUtilities.CommonCode.DataAccess
         /// <param name="result">The result to store.</param>
         /// <param name="message">Optional success message.</param>
         /// <returns>The same response instance for chaining.</returns>
-        public SqlResponse<T> Success(T result, string message = "Success")
+        public SqlResponse<T> Success(T result)
         {
             ExecutionTime = DateTime.Now;
             this.Result = result;
-            this.Message = message;
+            this.Message = "Success";
             return this;
         }
 
@@ -293,11 +300,11 @@ namespace ZidUtilities.CommonCode.DataAccess
         /// <param name="results">The results to store.</param>
         /// <param name="message">Optional success message.</param>
         /// <returns>The same response instance for chaining.</returns>
-        public SqlResponse<T> Success(List<T> results, string message = "Success")
+        public SqlResponse<T> Success(List<T> results)
         {
             ExecutionTime = DateTime.Now;
             this.Results = results;
-            this.Message = message;
+            this.Message = "Success";
             return this;
         }
 
@@ -328,9 +335,9 @@ namespace ZidUtilities.CommonCode.DataAccess
         /// <param name="results">Results list.</param>
         /// <param name="message">Optional success message.</param>
         /// <returns>A new success SqlResponse instance.</returns>
-        public static SqlResponse<T> Successful(List<T> results, string message = "Success")
+        public static SqlResponse<T> Successful(List<T> results)
         {
-            return new SqlResponse<T>().Success(results, message);
+            return new SqlResponse<T>().Success(results);
         }
 
         /// <summary>
@@ -339,9 +346,9 @@ namespace ZidUtilities.CommonCode.DataAccess
         /// <param name="result">Single result.</param>
         /// <param name="message">Optional success message.</param>
         /// <returns>A new success SqlResponse instance.</returns>
-        public static SqlResponse<T> Successful(T result, string message = "Success")
+        public static SqlResponse<T> Successful(T result)
         {
-            return new SqlResponse<T>().Success(result, message);
+            return new SqlResponse<T>().Success(result);
         }
 
         /// <summary>
@@ -349,9 +356,9 @@ namespace ZidUtilities.CommonCode.DataAccess
         /// </summary>
         /// <param name="message">Optional success message.</param>
         /// <returns>A new success SqlResponse instance.</returns>
-        public static SqlResponse<T> Successful(string message = "Success")
+        public static SqlResponse<T> Successful()
         {
-            return new SqlResponse<T>().Success(message);
+            return new SqlResponse<T>().Success();
         }
     }
 }

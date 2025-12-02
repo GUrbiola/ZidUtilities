@@ -72,6 +72,42 @@ namespace ZidUtilities.CommonCode.ICSharpTextEditor
                             Editor.Document.FormattingStrategy = this.DefaultFormattingStrategy;
                             Editor.Document.FoldingManager.FoldingStrategy = null;
                             break;
+                        case SyntaxHighlighting.VBNET:
+                            HighlightingManager.Manager.AddSyntaxModeFileProvider(new InlineSyntaxProvider(SyntaxLanguage.VBNET));
+                            Editor.Document.HighlightingStrategy = HighlightingManager.Manager.FindHighlighter("InlineLanguage");
+                            Editor.Document.FormattingStrategy = this.DefaultFormattingStrategy;//no bracket matching strategy for vbnet
+
+                            GenericFoldingStrategy vbnetFolding = new GenericFoldingStrategy();
+                            vbnetFolding.StartFolding.Add("#Region");
+                            vbnetFolding.EndFolding.Add("#End Region");
+
+                            Editor.Document.FoldingManager.FoldingStrategy = vbnetFolding;
+                            Editor.Document.FoldingManager.UpdateFoldings(null, null);
+                            break;
+                        case SyntaxHighlighting.Java:
+                            HighlightingManager.Manager.AddSyntaxModeFileProvider(new InlineSyntaxProvider(SyntaxLanguage.Java));
+                            Editor.Document.HighlightingStrategy = HighlightingManager.Manager.FindHighlighter("InlineLanguage");
+                            Editor.Document.FormattingStrategy = new GenericBracketMatcher(ZidUtilities.CommonCode.GenericLanguage.CSharp);
+
+                            GenericFoldingStrategy javaFolding = new GenericFoldingStrategy();
+                            javaFolding.StartFolding.Add("/*");
+                            javaFolding.EndFolding.Add("*/");
+
+                            Editor.Document.FoldingManager.FoldingStrategy = javaFolding;
+                            Editor.Document.FoldingManager.UpdateFoldings(null, null);
+                            break;
+                        case SyntaxHighlighting.CPlusPlus:
+                            HighlightingManager.Manager.AddSyntaxModeFileProvider(new InlineSyntaxProvider(SyntaxLanguage.CPlusPlus));
+                            Editor.Document.HighlightingStrategy = HighlightingManager.Manager.FindHighlighter("InlineLanguage");
+                            Editor.Document.FormattingStrategy = new GenericBracketMatcher(ZidUtilities.CommonCode.GenericLanguage.CSharp);
+
+                            GenericFoldingStrategy cplusplusFolding = new GenericFoldingStrategy();
+                            cplusplusFolding.StartFolding.Add("/*");
+                            cplusplusFolding.EndFolding.Add("*/");
+
+                            Editor.Document.FoldingManager.FoldingStrategy = cplusplusFolding;
+                            Editor.Document.FoldingManager.UpdateFoldings(null, null);
+                            break;
                         case SyntaxHighlighting.CSharp:
                             HighlightingManager.Manager.AddSyntaxModeFileProvider(new InlineSyntaxProvider(SyntaxLanguage.CSharp));
                             Editor.Document.HighlightingStrategy = HighlightingManager.Manager.FindHighlighter("InlineLanguage");
@@ -86,7 +122,6 @@ namespace ZidUtilities.CommonCode.ICSharpTextEditor
                             csharpFolding.SpamFolding.Add("///");
 
                             Editor.Document.FoldingManager.FoldingStrategy = csharpFolding;
-                            //Editor.Document.FoldingManager.FoldingStrategy = new CSharpFoldingStrategy();
                             Editor.Document.FoldingManager.UpdateFoldings(null, null);
                             break;
                         case SyntaxHighlighting.XML:

@@ -58,17 +58,11 @@ namespace ZidUtilities.CommonCode.DataAccess.ActiveDirectory
         /// </param>
         public AdManager(string domainController)
         {
-            this.MuteMode = false;
             this.DomainController = domainController;
             this.Attributes = new List<AdAttribute>();
             this.Paths = new List<AdManagerPath>();
             this.Filter = AdManagerFilter.CreateFilter();
         }
-
-        /// <summary>
-        /// Value determines if the execution will trigger log messages
-        /// </summary>
-        public bool MuteMode { get; set; }
 
         /// <summary>
         /// Domain Controller to which it will connect to
@@ -392,7 +386,6 @@ namespace ZidUtilities.CommonCode.DataAccess.ActiveDirectory
                     user.Properties[update.AdName].Value = update.Evaluate(update.UpdateValue);
             }
         }
-
 
         /// <summary>
         /// Validates credentials against Active Directory

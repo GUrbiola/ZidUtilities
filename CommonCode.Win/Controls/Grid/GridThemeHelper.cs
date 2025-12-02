@@ -1,3 +1,4 @@
+using System;
 using System.Drawing;
 
 namespace ZidUtilities.CommonCode.Win.Controls.Grid
@@ -454,6 +455,16 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
             }
 
             return colors;
+        }
+        /// <summary>
+        /// Directly applies a theme to a ZidGrid control.
+        /// </summary>
+        /// <param name="grid">ZidGrid control to which the theme will be applied</param>
+        /// <param name="theme">Theme to apply</param>
+        public static void ApplyTheme(ZidGrid grid, ZidThemes theme)
+        {
+            grid.Theme = theme;
+            grid.Refresh();
         }
     }
 }

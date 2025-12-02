@@ -308,14 +308,23 @@ namespace ZidUtilities.CommonCode.DataAccess
         /// <param name="sql">The SQL text to execute.</param>
         /// <param name="autoTransact">If true, wraps execution in a transaction which is committed on success or rolled back on failure.</param>
         /// <returns>0 on success; -1 on failure.</returns>
-        public int ExecuteNonQuery(string sql, bool autoTransact = false)
+        public SqlResponse<int> ExecuteNonQuery(string sql, Dictionary<string, string> ps = null, bool autoTransact = false)
         {
             int result = 0;
+            SqlResponse<int> back = null;
             try
             {
                 cmd.Connection = Connection;
                 cmd.CommandText = sql;
                 cmd.CommandTimeout = TimeOut;
+
+                if (ps != null && ps.Count > 0)
+                {
+                    cmd.Parameters.Clear();
+                    foreach (var p in ps)
+                        cmd.Parameters.AddWithValue(p.Key, p.Value);
+                }
+
                 Executing = true;
                 cmd.Connection.Open();
                 if (autoTransact)
@@ -329,6 +338,9 @@ namespace ZidUtilities.CommonCode.DataAccess
                 {
                     CommitTransaction();
                 }
+
+                back = SqlResponse<int>.Successful(1);
+                
                 LastMessage = "OK";
             }
             catch (SqlException sqlex)
@@ -339,7 +351,8 @@ namespace ZidUtilities.CommonCode.DataAccess
                 }
                 LastMessage = sqlex.Errors[0].Message;
                 LastSqlException = sqlex;
-                result = -1;
+                
+                back = SqlResponse<int>.Failure(LastMessage, sqlex);
             }
             catch (Exception ex)
             {
@@ -349,7 +362,8 @@ namespace ZidUtilities.CommonCode.DataAccess
                 }
                 LastMessage = ex.Message;
                 LastException = ex;
-                result = -1;
+                
+                back = SqlResponse<int>.Failure(LastMessage, ex);
             }
             finally
             {
@@ -360,7 +374,7 @@ namespace ZidUtilities.CommonCode.DataAccess
                 }
                 Executing = false;
             }
-            return result;
+            return back;
         }
 
         /// <summary>
@@ -369,29 +383,36 @@ namespace ZidUtilities.CommonCode.DataAccess
         /// <param name="sql">The SQL text to execute.</param>
         /// <param name="autoTransact">If true, wraps execution in a transaction which is committed on success or rolled back on failure.</param>
         /// <returns>The scalar value returned by the query; null if failed.</returns>
-        public object ExecuteScalar(string sql, bool autoTransact = false)
+        public SqlResponse<object> ExecuteScalar(string sql, Dictionary<string, string> ps = null, bool autoTransact = false)
         {
+            SqlResponse<object> back = null;
             object result = null;
             try
             {
                 cmd.Connection = Connection;
                 cmd.CommandText = sql;
                 cmd.CommandTimeout = TimeOut;
+
+                if (ps != null && ps.Count > 0)
+                {
+                    cmd.Parameters.Clear();
+                    foreach (var p in ps)
+                        cmd.Parameters.AddWithValue(p.Key, p.Value);
+                }   
+
                 Executing = true;
                 cmd.Connection.Open();
                 if (autoTransact)
-                {
                     BeginTransaction();
-                }
 
                 cmd.CommandType = CommandType.Text;
                 RowsRead = 0;
                 result = cmd.ExecuteScalar();
                 RowsRead++;
                 if (autoTransact)
-                {
                     CommitTransaction();
-                }
+                
+                back = SqlResponse<object>.Successful(result);
                 LastMessage = "OK";
             }
             catch (SqlException sqlex)
@@ -403,6 +424,7 @@ namespace ZidUtilities.CommonCode.DataAccess
                 LastMessage = sqlex.Errors[0].Message;
                 LastSqlException = sqlex;
                 result = null;
+                back = SqlResponse<object>.Failure(LastMessage, sqlex);
             }
             catch (Exception ex)
             {
@@ -413,6 +435,7 @@ namespace ZidUtilities.CommonCode.DataAccess
                 LastMessage = ex.Message;
                 LastException = ex;
                 result = null;
+                back = SqlResponse<object>.Failure(LastMessage, ex);
             }
             finally
             {
@@ -423,7 +446,7 @@ namespace ZidUtilities.CommonCode.DataAccess
                 }
                 Executing = false;
             }
-            return result;
+            return back;
         }
 
         /// <summary>
@@ -432,9 +455,10 @@ namespace ZidUtilities.CommonCode.DataAccess
         /// <param name="sql">The SQL text to execute.</param>
         /// <param name="autoTransact">If true, wraps execution in a transaction which is committed on success or rolled back on failure.</param>
         /// <returns>A DataSet with the results; null if failed.</returns>
-        public DataSet ExecuteDataSet(string sql, bool autoTransact = false)
+        public SqlResponse<DataSet> ExecuteDataSet(string sql, Dictionary<string, string> ps = null, bool autoTransact = false)
         {
             DataSet result = new DataSet();
+            SqlResponse<DataSet> back = null;
             try
             {
                 cmd.Connection = Connection;
@@ -447,9 +471,7 @@ namespace ZidUtilities.CommonCode.DataAccess
 
                 da.SelectCommand.Connection.Open();
                 if (autoTransact)
-                {
                     BeginTransaction();
-                }
                 RowsRead = 0;
                 da.Fill(result);
                 foreach (DataTable tab in result.Tables)
@@ -457,9 +479,9 @@ namespace ZidUtilities.CommonCode.DataAccess
                         RowsRead = tab.Rows.Count;
 
                 if (autoTransact)
-                {
                     CommitTransaction();
-                }
+
+                back = SqlResponse<DataSet>.Successful(result);
                 LastMessage = "OK";
             }
             catch (SqlException sqlex)
@@ -471,6 +493,7 @@ namespace ZidUtilities.CommonCode.DataAccess
                 LastMessage = sqlex.Errors[0].Message;
                 LastSqlException = sqlex;
                 result = null;
+                back = SqlResponse<DataSet>.Failure(LastMessage, sqlex);
             }
             catch (Exception ex)
             {
@@ -481,6 +504,7 @@ namespace ZidUtilities.CommonCode.DataAccess
                 LastMessage = ex.Message;
                 LastException = ex;
                 result = null;
+                back = SqlResponse<DataSet>.Failure(LastMessage, ex);
             }
             finally
             {
@@ -491,7 +515,7 @@ namespace ZidUtilities.CommonCode.DataAccess
                 }
                 Executing = false;
             }
-            return result;
+            return back;
         }
 
         /// <summary>
@@ -501,22 +525,36 @@ namespace ZidUtilities.CommonCode.DataAccess
         /// <param name="autoTransact">If true, wraps execution in a transaction which is committed on success or rolled back on failure.</param>
         /// <param name="tableName">Optional name to assign to the returned DataTable.</param>
         /// <returns>The first DataTable from the result; null if failed or no tables.</returns>
-        public DataTable ExecuteTable(string sql, bool autoTransact = false, string tableName = "")
+        public SqlResponse<DataTable> ExecuteTable(string sql, Dictionary<string, string> ps = null, bool autoTransact = false, string tableName = "")
         {
-            DataTable aux = null;
-            DataSet info;
+            SqlResponse<DataSet> tmp = null;
+            SqlResponse<DataTable> back = null;
 
-            info = ExecuteDataSet(sql, autoTransact);
-            if (info != null && info.Tables.Count > 0)
+            tmp = ExecuteDataSet(sql, ps, autoTransact);
+            if (tmp.IsOK)
             {
-                if (!String.IsNullOrEmpty(tableName))
+                if (tmp?.Result != null && tmp.Result.Tables.Count > 0)
                 {
-                    info.Tables[0].TableName = tableName;
+                    DataTable table = tmp.Result.Tables[0];
+                    if (!String.IsNullOrEmpty(tableName))
+                        table.TableName = tableName; // Use 'table' instead of 'tmp.Result.Tables[0]'
+
+                    back = SqlResponse<DataTable>.Successful(table);
                 }
-                aux = info.Tables[0];
+                else
+                {
+                    back = SqlResponse<DataTable>.Successful(new DataTable());
+                }
+                LastMessage = "OK";
+            }
+            else
+            {
+                back = new SqlResponse<DataTable>();
+                back.Errors.AddRange(tmp.Errors);
+                LastMessage = "Errors occurred during execution.";
             }
 
-            return aux;
+            return back;
         }
 
         /// <summary>
@@ -525,17 +563,37 @@ namespace ZidUtilities.CommonCode.DataAccess
         /// <param name="sql">The SQL text to execute.</param>
         /// <param name="autoTransact">If true, wraps execution in a transaction which is committed on success or rolled back on failure.</param>
         /// <returns>A list of string values from the first column; empty list on failure or no rows.</returns>
-        public List<string> ExecuteColumn(string sql, bool autoTransact = false)
+        public SqlResponse<List<string>> ExecuteColumn(string sql, Dictionary<string, string> ps = null, bool autoTransact = false)
         {
-            List<string> back = new List<string>();
-            DataTable aux;
-            aux = ExecuteTable(sql, autoTransact);
-            if (!Error && aux != null && aux.Rows.Count > 0)
+            SqlResponse<List<string>> back = new SqlResponse<List<string>>();
+            SqlResponse<DataTable> aux = ExecuteTable(sql, ps, autoTransact);
+
+            if (aux.IsOK)
             {
-                int rc = aux.Rows.Count;
-                for (int i = 0; i < rc; i++)
-                    back.Add(aux.Rows[i][0].ToString());
+                if (aux?.Result != null)
+                {
+                    DataTable table = (DataTable)aux.Result;
+                    List<string> list = new List<string>();
+                    int rc = table.Rows.Count;
+                    
+                    for (int i = 0; i < rc; i++)
+                        list.Add(table.Rows[i][0].ToString());
+                    
+                    back = SqlResponse<List<string>>.Successful(list);
+                }
+                else
+                {
+                    back = SqlResponse<List<string>>.Successful(new List<string>());
+                }
+                LastMessage = "OK";
             }
+            else
+            {
+                back = new SqlResponse<List<string>>();
+                back.Errors.AddRange(aux.Errors);
+                LastMessage = "Errors occurred during execution.";
+            }
+
             return back;
         }
 

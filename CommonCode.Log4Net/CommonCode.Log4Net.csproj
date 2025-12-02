@@ -50,6 +50,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="ZidUtilities.CommonCode, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZidUtilities.CommonCode.1.0.0\lib\net48\ZidUtilities.CommonCode.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppenderType.cs" />
@@ -72,10 +75,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CommonCode\CommonCode.csproj">
-      <Project>{E03D978A-06DB-4A36-82FB-8184408E33DD}</Project>
-      <Name>CommonCode</Name>
-    </ProjectReference>
+    <Content Include="DataComparison\ComparisonReportTemplate.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

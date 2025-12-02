@@ -87,6 +87,9 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
+    <Reference Include="ZidUtilities.CommonCode, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZidUtilities.CommonCode.1.0.0\lib\net48\ZidUtilities.CommonCode.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataExporter.cs" />
@@ -99,10 +102,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CommonCode\CommonCode.csproj">
-      <Project>{e03d978a-06db-4a36-82fb-8184408e33dd}</Project>
-      <Name>CommonCode</Name>
-    </ProjectReference>
+    <Content Include="DataComparison\ComparisonReportTemplate.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

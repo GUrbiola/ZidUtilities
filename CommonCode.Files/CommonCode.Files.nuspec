@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>$version$</version>
+    <version>1.0.1</version>
     <title>ZidUtilities.CommonCode.Files</title>
     <authors>Gonzalo Urbiola</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>

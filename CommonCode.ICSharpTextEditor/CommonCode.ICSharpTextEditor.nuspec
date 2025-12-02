@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>ZidUtilities.CommonCode.ICSharptextEditor</title>
+    <authors>Gonzalo Urbiola</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <!-- <icon>icon.png</icon> -->
+    <projectUrl>https://github.com/GUrbiola/ZidUtilities</projectUrl>
+    <description>Provides a custom control that facilitates the usage of the control ICSharpCode.TextEditor.TextEditorControl.</description>
+    <releaseNotes>First release version.</releaseNotes>
+    <copyright>$copyright$</copyright>
+    <tags>ZidUtilities TextEditorControl Syntax Highlighting SyntaxHighlighting TextEditor ICSharpCode.TextEditor.TextEditorControl ElCid Urbiola</tags>
+	<readme>README.md</readme>
+  </metadata>
+  <files>
+    <file src="README.md" target="\" />
+  </files>  
+</package>

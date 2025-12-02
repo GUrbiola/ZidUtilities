@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>ZidUtilities.CommonCode.Files</title>
+    <authors>Gonzalo Urbiola</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <!-- <icon>icon.png</icon> -->
+    <projectUrl>https://github.com/GUrbiola/ZidUtilities</projectUrl>
+    <description>Library Classes to import data from files or export data to files.</description>
+    <releaseNotes>First release version.</releaseNotes>
+    <copyright>$copyright$</copyright>
+    <tags>ZidUtilities File Export Import ElCid Urbiola</tags>
+	<readme>README.md</readme>
+  </metadata>
+  <files>
+    <file src="README.md" target="\" />
+  </files>  
+
+</package>

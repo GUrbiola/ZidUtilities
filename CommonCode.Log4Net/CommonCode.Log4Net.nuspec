@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>ZidUtilities.CommonCode.Log4Net</title>
+    <authors>Gonzalo Urbiola</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <!-- <icon>icon.png</icon> -->
+    <projectUrl>https://github.com/GUrbiola/ZidUtilities</projectUrl>
+    <description>Provides classes to ease configuration of log4net appenders and also classes to read back these log files. I have not tested reading big log files, only a few thousand lines, I do not expect good performance with very large files.</description>
+    <releaseNotes>First release version.</releaseNotes>
+    <copyright>$copyright$</copyright>
+    <tags>ZidUtilities Log4Net logs logfile Log4NetAppender ElCid Urbiola</tags>
+	<readme>README.md</readme>
+  </metadata>
+  <files>
+    <file src="README.md" target="\" />
+  </files>  
+</package>

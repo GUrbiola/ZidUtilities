@@ -797,7 +797,7 @@ namespace ZidUtilities.CommonCode.Files
                         CellRemark remark = Remarks.FirstOrDefault(x => x.Row == curRow && x.Col == curCol);
                         newSheet.Cell(curRow, curCol).Style.SetCustomStyle(remark.Style);
                         if (String.IsNullOrEmpty(remark.Comment))
-                            newSheet.Cell(curRow, curCol).GetComment().AddText(remark.Comment);
+                            newSheet.Cell(curRow, curCol).Comment.AddText(remark.Comment);
                     }
 
                     curCol++;

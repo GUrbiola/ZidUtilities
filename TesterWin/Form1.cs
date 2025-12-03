@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.IO;
 using System.Windows.Forms;
 using ZidUtilities.CommonCode;
@@ -10,6 +11,12 @@ namespace ZidUtilities.TesterWin
         public Form1()
         {
             InitializeComponent();
+            extEditor.OnEditorKeyPress += ExtEditor_OnEditorKeyPress;
+        }
+
+        private bool ExtEditor_OnEditorKeyPress(Keys keyData)
+        {
+			return false;
         }
 
         private void extendedEditor1_Load(object sender, EventArgs e)
@@ -538,6 +545,10 @@ END
         private void extEditor_OnRun(string selectedText, CommonCode.ICSharpTextEditor.ToolbarOption btnClicked)
         {
 			MessageBox.Show($"You clicked the {btnClicked} button!");
+        }
+
+        private void extEditor_OnKill(string selectedText, CommonCode.ICSharpTextEditor.ToolbarOption btnClicked)
+        {
         }
     }
 }

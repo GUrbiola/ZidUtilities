@@ -251,7 +251,7 @@ namespace ZidUtilities.CommonCode.Files
                             }
                             break;
                     }
-                    dataSheet.Cell(workingRow, celld.ColumnNumber + 3).GetComment().AddText(String.Format("{0}: {1} vs {2}: {3}", comparer.Label1, celld.Value1, comparer.Label2, celld.Value2));
+                    dataSheet.Cell(workingRow, celld.ColumnNumber + 3).Comment.AddText(String.Format("{0}: {1} vs {2}: {3}", comparer.Label1, celld.Value1, comparer.Label2, celld.Value2));
                 }
                 #endregion
 

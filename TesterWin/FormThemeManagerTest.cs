@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using ZidUtilities.CommonCode.Win;
 using ZidUtilities.CommonCode.Win.Controls;
@@ -28,6 +30,53 @@ namespace ZidUtilities.TesterWin
         {
             this.SuspendLayout();
 
+            // MenuStrip
+            MenuStrip menuStrip = new MenuStrip();
+
+            ToolStripMenuItem fileMenu = new ToolStripMenuItem("&File");
+            fileMenu.DropDownItems.Add("&New", null, (s, ev) => MessageBox.Show("New clicked"));
+            fileMenu.DropDownItems.Add("&Open", null, (s, ev) => MessageBox.Show("Open clicked"));
+            fileMenu.DropDownItems.Add("-");
+            fileMenu.DropDownItems.Add("E&xit", null, (s, ev) => this.Close());
+
+            ToolStripMenuItem editMenu = new ToolStripMenuItem("&Edit");
+            editMenu.DropDownItems.Add("&Copy", null, (s, ev) => MessageBox.Show("Copy clicked"));
+            editMenu.DropDownItems.Add("&Paste", null, (s, ev) => MessageBox.Show("Paste clicked"));
+
+            ToolStripMenuItem viewMenu = new ToolStripMenuItem("&View");
+            viewMenu.DropDownItems.Add("&Refresh", null, (s, ev) => MessageBox.Show("Refresh clicked"));
+
+            ToolStripMenuItem helpMenu = new ToolStripMenuItem("&Help");
+            helpMenu.DropDownItems.Add("&About", null, (s, ev) => MessageBox.Show("Theme Manager Test v1.0", "About"));
+
+            menuStrip.Items.AddRange(new ToolStripItem[] { fileMenu, editMenu, viewMenu, helpMenu });
+            this.Controls.Add(menuStrip);
+            this.MainMenuStrip = menuStrip;
+
+            // ToolStrip
+            ToolStrip toolStrip = new ToolStrip();
+            toolStrip.Items.Add(new ToolStripButton("New", null, (s, ev) => MessageBox.Show("New clicked")));
+            toolStrip.Items.Add(new ToolStripButton("Open", null, (s, ev) => MessageBox.Show("Open clicked")));
+            toolStrip.Items.Add(new ToolStripButton("Save", null, (s, ev) => MessageBox.Show("Save clicked")));
+            toolStrip.Items.Add(new ToolStripSeparator());
+            toolStrip.Items.Add(new ToolStripButton("Copy", null, (s, ev) => MessageBox.Show("Copy clicked")));
+            toolStrip.Items.Add(new ToolStripButton("Paste", null, (s, ev) => MessageBox.Show("Paste clicked")));
+            toolStrip.Items.Add(new ToolStripSeparator());
+            toolStrip.Items.Add(new ToolStripLabel("Zoom:"));
+            ToolStripComboBox zoomCombo = new ToolStripComboBox();
+            zoomCombo.Items.AddRange(new object[] { "50%", "75%", "100%", "125%", "150%" });
+            zoomCombo.SelectedIndex = 2;
+            toolStrip.Items.Add(zoomCombo);
+            this.Controls.Add(toolStrip);
+
+            // StatusStrip
+            StatusStrip statusStrip = new StatusStrip();
+            statusStrip.Items.Add(new ToolStripStatusLabel("Ready"));
+            statusStrip.Items.Add(new ToolStripStatusLabel("Status: OK") { Spring = true, TextAlign = ContentAlignment.MiddleLeft });
+            statusStrip.Items.Add(new ToolStripStatusLabel("Line: 1, Col: 1"));
+            statusStrip.Items.Add(new ToolStripProgressBar() { Value = 50, Width = 100 });
+            this.Controls.Add(statusStrip);
+
             // Header Panel
             Panel headerPanel = new Panel
             {
@@ -42,6 +91,15 @@ namespace ZidUtilities.TesterWin
                 Location = new Point(20, 15),
                 AutoSize = true
             };
+
+            // Add ContextMenuStrip to header label
+            ContextMenuStrip headerContextMenu = new ContextMenuStrip();
+            headerContextMenu.Items.Add("Copy Title", null, (s, ev) => MessageBox.Show("Title copied!"));
+            headerContextMenu.Items.Add("Change Title", null, (s, ev) => headerLabel.Text = "New Title");
+            headerContextMenu.Items.Add("-");
+            headerContextMenu.Items.Add("Reset Title", null, (s, ev) => headerLabel.Text = "Theme Manager Demonstration");
+            headerLabel.ContextMenuStrip = headerContextMenu;
+
             headerPanel.Controls.Add(headerLabel);
             this.Controls.Add(headerPanel);
 
@@ -69,11 +127,14 @@ namespace ZidUtilities.TesterWin
             };
 
             // Populate themes
+            List<ZidThemes> themesList = new List<ZidThemes>();
             foreach (ZidThemes theme in Enum.GetValues(typeof(ZidThemes)))
-            {
-                cmbTheme.Items.Add(theme);
-            }
-            cmbTheme.SelectedIndex = 0;
+                themesList.Add(theme);
+            themesList = themesList.OrderBy(t => t.ToString()).ToList();
+            for (int i = 0; i < themesList.Count; i++)
+                cmbTheme.Items.Add(themesList[i]);
+
+            cmbTheme.SelectedValue = ZidThemes.None;
             cmbTheme.SelectedIndexChanged += (s, ev) =>
             {
                 themeManager.Theme = (ZidThemes)cmbTheme.SelectedItem;
@@ -125,6 +186,16 @@ namespace ZidUtilities.TesterWin
                 Size = new Size(300, 25),
                 Text = "Sample Text"
             };
+
+            // Add ContextMenuStrip to textbox
+            ContextMenuStrip textBoxContextMenu = new ContextMenuStrip();
+            textBoxContextMenu.Items.Add("Cut", null, (s, ev) => { if (textBox1.SelectionLength > 0) textBox1.Cut(); });
+            textBoxContextMenu.Items.Add("Copy", null, (s, ev) => { if (textBox1.SelectionLength > 0) textBox1.Copy(); });
+            textBoxContextMenu.Items.Add("Paste", null, (s, ev) => textBox1.Paste());
+            textBoxContextMenu.Items.Add("-");
+            textBoxContextMenu.Items.Add("Select All", null, (s, ev) => textBox1.SelectAll());
+            textBoxContextMenu.Items.Add("Clear", null, (s, ev) => textBox1.Clear());
+            textBox1.ContextMenuStrip = textBoxContextMenu;
 
             Label label2 = new Label
             {
@@ -369,6 +440,22 @@ namespace ZidUtilities.TesterWin
             listView1.Items.Add(new ListViewItem(new[] { "Item 1", "100" }));
             listView1.Items.Add(new ListViewItem(new[] { "Item 2", "200" }));
             listView1.Items.Add(new ListViewItem(new[] { "Item 3", "300" }));
+
+            // Add ContextMenuStrip to ListView
+            ContextMenuStrip listViewContextMenu = new ContextMenuStrip();
+            listViewContextMenu.Items.Add("Add Item", null, (s, ev) =>
+            {
+                int newIndex = listView1.Items.Count + 1;
+                listView1.Items.Add(new ListViewItem(new[] { $"Item {newIndex}", $"{newIndex * 100}" }));
+            });
+            listViewContextMenu.Items.Add("Remove Selected", null, (s, ev) =>
+            {
+                if (listView1.SelectedItems.Count > 0)
+                    listView1.Items.Remove(listView1.SelectedItems[0]);
+            });
+            listViewContextMenu.Items.Add("-");
+            listViewContextMenu.Items.Add("Clear All", null, (s, ev) => listView1.Items.Clear());
+            listView1.ContextMenuStrip = listViewContextMenu;
 
             groupBox4.Controls.AddRange(new Control[] { treeView1, listView1 });
 

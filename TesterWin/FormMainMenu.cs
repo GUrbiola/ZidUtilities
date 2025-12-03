@@ -104,8 +104,11 @@ namespace ZidUtilities.TesterWin
             AddTestButton(content, "ZidGrid Menu Test", "Test ZidGrid context menu and plugin system",
                 ref yPos, () => OpenForm(new FormZidGridMenuTest()));
 
-            AddTestButton(content, "Form 1", "Original test form 1",
+            AddTestButton(content, "Form 1 (ICSharpTextEditor)", "Test ICSharpTextEditor.ExtendedEditor control",
                 ref yPos, () => OpenForm(new Form1()));
+
+            AddTestButton(content, "AvalonEdit Test", "Test AvalonEdit.ExtendedEditor control",
+                ref yPos, () => OpenForm(new FormAvalonEditTest()));
 
             AddTestButton(content, "Form 2", "Original test form 2",
                 ref yPos, () => OpenForm(new Form2()));

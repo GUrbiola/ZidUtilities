@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Design;
 using System.Windows.Forms;
 using ZidUtilities.CommonCode.Win.Controls.Grid;
 
@@ -15,6 +17,7 @@ namespace ZidUtilities.CommonCode.Win.Controls
         private ZidThemes _theme = ZidThemes.None;
         private Form _parentForm = null;
         private GridThemeHelper.ThemeColors _themeColors;
+        private List<string> _excludedControlTypes;
 
         /// <summary>
         /// Gets or sets the theme to apply to the form and controls.
@@ -66,11 +69,42 @@ namespace ZidUtilities.CommonCode.Win.Controls
         }
 
         /// <summary>
+        /// Gets or sets the list of control type names to exclude from theming.
+        /// Control types in this list will not have any styling applied.
+        /// Use the full type name (e.g., "ICSharpCode.TextEditor.TextEditorControl").
+        /// </summary>
+        [Category("Behavior")]
+        [Description("List of control type names (full type names) to exclude from theming. Controls of these types will not have any styling applied.")]
+        [Editor("System.Windows.Forms.Design.StringCollectionEditor, System.Design", typeof(UITypeEditor))]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public List<string> ExcludedControlTypes
+        {
+            get
+            {
+                if (_excludedControlTypes == null)
+                {
+                    _excludedControlTypes = new List<string>
+                    {
+                        "ICSharpCode.TextEditor.TextEditorControl",
+                        "ZidUtilities.CommonCode.ICSharpTextEditor.ExtendedEditor"
+                    };
+                }
+                return _excludedControlTypes;
+            }
+        }
+
+        /// <summary>
         /// Initializes a new instance of the ThemeManager component.
         /// </summary>
         public ThemeManager()
         {
             _themeColors = GridThemeHelper.GetThemeColors(_theme);
+            // Initialize with default excluded types
+            _excludedControlTypes = new List<string>
+            {
+                "ICSharpCode.TextEditor.TextEditorControl",
+                "ZidUtilities.CommonCode.ICSharpTextEditor.ExtendedEditor"
+            };
         }
 
         /// <summary>
@@ -139,6 +173,12 @@ namespace ZidUtilities.CommonCode.Win.Controls
             {
                 ApplyThemeToControl(control);
 
+                // Check for ContextMenuStrip attached to this control
+                if (control.ContextMenuStrip != null)
+                {
+                    ApplyThemeToToolStrip(control.ContextMenuStrip);
+                }
+
                 // Recursively apply to child controls
                 if (control.HasChildren)
                 {
@@ -152,6 +192,13 @@ namespace ZidUtilities.CommonCode.Win.Controls
         /// </summary>
         private void ApplyThemeToControl(Control control)
         {
+            // Check if this control type should be excluded from theming
+            string controlTypeName = control.GetType().FullName;
+            if (_excludedControlTypes != null && _excludedControlTypes.Contains(controlTypeName))
+            {
+                return;
+            }
+
             // Skip certain controls that manage their own themes
             if (control is Grid.ZidGrid)
             {
@@ -215,7 +262,7 @@ namespace ZidUtilities.CommonCode.Win.Controls
             {
                 ApplyThemeToTabControl((TabControl)control);
             }
-            else if (control is MenuStrip || control is ToolStrip)
+            else if (control is MenuStrip || control is ToolStrip || control is StatusStrip || control is ContextMenuStrip)
             {
                 ApplyThemeToToolStrip((ToolStrip)control);
             }
@@ -397,10 +444,27 @@ namespace ZidUtilities.CommonCode.Win.Controls
             toolStrip.BackColor = _themeColors.HeaderBackColor;
             toolStrip.ForeColor = _themeColors.HeaderForeColor;
 
-            foreach (ToolStripItem item in toolStrip.Items)
+            // Use custom renderer for proper theming of menu items and their states
+            toolStrip.Renderer = new ThemedToolStripRenderer(_themeColors);
+
+            // Apply theme to all items recursively
+            ApplyThemeToToolStripItems(toolStrip.Items);
+        }
+
+        private void ApplyThemeToToolStripItems(ToolStripItemCollection items)
+        {
+            foreach (ToolStripItem item in items)
             {
                 item.BackColor = _themeColors.HeaderBackColor;
                 item.ForeColor = _themeColors.HeaderForeColor;
+
+                // Recursively apply to dropdown items
+                if (item is ToolStripMenuItem menuItem && menuItem.HasDropDownItems)
+                {
+                    menuItem.DropDown.BackColor = _themeColors.HeaderBackColor;
+                    menuItem.DropDown.ForeColor = _themeColors.HeaderForeColor;
+                    ApplyThemeToToolStripItems(menuItem.DropDownItems);
+                }
             }
         }
 
@@ -507,6 +571,12 @@ namespace ZidUtilities.CommonCode.Win.Controls
             {
                 ResetControlToDefault(control);
 
+                // Check for ContextMenuStrip attached to this control
+                if (control.ContextMenuStrip != null)
+                {
+                    ResetToolStrip(control.ContextMenuStrip);
+                }
+
                 // Recursively reset child controls
                 if (control.HasChildren)
                 {
@@ -520,6 +590,13 @@ namespace ZidUtilities.CommonCode.Win.Controls
         /// </summary>
         private void ResetControlToDefault(Control control)
         {
+            // Check if this control type should be excluded from theming
+            string controlTypeName = control.GetType().FullName;
+            if (_excludedControlTypes != null && _excludedControlTypes.Contains(controlTypeName))
+            {
+                return;
+            }
+
             // Skip ZidGrid - let it manage its own theme reset
             if (control is Grid.ZidGrid)
             {
@@ -582,7 +659,7 @@ namespace ZidUtilities.CommonCode.Win.Controls
             {
                 ResetTabControl((TabControl)control);
             }
-            else if (control is MenuStrip || control is ToolStrip)
+            else if (control is MenuStrip || control is ToolStrip || control is StatusStrip || control is ContextMenuStrip)
             {
                 ResetToolStrip((ToolStrip)control);
             }
@@ -729,10 +806,27 @@ namespace ZidUtilities.CommonCode.Win.Controls
             toolStrip.BackColor = SystemColors.Control;
             toolStrip.ForeColor = SystemColors.ControlText;
 
-            foreach (ToolStripItem item in toolStrip.Items)
+            // Reset to default renderer
+            toolStrip.Renderer = new ToolStripProfessionalRenderer();
+
+            // Reset all items recursively
+            ResetToolStripItems(toolStrip.Items);
+        }
+
+        private void ResetToolStripItems(ToolStripItemCollection items)
+        {
+            foreach (ToolStripItem item in items)
             {
                 item.BackColor = SystemColors.Control;
                 item.ForeColor = SystemColors.ControlText;
+
+                // Recursively reset dropdown items
+                if (item is ToolStripMenuItem menuItem && menuItem.HasDropDownItems)
+                {
+                    menuItem.DropDown.BackColor = SystemColors.Control;
+                    menuItem.DropDown.ForeColor = SystemColors.ControlText;
+                    ResetToolStripItems(menuItem.DropDownItems);
+                }
             }
         }
 
@@ -819,6 +913,133 @@ namespace ZidUtilities.CommonCode.Win.Controls
         {
             return (LicenseManager.UsageMode == LicenseUsageMode.Designtime) ||
                    (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "devenv");
+        }
+    }
+
+    /// <summary>
+    /// Custom renderer for ToolStrip and MenuStrip controls that applies theme colors.
+    /// </summary>
+    internal class ThemedToolStripRenderer : ToolStripProfessionalRenderer
+    {
+        private GridThemeHelper.ThemeColors _themeColors;
+
+        public ThemedToolStripRenderer(GridThemeHelper.ThemeColors themeColors)
+        {
+            _themeColors = themeColors;
+        }
+
+        protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e)
+        {
+            Rectangle rect = new Rectangle(Point.Empty, e.Item.Size);
+
+            if (e.Item.Selected || e.Item.Pressed)
+            {
+                // Use accent color for selected/hover state
+                using (SolidBrush brush = new SolidBrush(_themeColors.AccentColor))
+                {
+                    e.Graphics.FillRectangle(brush, rect);
+                }
+            }
+            else
+            {
+                // Use header color for normal state
+                using (SolidBrush brush = new SolidBrush(_themeColors.HeaderBackColor))
+                {
+                    e.Graphics.FillRectangle(brush, rect);
+                }
+            }
+        }
+
+        protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e)
+        {
+            e.TextColor = _themeColors.HeaderForeColor;
+            base.OnRenderItemText(e);
+        }
+
+        protected override void OnRenderToolStripBackground(ToolStripRenderEventArgs e)
+        {
+            using (SolidBrush brush = new SolidBrush(_themeColors.HeaderBackColor))
+            {
+                e.Graphics.FillRectangle(brush, e.AffectedBounds);
+            }
+        }
+
+        protected override void OnRenderToolStripBorder(ToolStripRenderEventArgs e)
+        {
+            // Draw border with grid color
+            if (e.ToolStrip is MenuStrip)
+            {
+                // Don't draw border for MenuStrip
+                return;
+            }
+
+            using (Pen pen = new Pen(_themeColors.GridColor))
+            {
+                Rectangle bounds = e.AffectedBounds;
+                bounds.Width -= 1;
+                bounds.Height -= 1;
+                e.Graphics.DrawRectangle(pen, bounds);
+            }
+        }
+
+        protected override void OnRenderButtonBackground(ToolStripItemRenderEventArgs e)
+        {
+            Rectangle rect = new Rectangle(Point.Empty, e.Item.Size);
+
+            if (e.Item.Selected || e.Item.Pressed)
+            {
+                // Use accent color for selected/pressed buttons
+                using (SolidBrush brush = new SolidBrush(_themeColors.AccentColor))
+                {
+                    e.Graphics.FillRectangle(brush, rect);
+                }
+            }
+            else
+            {
+                // Use header color for normal state
+                using (SolidBrush brush = new SolidBrush(_themeColors.HeaderBackColor))
+                {
+                    e.Graphics.FillRectangle(brush, rect);
+                }
+            }
+        }
+
+        protected override void OnRenderSeparator(ToolStripSeparatorRenderEventArgs e)
+        {
+            Rectangle rect = new Rectangle(Point.Empty, e.Item.Size);
+
+            // Fill the entire separator background first
+            using (SolidBrush brush = new SolidBrush(_themeColors.HeaderBackColor))
+            {
+                e.Graphics.FillRectangle(brush, rect);
+            }
+
+            // Draw separator line with grid color
+            using (Pen pen = new Pen(_themeColors.GridColor))
+            {
+                int middle = rect.Height / 2;
+                e.Graphics.DrawLine(pen,
+                    rect.Left,
+                    middle,
+                    rect.Right,
+                    middle);
+            }
+        }
+
+        protected override void OnRenderImageMargin(ToolStripRenderEventArgs e)
+        {
+            // Render image margin with a slightly darker shade
+            Color marginColor = ControlPaint.Dark(_themeColors.HeaderBackColor, 0.05f);
+            using (SolidBrush brush = new SolidBrush(marginColor))
+            {
+                e.Graphics.FillRectangle(brush, e.AffectedBounds);
+            }
+        }
+
+        protected override void OnRenderArrow(ToolStripArrowRenderEventArgs e)
+        {
+            e.ArrowColor = _themeColors.HeaderForeColor;
+            base.OnRenderArrow(e);
         }
     }
 }

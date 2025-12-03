@@ -39,7 +39,7 @@
             this.loadXmlToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadJsonToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.removeHighlightingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.extEditor = new CommonCode.ICSharpTextEditor.ExtendedEditor();
+            this.extEditor = new ZidUtilities.CommonCode.ICSharpTextEditor.ExtendedEditor();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -49,7 +49,7 @@
             this.loadFilesToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(937, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1061, 24);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -212,6 +212,7 @@
             this.extEditor.BtnUncomment.Tooltip = "Uncomment selected code lines (Ctr + K, U)";
             this.extEditor.BtnUncomment.Visible = true;
             this.extEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.extEditor.EditorText = "";
             this.extEditor.ImpCollapseOutlining.Enabled = false;
             this.extEditor.ImpCollapseOutlining.Name = "CollapseOutlining";
             this.extEditor.ImpCollapseOutlining.ShortCut = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
@@ -249,23 +250,26 @@
             this.extEditor.Location = new System.Drawing.Point(0, 24);
             this.extEditor.Name = "extEditor";
             this.extEditor.ShowToolbar = true;
-            this.extEditor.Size = new System.Drawing.Size(937, 572);
-            this.extEditor.Syntax = CommonCode.ICSharpTextEditor.SyntaxHighlighting.None;
+            this.extEditor.Size = new System.Drawing.Size(1061, 572);
+            this.extEditor.Syntax = ZidUtilities.CommonCode.ICSharpTextEditor.SyntaxHighlighting.None;
             this.extEditor.TabIndex = 2;
             this.extEditor.TrackToolbarShortcuts = true;
             this.extEditor.Txt01Helper.Text = "TextBoxHelper1";
             this.extEditor.Txt01Helper.ToolTip = "";
             this.extEditor.Txt01Helper.Visible = true;
-            this.extEditor.Txt02Helper.Text = "TextBoxHelper2";
+            this.extEditor.Txt01Helper.Width = 200;
+            this.extEditor.Txt02Helper.Text = "";
             this.extEditor.Txt02Helper.ToolTip = "";
             this.extEditor.Txt02Helper.Visible = true;
-            this.extEditor.OnRun += new CommonCode.ICSharpTextEditor.OnToolbarButtonClick(this.extEditor_OnRun);
+            this.extEditor.Txt02Helper.Width = 200;
+            this.extEditor.OnRun += new ZidUtilities.CommonCode.ICSharpTextEditor.OnToolbarButtonClick(this.extEditor_OnRun);
+            this.extEditor.OnKill += new ZidUtilities.CommonCode.ICSharpTextEditor.OnToolbarButtonClick(this.extEditor_OnKill);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(937, 596);
+            this.ClientSize = new System.Drawing.Size(1061, 596);
             this.Controls.Add(this.extEditor);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;

@@ -222,6 +222,7 @@
             // 
             this.tsText2.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.tsText2.Enabled = false;
+            this.tsText2.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.tsText2.Name = "tsText2";
             this.tsText2.Size = new System.Drawing.Size(200, 30);
             this.tsText2.Text = "TextBoxHelper2";
@@ -230,6 +231,7 @@
             // 
             this.tsText1.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.tsText1.Enabled = false;
+            this.tsText1.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.tsText1.Name = "tsText1";
             this.tsText1.Size = new System.Drawing.Size(200, 30);
             this.tsText1.Text = "TextBoxHelper1";

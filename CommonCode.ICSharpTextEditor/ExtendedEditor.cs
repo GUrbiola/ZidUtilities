@@ -9,6 +9,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -21,7 +22,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 namespace ZidUtilities.CommonCode.ICSharpTextEditor
 {
     public delegate void OnToolbarButtonClick(string selectedText, ToolbarOption btnClicked);
-    public delegate void OnKeyPressOnEditor(Keys keyData);
+    public delegate bool OnKeyPressOnEditor(Keys keyData);
     
     [ToolboxBitmap(@"D:\Just For Fun\ZidUtilities\CommonCode.ICSharpTextEditor\ExtendedEditor.ico")]
     public partial class ExtendedEditor : UserControl
@@ -37,7 +38,8 @@ namespace ZidUtilities.CommonCode.ICSharpTextEditor
         public event OnToolbarButtonClick OnKill;
         [Category("Custom Event")]
         [Description("Event triggered on key press on editor, it is processed after shortcuts.")]
-        public event OnKeyPressOnEditor OnEditorKeyPress;
+        
+        public event OnKeyPressOnEditor WhenKeyPress;
 
         private SearchAndReplace searchForm = null;
         private bool _lastSearchLoopedAround = false, _lastSearchWasBackward = false;
@@ -239,9 +241,7 @@ namespace ZidUtilities.CommonCode.ICSharpTextEditor
 
         [Category("Custom Properties")]
         [Description("Determines if the control should track key press for toolbar shortcuts and implicit shortcuts.")]
-        public bool TrackToolbarShortcuts { get; set; }
-
-
+        public bool TrackToolbarShortcuts { get; set; } = true;
 
         #region Properties that represent the toolbar buttons, class has an event to track changes so they can be customized at design time
         private ToolbarOption _btnRun = new ToolbarOption("Run", "Executes selected/all code (F5)", Content.Play, true) { Enabled = true, ShortCut = Keys.F5 };
@@ -602,12 +602,11 @@ namespace ZidUtilities.CommonCode.ICSharpTextEditor
 
             if (!TrackToolbarShortcuts)
             {
-                if(OnEditorKeyPress != null)
-                    OnEditorKeyPress(keyData);
+                if(WhenKeyPress != null)
+                    return WhenKeyPress(keyData);
                 
                 return Echo;
             }
-                
 
             // Echo == true, then NoEcho == false
             #region Key shortcut processing for toolbar shortcuts
@@ -709,8 +708,8 @@ namespace ZidUtilities.CommonCode.ICSharpTextEditor
 
             LastKeyPressed = keyData;//store last key pressed for two key impShortcuts
 
-            if (OnEditorKeyPress != null)
-                OnEditorKeyPress(keyData);
+            if (WhenKeyPress != null)
+                return WhenKeyPress(keyData);
 
             return Echo;
         }
@@ -900,6 +899,7 @@ namespace ZidUtilities.CommonCode.ICSharpTextEditor
                 toolbarTxtBox.Visible = changedOption.Visible;
                 toolbarTxtBox.Text = changedOption.Text;
                 toolbarTxtBox.ToolTipText = changedOption.ToolTip;
+                toolbarTxtBox.Size = new Size(changedOption.Width, toolbarTxtBox.Height);
             }
         }
 

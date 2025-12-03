@@ -20,6 +20,7 @@ namespace ZidUtilities.CommonCode.ICSharpTextEditor
         private string _text;
         private string _toolTip;
         private bool _visible;
+        private int _width = 200;
 
         /// <summary>
         /// Event fired whenever Text, Visible, or ToolTip changes.
@@ -87,6 +88,25 @@ namespace ZidUtilities.CommonCode.ICSharpTextEditor
             }
         }
 
+        /// <summary>
+        /// Gets or sets the width of the toolbar text box.
+        /// Setting this property raises <see cref="TextOptionChanged"/> if the value changes.
+        /// </summary>
+        /// <value>The width of the toolbar text box.</value>
+        [NotifyParentProperty(true)]
+        [Browsable(true)]
+        public int Width
+        {
+            get => _width;
+            set
+            {
+                if (_width != value)
+                {
+                    _width = value;
+                    OnTextOptionChangedRaised();
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets the underlying control object associated with this toolbar text box.

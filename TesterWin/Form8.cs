@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ZidUtilities.CommonCode.Win;
 using ZidUtilities.CommonCode.Win.Forms;
 
 namespace ZidUtilities.TesterWin
@@ -36,7 +37,7 @@ namespace ZidUtilities.TesterWin
                 using (var dialog = ProcessingDialogManager.Show(
                     "Processing",
                     "Starting background process...",
-                    DialogStyle.Information))
+                    ZidThemes.Information))
                 {
                     try
                     {
@@ -91,7 +92,7 @@ namespace ZidUtilities.TesterWin
                 _currentDialog = ProcessingDialogManager.Show(
                     "Long Running Process",
                     "Initializing...",
-                    DialogStyle.Professional);
+                    ZidThemes.Professional);
 
                 try
                 {
@@ -152,7 +153,7 @@ namespace ZidUtilities.TesterWin
             using (var dialog = ProcessingDialogManager.Show(
                 "Bad Example",
                 "This dialog will be frozen...",
-                DialogStyle.Warning))
+                ZidThemes.Warning))
             {
                 // Blocking the main thread - BAD!
                 for (int i = 0; i <= 100; i += 10)
@@ -189,7 +190,7 @@ namespace ZidUtilities.TesterWin
                     using (var dialog = ProcessingDialogManager.Show(
                         "Async Processing",
                         "Processing asynchronously...",
-                        DialogStyle.Success))
+                        ZidThemes.Success))
                     {
                         // Simulate async work
                         for (int i = 0; i <= 100; i += 10)
@@ -239,7 +240,7 @@ namespace ZidUtilities.TesterWin
                 using (var dialog = ProcessingDialogManager.Show(
                     "Cancellable Process",
                     "Processing... (can be cancelled)",
-                    DialogStyle.Information))
+                    ZidThemes.Information))
                 {
                     try
                     {
@@ -299,7 +300,7 @@ namespace ZidUtilities.TesterWin
                     using (var dialog = ProcessingDialogManager.Show(
                         "Multi-Step Process",
                         "Starting operations...",
-                        DialogStyle.Professional))
+                        ZidThemes.Professional))
                     {
                         // Operation 1
                         dialog.Update("Operation 1: Connecting to database...", 0);
@@ -354,7 +355,7 @@ namespace ZidUtilities.TesterWin
                     using (var dialog = ProcessingDialogManager.Show(
                         "Error Handling Demo",
                         "Processing...",
-                        DialogStyle.Error))
+                        ZidThemes.Error))
                     {
                         try
                         {
@@ -409,7 +410,7 @@ namespace ZidUtilities.TesterWin
                     using (var dialog = ProcessingDialogManager.Show(
                         "Unknown Duration",
                         "Please wait...",
-                        DialogStyle.Information,
+                        ZidThemes.Information,
                         null,
                         true)) // Indeterminate = true
                     {
@@ -454,7 +455,7 @@ namespace ZidUtilities.TesterWin
                 _currentDialog = ProcessingDialogManager.Show(
                     "Timer-Based Progress",
                     "Processing with timer updates...",
-                    DialogStyle.Success);
+                    ZidThemes.Success);
             });
 
             // Wait a bit for dialog to initialize

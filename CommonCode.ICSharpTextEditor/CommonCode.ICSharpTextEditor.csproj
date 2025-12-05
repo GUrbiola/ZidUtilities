@@ -229,7 +229,7 @@
     <Content Include="Resources\Search.png" />
     <Content Include="Resources\Stop.png" />
     <Content Include="Resources\UnComment.png" />
-    <Content Include="ExtendedEditor.ico" />
+    <EmbeddedResource Include="ExtendedEditor.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace ZidUtilities.Win.Controls.Grid.GridFilter.GridFilters
+namespace ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter.GridFilters
 {
 	/// <summary>
 	/// A dummy <see cref="IGridFilter"/> implementation, which does no filtering.

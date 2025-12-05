@@ -2,7 +2,7 @@ using System;
 using System.Data;
 using System.Windows.Forms;
 
-namespace ZidUtilities.Win.Controls.Grid.GridFilter
+namespace ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter
 {
 	/// <summary>
 	/// Implemenations of this interface can provide the 

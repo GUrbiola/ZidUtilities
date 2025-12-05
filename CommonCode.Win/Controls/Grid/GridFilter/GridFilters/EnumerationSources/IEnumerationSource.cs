@@ -1,6 +1,6 @@
 using System;
 
-namespace ZidUtilities.Win.Controls.Grid.GridFilter.GridFilters.EnumerationSources
+namespace ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter.GridFilters.EnumerationSources
 {
 	/// <summary>
 	/// Interface defining a data source for the <see cref="EnumerationGridFilter"/>.

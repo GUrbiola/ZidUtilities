@@ -18,7 +18,7 @@ namespace ZidUtilities.CommonCode.Win.Forms
 
         private bool _required = false;
         private bool _allowMultipleSelection = false;
-        private DialogStyle _style = DialogStyle.Default;
+        private ZidThemes _theme = ZidThemes.Default;
         private DataTable _dataSource = null;
         private List<string> _keyMembers = new List<string>();
         private List<object> _selectedKeyValues = new List<object>();
@@ -71,15 +71,15 @@ namespace ZidUtilities.CommonCode.Win.Forms
         }
 
         /// <summary>
-        /// Gets or sets the dialog style (color scheme).
+        /// Gets or sets the dialog theme (color scheme).
         /// </summary>
-        public DialogStyle Style
+        public ZidThemes Theme
         {
-            get { return _style; }
+            get { return _theme; }
             set
             {
-                _style = value;
-                ApplyStyle();
+                _theme = value;
+                ApplyTheme();
             }
         }
 
@@ -135,7 +135,7 @@ namespace ZidUtilities.CommonCode.Win.Forms
         public ComplexObjectSelectionDialog()
         {
             InitializeComponent();
-            ApplyStyle();
+            ApplyTheme();
             AllowMultipleSelection = false;
         }
 
@@ -261,13 +261,13 @@ namespace ZidUtilities.CommonCode.Win.Forms
         #region Private Methods
 
         /// <summary>
-        /// Applies the selected style to the dialog.
+        /// Applies the selected theme to the dialog.
         /// </summary>
-        private void ApplyStyle()
+        private void ApplyTheme()
         {
-            Color headerColor = DialogStyleHelper.GetHeaderColor(_style);
-            Color headerTextColor = DialogStyleHelper.GetHeaderTextColor(_style);
-            Color accentColor = DialogStyleHelper.GetAccentColor(_style);
+            Color headerColor = DialogStyleHelper.GetHeaderColor(_theme);
+            Color headerTextColor = DialogStyleHelper.GetHeaderTextColor(_theme);
+            Color accentColor = DialogStyleHelper.GetAccentColor(_theme);
 
             pnlHeader.BackColor = headerColor;
             lblMessage.ForeColor = headerTextColor;
@@ -422,14 +422,14 @@ namespace ZidUtilities.CommonCode.Win.Forms
         /// </summary>
         public static List<object> ShowDialog(string title, string message, DataTable dataTable,
             List<string> displayMembers, List<string> keyMembers, bool allowMultiple = false,
-            DialogStyle style = DialogStyle.Default, bool required = false, bool hideKeyColumns = false,
+            ZidThemes theme = ZidThemes.Default, bool required = false, bool hideKeyColumns = false,
             Image image = null, IWin32Window owner = null)
         {
             using (ComplexObjectSelectionDialog dialog = new ComplexObjectSelectionDialog())
             {
                 dialog.DialogTitle = title;
                 dialog.Message = message;
-                dialog.Style = style;
+                dialog.Theme = theme;
                 dialog.Required = required;
                 dialog.AllowMultipleSelection = allowMultiple;
                 dialog.DialogImage = image;
@@ -447,14 +447,14 @@ namespace ZidUtilities.CommonCode.Win.Forms
         /// </summary>
         public static List<object> ShowDialog<T>(string title, string message, List<T> items,
             List<string> displayProperties, List<string> keyProperties, bool allowMultiple = false,
-            DialogStyle style = DialogStyle.Default, bool required = false, bool hideKeyColumns = false,
+            ZidThemes theme = ZidThemes.Default, bool required = false, bool hideKeyColumns = false,
             Image image = null, IWin32Window owner = null)
         {
             using (ComplexObjectSelectionDialog dialog = new ComplexObjectSelectionDialog())
             {
                 dialog.DialogTitle = title;
                 dialog.Message = message;
-                dialog.Style = style;
+                dialog.Theme = theme;
                 dialog.Required = required;
                 dialog.AllowMultipleSelection = allowMultiple;
                 dialog.DialogImage = image;

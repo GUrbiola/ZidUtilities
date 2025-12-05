@@ -213,13 +213,13 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
         /// <param name="filePath">Destination file path where the exported file will be saved.</param>
         private void PerformExport(DataTable data, ExportTo format, string filePath)
         {
-            using 
+            using
             (
                 var dialogManager = new ProcessingDialogManager
                 (
                     "Exporting Data",
                     "Preparing export...",
-                    DialogStyle.Information, 
+                    ZidThemes.Information,
                     false
                 )
             )

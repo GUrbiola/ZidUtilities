@@ -3,7 +3,7 @@ using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace ZidUtilities.Win.Controls.Grid.GridFilter
+namespace ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter
 {
 	/// <summary>
 	/// Interface which is used to provide different filter methods 

@@ -6,7 +6,7 @@ using System.Windows.Forms;
 using System.Globalization;
 using System.ComponentModel;
 
-namespace ZidUtilities.Win.Controls.Grid.GridFilter.GridFilters
+namespace ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter.GridFilters
 {
     [ToolboxItem(false)]
     /// <summary>

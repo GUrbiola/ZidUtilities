@@ -2,7 +2,7 @@ using System;
 using System.Data;
 using System.Windows.Forms;
 
-namespace ZidUtilities.Win.Controls.Grid.GridFilter.GridFilterFactories
+namespace ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter.GridFilterFactories
 {
 	/// <summary>
 	/// Base implementation for <see cref="IGridFilterFactory"/> handling

@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            ZidUtilities.Win.Controls.Grid.GridFilter.GridFilterFactories.DefaultGridFilterFactory defaultGridFilterFactory1 = new ZidUtilities.Win.Controls.Grid.GridFilter.GridFilterFactories.DefaultGridFilterFactory();
+            ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter.GridFilterFactories.DefaultGridFilterFactory defaultGridFilterFactory1 = new ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter.GridFilterFactories.DefaultGridFilterFactory();
             this.GridView = new System.Windows.Forms.DataGridView();
-            this.filterExtender = new ZidUtilities.Win.Controls.Grid.GridFilter.DataGridFilterExtender(this.components);
+            this.filterExtender = new ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter.DataGridFilterExtender(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.GridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.filterExtender)).BeginInit();
             this.SuspendLayout();
@@ -53,7 +53,7 @@
             // 
             this.filterExtender.DataGridView = this.GridView;
             defaultGridFilterFactory1.CreateDistinctGridFilters = false;
-            defaultGridFilterFactory1.DefaultGridFilterType = typeof(ZidUtilities.Win.Controls.Grid.GridFilter.GridFilters.TextGridFilter);
+            defaultGridFilterFactory1.DefaultGridFilterType = typeof(ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter.GridFilters.TextGridFilter);
             defaultGridFilterFactory1.DefaultShowDateInBetweenOperator = false;
             defaultGridFilterFactory1.DefaultShowNumericInBetweenOperator = false;
             defaultGridFilterFactory1.HandleEnumerationTypes = true;
@@ -76,6 +76,6 @@
         #endregion
 
         private System.Windows.Forms.DataGridView GridView;
-        private ZidUtilities.Win.Controls.Grid.GridFilter.DataGridFilterExtender filterExtender;
+        private ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter.DataGridFilterExtender filterExtender;
     }
 }

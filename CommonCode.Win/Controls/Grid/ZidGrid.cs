@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using ZidUtilities.Win.Controls.Grid.GridFilter;
+using ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter;
 using System.ComponentModel.Design; // keep for attribute reference if needed
 
 namespace ZidUtilities.CommonCode.Win.Controls.Grid
@@ -30,9 +30,9 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
 
             GridView.RowsAdded += new DataGridViewRowsAddedEventHandler(GridView_RowsAdded);
             GridView.RowsRemoved += new DataGridViewRowsRemovedEventHandler(GridView_RowsRemoved);
-            //GridView.CellFormatting += new DataGridViewCellFormattingEventHandler(GridView_CellFormatting);//first attempts from Claude to handle binary data columns
-            //GridView.DataError += new DataGridViewDataErrorEventHandler(GridView_DataError);//first attempts from Claude to handle binary data columns
             GridView.DataBindingComplete += new DataGridViewBindingCompleteEventHandler(GridView_DataBindingComplete);
+            GridView.CellFormatting += new DataGridViewCellFormattingEventHandler(GridView_CellFormatting);
+            GridView.DataError += new DataGridViewDataErrorEventHandler(GridView_DataError);
             GridView.ColumnHeaderMouseClick += new DataGridViewCellMouseEventHandler(GridView_ColumnHeaderMouseClick);
         }
 
@@ -181,71 +181,91 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
         {
             SetRowCount();
         }
-        
+
+        /// <summary>
+        /// Tests columns after data binding to identify and handle problematic ones
+        /// </summary>
         void GridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
-            // Handle binary columns after data binding is complete
-            GridView.SuspendLayout();
+            if (GridView.Rows.Count == 0 || GridView.Columns.Count == 0)
+                return;
 
+            GridView.SuspendLayout();
             try
             {
-                // First, collect all binary columns to avoid modifying collection while iterating
-                var binaryColumns = new System.Collections.Generic.List<DataGridViewColumn>();
+                var problematicColumns = new List<DataGridViewColumn>();
 
+                // Test each column by trying to access and format values from the first few rows
                 foreach (DataGridViewColumn column in GridView.Columns)
                 {
-                    if (column.ValueType != null)
+                    bool isProblematic = false;
+                    int testRows = Math.Min(5, GridView.Rows.Count); // Test first 5 rows or fewer
+
+                    for (int rowIndex = 0; rowIndex < testRows; rowIndex++)
                     {
-                        // Check for various binary types
-                        if (column.ValueType == typeof(byte[]) ||
-                            column.ValueType.FullName == "System.Data.SqlTypes.SqlBinary" ||
-                            column.ValueType.FullName == "System.Data.Linq.Binary" ||
-                            column.ValueType.Name.Contains("Binary"))
+                        if (GridView.Rows[rowIndex].IsNewRow)
+                            continue;
+
+                        try
                         {
-                            binaryColumns.Add(column);
+                            var cell = GridView.Rows[rowIndex].Cells[column.Index];
+                            var value = cell.Value;
+
+                            // Try to get the formatted value - this is where most errors occur
+                            if (value != null && value != DBNull.Value)
+                            {
+                                var formattedValue = cell.FormattedValue;
+                                // If we can access both without error, this column is OK
+                            }
                         }
+                        catch
+                        {
+                            // This column causes errors when trying to display
+                            isProblematic = true;
+                            break;
+                        }
+                    }
+
+                    if (isProblematic)
+                    {
+                        problematicColumns.Add(column);
                     }
                 }
 
-                // Now process each binary column
-                foreach (var column in binaryColumns)
+                // Replace problematic columns with text columns showing error message
+                foreach (var column in problematicColumns)
                 {
-                    // Convert the column to a text column to avoid binary display issues
                     int columnIndex = column.Index;
                     string columnName = column.Name;
                     string headerText = column.HeaderText;
-                    string dataPropertyName = column.DataPropertyName;
-
-                    // Store original column properties
                     var displayIndex = column.DisplayIndex;
                     var width = column.Width;
                     var visible = column.Visible;
 
-                    // Remove the binary column
+                    // Remove the problematic column
                     GridView.Columns.Remove(column);
 
-                    // Create a new text column (unbound - no DataPropertyName)
+                    // Create a replacement text column (unbound)
                     DataGridViewTextBoxColumn textColumn = new DataGridViewTextBoxColumn();
                     textColumn.Name = columnName;
                     textColumn.HeaderText = headerText;
-                    // Don't set DataPropertyName - we don't want to bind to the binary data
-                    textColumn.DataPropertyName = ""; // Empty = unbound column
+                    textColumn.DataPropertyName = ""; // Unbound
                     textColumn.DisplayIndex = displayIndex;
                     textColumn.Width = width;
                     textColumn.Visible = visible;
-                    textColumn.ReadOnly = true; // Always readonly for binary data
-                    textColumn.DefaultCellStyle.NullValue = "<Binary Data>";
-                    textColumn.Tag = "BinaryColumn";
+                    textColumn.ReadOnly = true;
+                    textColumn.DefaultCellStyle.ForeColor = Color.Red;
 
                     // Insert at the same position
                     GridView.Columns.Insert(columnIndex, textColumn);
 
-                    // Set all cell values to placeholder text
+                    // Set all cell values to error indicator
                     foreach (DataGridViewRow row in GridView.Rows)
                     {
                         if (!row.IsNewRow)
                         {
-                            row.Cells[columnIndex].Value = "<Binary Data>";
+                            row.Cells[columnIndex].Value = "<Display Error>";
+                            row.Cells[columnIndex].ToolTipText = "This column contains data that cannot be displayed";
                         }
                     }
                 }
@@ -254,6 +274,92 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid
             {
                 GridView.ResumeLayout();
             }
+        }
+
+        /// <summary>
+        /// Handles cell formatting to gracefully display byte arrays
+        /// </summary>
+        void GridView_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            // Skip header rows
+            if (e.RowIndex < 0)
+                return;
+
+            try
+            {
+                // If the value is null or DBNull, let default handling occur
+                if (e.Value == null || e.Value == DBNull.Value)
+                    return;
+
+                // Check if this is a byte array (raw binary data, not images)
+                if (e.Value is byte[] byteArray)
+                {
+                    // Try to determine if this might be an image
+                    if (IsLikelyImage(byteArray))
+                    {
+                        // Let DataGridView try to handle it as an image
+                        // Most image types will display fine in DataGridView
+                        return;
+                    }
+                    else
+                    {
+                        // For non-image binary data, show a placeholder
+                        e.Value = $"<Binary: {byteArray.Length} bytes>";
+                        e.FormattingApplied = true;
+                    }
+                }
+            }
+            catch
+            {
+                // If formatting fails, show error indicator without modifying cell value
+                e.Value = "<Error>";
+                e.FormattingApplied = true;
+            }
+        }
+
+        /// <summary>
+        /// Handles data errors that occur during cell display
+        /// Suppresses exceptions to prevent application crashes
+        /// </summary>
+        void GridView_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            // Suppress the exception from being thrown to the user
+            e.ThrowException = false;
+
+            // Note: We don't modify cell.Value here as that would trigger a repaint loop
+            // Instead, problematic columns are handled once in DataBindingComplete
+        }
+
+        /// <summary>
+        /// Attempts to determine if a byte array might be an image
+        /// </summary>
+        private bool IsLikelyImage(byte[] data)
+        {
+            if (data == null || data.Length < 4)
+                return false;
+
+            // Check common image file signatures
+            // PNG: 89 50 4E 47
+            if (data[0] == 0x89 && data[1] == 0x50 && data[2] == 0x4E && data[3] == 0x47)
+                return true;
+
+            // JPEG: FF D8 FF
+            if (data[0] == 0xFF && data[1] == 0xD8 && data[2] == 0xFF)
+                return true;
+
+            // GIF: 47 49 46 38
+            if (data[0] == 0x47 && data[1] == 0x49 && data[2] == 0x46 && data[3] == 0x38)
+                return true;
+
+            // BMP: 42 4D
+            if (data[0] == 0x42 && data[1] == 0x4D)
+                return true;
+
+            // ICO: 00 00 01 00
+            if (data[0] == 0x00 && data[1] == 0x00 && data[2] == 0x01 && data[3] == 0x00)
+                return true;
+
+            return false;
         }
 
         [Category("Custom Property"), Browsable(true), DefaultValue(null)]

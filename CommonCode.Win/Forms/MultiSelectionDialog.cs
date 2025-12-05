@@ -16,7 +16,7 @@ namespace ZidUtilities.CommonCode.Win.Forms
         #region Fields
 
         private bool _required = false;
-        private DialogStyle _style = DialogStyle.Default;
+        private ZidThemes _theme = ZidThemes.Default;
         private DataTable _dataSource = null;
         private string _displayMember = null;
         private string _valueMember = null;
@@ -54,15 +54,15 @@ namespace ZidUtilities.CommonCode.Win.Forms
         }
 
         /// <summary>
-        /// Gets or sets the dialog style (color scheme).
+        /// Gets or sets the dialog theme (color scheme).
         /// </summary>
-        public DialogStyle Style
+        public ZidThemes Theme
         {
-            get { return _style; }
+            get { return _theme; }
             set
             {
-                _style = value;
-                ApplyStyle();
+                _theme = value;
+                ApplyTheme();
             }
         }
 
@@ -113,7 +113,7 @@ namespace ZidUtilities.CommonCode.Win.Forms
         public MultiSelectionDialog()
         {
             InitializeComponent();
-            ApplyStyle();
+            ApplyTheme();
         }
 
         #endregion
@@ -219,13 +219,13 @@ namespace ZidUtilities.CommonCode.Win.Forms
         #region Private Methods
 
         /// <summary>
-        /// Applies the selected style to the dialog.
+        /// Applies the selected theme to the dialog.
         /// </summary>
-        private void ApplyStyle()
+        private void ApplyTheme()
         {
-            Color headerColor = DialogStyleHelper.GetHeaderColor(_style);
-            Color headerTextColor = DialogStyleHelper.GetHeaderTextColor(_style);
-            Color accentColor = DialogStyleHelper.GetAccentColor(_style);
+            Color headerColor = DialogStyleHelper.GetHeaderColor(_theme);
+            Color headerTextColor = DialogStyleHelper.GetHeaderTextColor(_theme);
+            Color accentColor = DialogStyleHelper.GetAccentColor(_theme);
 
             pnlHeader.BackColor = headerColor;
             lblMessage.ForeColor = headerTextColor;
@@ -404,14 +404,14 @@ namespace ZidUtilities.CommonCode.Win.Forms
         /// Shows a multi-selection dialog with a string list.
         /// </summary>
         public static List<object> ShowDialog(string title, string message, List<string> items,
-            DialogStyle style = DialogStyle.Default, bool required = false,
+            ZidThemes theme = ZidThemes.Default, bool required = false,
             Image image = null, IWin32Window owner = null)
         {
             using (MultiSelectionDialog dialog = new MultiSelectionDialog())
             {
                 dialog.DialogTitle = title;
                 dialog.Message = message;
-                dialog.Style = style;
+                dialog.Theme = theme;
                 dialog.Required = required;
                 dialog.DialogImage = image;
                 dialog.SetDataSource(items);
@@ -427,14 +427,14 @@ namespace ZidUtilities.CommonCode.Win.Forms
         /// Shows a multi-selection dialog with a DataTable.
         /// </summary>
         public static List<object> ShowDialog(string title, string message, DataTable dataTable,
-            string displayMember, string valueMember, DialogStyle style = DialogStyle.Default,
+            string displayMember, string valueMember, ZidThemes theme = ZidThemes.Default,
             bool required = false, Image image = null, IWin32Window owner = null)
         {
             using (MultiSelectionDialog dialog = new MultiSelectionDialog())
             {
                 dialog.DialogTitle = title;
                 dialog.Message = message;
-                dialog.Style = style;
+                dialog.Theme = theme;
                 dialog.Required = required;
                 dialog.DialogImage = image;
                 dialog.SetDataSource(dataTable, displayMember, valueMember);
@@ -451,14 +451,14 @@ namespace ZidUtilities.CommonCode.Win.Forms
         /// </summary>
         public static List<object> ShowDialog<T>(string title, string message, List<T> items,
             Func<T, string> displaySelector, Func<T, object> valueSelector,
-            DialogStyle style = DialogStyle.Default, bool required = false,
+            ZidThemes theme = ZidThemes.Default, bool required = false,
             Image image = null, IWin32Window owner = null)
         {
             using (MultiSelectionDialog dialog = new MultiSelectionDialog())
             {
                 dialog.DialogTitle = title;
                 dialog.Message = message;
-                dialog.Style = style;
+                dialog.Theme = theme;
                 dialog.Required = required;
                 dialog.DialogImage = image;
                 dialog.SetDataSource(items, displaySelector, valueSelector);

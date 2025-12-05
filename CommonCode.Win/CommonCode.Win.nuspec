@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>1.0.5</version>
+    <version>1.0.7</version>
     <title>ZidUtilities.CommonCode.Win</title>
     <authors>Gonzalo Urbiola</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -10,7 +10,7 @@
     <!-- <icon>icon.png</icon> -->
     <projectUrl>https://github.com/GUrbiola/ZidUtilities</projectUrl>
     <description>Custom controls for winforms projects. ThemeManager, Grid, Toast Notifications, BreadCrumb Bar, Diff Viewers, etc.</description>
-    <releaseNotes>Updated references to ZidUtilities.CommonCode.ICSharpTexteditor</releaseNotes>
+    <releaseNotes>Small fxs to namespace naming and the way ZidGrid loads images and bynary data(which is not supported).</releaseNotes>
     <copyright>$copyright$</copyright>
     <tags>ZidUtilities CustomControls Themes ZidGrid CustomGrid Toast ToastNotification Diff DiffViewer CustommForms Skins ElCid Urbiola</tags>
 	<readme>README.md</readme>

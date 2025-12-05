@@ -11,7 +11,7 @@ namespace ZidUtilities.TesterWin
         public Form1()
         {
             InitializeComponent();
-            extEditor.OnEditorKeyPress += ExtEditor_OnEditorKeyPress;
+            extEditor.WhenKeyPress += ExtEditor_OnEditorKeyPress;
         }
 
         private bool ExtEditor_OnEditorKeyPress(Keys keyData)

@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
 
-namespace ZidUtilities.Win.Controls.Grid.GridFilter.GridFilters
+namespace ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter.GridFilters
 {
 	/// <summary>
 	/// A <see cref="IGridFilter"/> implementation for filtering boolean columns

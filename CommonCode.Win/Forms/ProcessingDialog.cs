@@ -13,8 +13,7 @@ namespace ZidUtilities.CommonCode.Win.Forms
     {
         #region Fields
 
-        private DialogStyle _style = DialogStyle.Default;
-        private ZidThemes? _theme = null;
+        private ZidThemes _theme = ZidThemes.Default;
         private object _lockObject = new object();
 
         #endregion
@@ -67,32 +66,11 @@ namespace ZidUtilities.CommonCode.Win.Forms
         }
 
         /// <summary>
-        /// Gets or sets the dialog style (color scheme).
-        /// </summary>
-        public DialogStyle Style
-        {
-            get { return _style; }
-            set
-            {
-                _style = value;
-                _theme = null; // Clear theme when style is set
-                if (this.InvokeRequired)
-                {
-                    this.Invoke(new Action(() => ApplyStyle()));
-                }
-                else
-                {
-                    ApplyStyle();
-                }
-            }
-        }
-
-        /// <summary>
         /// Gets or sets the ZidTheme (color scheme).
         /// </summary>
         public ZidThemes Theme
         {
-            get { return _theme ?? ZidThemes.Default; }
+            get { return _theme; }
             set
             {
                 _theme = value;
@@ -208,7 +186,7 @@ namespace ZidUtilities.CommonCode.Win.Forms
         public ProcessingDialog()
         {
             InitializeComponent();
-            ApplyStyle();
+            ApplyTheme();
             IsIndeterminate = true;
         }
 
@@ -290,34 +268,17 @@ namespace ZidUtilities.CommonCode.Win.Forms
         #region Private Methods
 
         /// <summary>
-        /// Applies the selected style to the dialog.
-        /// </summary>
-        private void ApplyStyle()
-        {
-            Color headerColor = DialogStyleHelper.GetHeaderColor(_style);
-            Color headerTextColor = DialogStyleHelper.GetHeaderTextColor(_style);
-            Color accentColor = DialogStyleHelper.GetAccentColor(_style);
-
-            pnlHeader.BackColor = headerColor;
-            lblMessage.ForeColor = headerTextColor;
-            progressBar.ForeColor = accentColor;
-        }
-
-        /// <summary>
         /// Applies the selected theme to the dialog.
         /// </summary>
         private void ApplyTheme()
         {
-            if (_theme.HasValue)
-            {
-                Color headerColor = DialogStyleHelper.GetHeaderColor(_theme.Value);
-                Color headerTextColor = DialogStyleHelper.GetHeaderTextColor(_theme.Value);
-                Color accentColor = DialogStyleHelper.GetAccentColor(_theme.Value);
+            Color headerColor = DialogStyleHelper.GetHeaderColor(_theme);
+            Color headerTextColor = DialogStyleHelper.GetHeaderTextColor(_theme);
+            Color accentColor = DialogStyleHelper.GetAccentColor(_theme);
 
-                pnlHeader.BackColor = headerColor;
-                lblMessage.ForeColor = headerTextColor;
-                progressBar.ForeColor = accentColor;
-            }
+            pnlHeader.BackColor = headerColor;
+            lblMessage.ForeColor = headerTextColor;
+            progressBar.ForeColor = accentColor;
         }
 
         /// <summary>
@@ -361,68 +322,6 @@ namespace ZidUtilities.CommonCode.Win.Forms
         private ManualResetEvent _dialogReady = new ManualResetEvent(false);
         private bool _disposed = false;
 
-        /// <summary>
-        /// Shows a processing dialog on a separate UI thread.
-        /// </summary>
-        /// <param name="title">Dialog title.</param>
-        /// <param name="message">Initial message.</param>
-        /// <param name="style">Dialog style.</param>
-        /// <param name="image">Optional image.</param>
-        /// <param name="isIndeterminate">Whether to show indeterminate progress.</param>
-        public ProcessingDialogManager(string title, string message,
-            DialogStyle style, Image image = null, bool isIndeterminate = true)
-        {
-            _dialogThread = new Thread(() =>
-            {
-                _dialog = new ProcessingDialog();
-                _dialog.DialogTitle = title;
-                _dialog.Message = message;
-                _dialog.Style = style;
-                _dialog.DialogImage = image;
-                _dialog.IsIndeterminate = isIndeterminate;
-
-                _dialogReady.Set();
-                Application.Run(_dialog);
-            });
-
-            _dialogThread.SetApartmentState(ApartmentState.STA);
-            _dialogThread.IsBackground = true;
-            _dialogThread.Start();
-
-            // Wait for dialog to be created
-            _dialogReady.WaitOne();
-        }
-
-        /// <summary>
-        /// Shows a processing dialog on a separate UI thread.
-        /// </summary>
-        /// <param name="title">Dialog title.</param>
-        /// <param name="message">Initial message.</param>
-        /// <param name="style">Dialog style.</param>
-        /// <param name="isIndeterminate">Whether to show indeterminate progress.</param>
-        public ProcessingDialogManager(string title, string message,
-            DialogStyle style, bool isIndeterminate = true)
-        {
-            _dialogThread = new Thread(() =>
-            {
-                _dialog = new ProcessingDialog();
-                _dialog.DialogTitle = title;
-                _dialog.Message = message;
-                _dialog.Style = style;
-                _dialog.DialogImage = Resources.InProgress;
-                _dialog.IsIndeterminate = isIndeterminate;
-
-                _dialogReady.Set();
-                Application.Run(_dialog);
-            });
-
-            _dialogThread.SetApartmentState(ApartmentState.STA);
-            _dialogThread.IsBackground = true;
-            _dialogThread.Start();
-
-            // Wait for dialog to be created
-            _dialogReady.WaitOne();
-        }
 
         /// <summary>
         /// Shows a processing dialog on a separate UI thread.
@@ -554,9 +453,9 @@ namespace ZidUtilities.CommonCode.Win.Forms
         /// Returns a ProcessingDialogManager that can be used to update or close the dialog.
         /// </summary>
         public static ProcessingDialogManager Show(string title, string message,
-            DialogStyle style = DialogStyle.Default, Image image = null, bool isIndeterminate = true)
+            ZidThemes theme = ZidThemes.Default, Image image = null, bool isIndeterminate = true)
         {
-            return new ProcessingDialogManager(title, message, style, image, isIndeterminate);
+            return new ProcessingDialogManager(title, message, theme, image, isIndeterminate);
         }
     }
 

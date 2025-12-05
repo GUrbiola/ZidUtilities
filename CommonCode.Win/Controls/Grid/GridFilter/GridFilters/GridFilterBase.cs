@@ -2,7 +2,7 @@ using System;
 using System.Data;
 using System.Windows.Forms;
 
-namespace ZidUtilities.Win.Controls.Grid.GridFilter.GridFilters
+namespace ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter.GridFilters
 {
 	/// <summary>
 	/// Base class for easier <see cref="IGridFilter"/> implementation.

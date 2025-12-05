@@ -4,7 +4,7 @@ using System.Data;
 using System.Reflection;
 using System.Text;
 
-namespace ZidUtilities.Win.Controls.Grid.GridFilter
+namespace ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter
 {
     /// <summary>
     /// Public Wrapper for the internal DataExpression class in the .Net framework.

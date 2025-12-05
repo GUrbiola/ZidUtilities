@@ -7,9 +7,9 @@ using System.Drawing;
 using System.Data;
 using System.Windows.Forms;
 
-using ZidUtilities.Win.Controls.Grid.GridFilter.GridFilterFactories;
+using ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter.GridFilterFactories;
 
-namespace ZidUtilities.Win.Controls.Grid.GridFilter
+namespace ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter
 {
 	#region Enum LogicalOperators
 

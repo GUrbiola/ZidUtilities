@@ -54,13 +54,19 @@ namespace ZidUtilities.TesterWin
 
         private void Form9_Load(object sender, EventArgs e)
         {
-            SqlConnector conx = new SqlConnector("Data Source=.\\SQLSERVER;Initial Catalog=CompensationDB;Integrated Security=True");
-            zidGrid1.DataSource = conx.ExecuteTable("SELECT * FROM dbo.Employee");
+            //SqlConnector conx = new SqlConnector("Data Source=.\\SQLSERVER;Initial Catalog=CompensationDB;Integrated Security=True");
+            //SqlResponse<DataTable> data = conx.ExecuteTable("SELECT * FROM dbo.Employee");
+
+            SqlConnector conx = new SqlConnector("Data Source=Main\\SQLSERVER;Initial Catalog=Northwind;Integrated Security=False;Persist Security Info=True;User ID=SqlAdmin;Password=SqlAdmin123");
+            SqlResponse<DataTable> data = conx.ExecuteTable("SELECT * FROM dbo.Employees");
 
             //SqlConnector conx = new SqlConnector("Data Source=.\\SQLSERVER;Initial Catalog=SupplierPortal;Integrated Security=True");
-            //zidGrid1.DataSource = conx.ExecuteTable("SELECT * FROM dbo.AppUsers");
+            //SqlResponse<DataTable> data = conx.ExecuteTable("SELECT * FROM dbo.AppUsers");
 
-
+            if (data.IsOK)
+                zidGrid1.DataSource = (DataTable)data.Result;
+            else
+                ZidUtilities.CommonCode.Win.Forms.MessageBoxDialog.Show("An error occured while loading the data from the Data base", "Loading Data on Grid", MessageBoxButtons.OK, MessageBoxIcon.Error, ZidThemes.Error);
         }
     }
     public class ComboBoxItem

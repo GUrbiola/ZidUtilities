@@ -6,9 +6,9 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
 
-using ZidUtilities.Win.Controls.Grid.GridFilter.GridFilters.EnumerationSources;
+using ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter.GridFilters.EnumerationSources;
 
-namespace ZidUtilities.Win.Controls.Grid.GridFilter.GridFilters
+namespace ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter.GridFilters
 {
 	/// <summary>
 	/// A <see cref="IGridFilter"/> implementation for columns with a <see cref="ComboBox"/>

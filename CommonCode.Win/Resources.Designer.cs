@@ -123,6 +123,16 @@ namespace ZidUtilities.CommonCode.Win {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Error64 {
+            get {
+                object obj = ResourceManager.GetObject("Error64", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Export32 {
             get {
                 object obj = ResourceManager.GetObject("Export32", resourceCulture);
@@ -163,6 +173,16 @@ namespace ZidUtilities.CommonCode.Win {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Info264 {
+            get {
+                object obj = ResourceManager.GetObject("Info264", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Info64 {
             get {
                 object obj = ResourceManager.GetObject("Info64", resourceCulture);
@@ -193,6 +213,16 @@ namespace ZidUtilities.CommonCode.Win {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Question64 {
+            get {
+                object obj = ResourceManager.GetObject("Question64", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ResizeColumn32 {
             get {
                 object obj = ResourceManager.GetObject("ResizeColumn32", resourceCulture);
@@ -216,6 +246,16 @@ namespace ZidUtilities.CommonCode.Win {
         internal static System.Drawing.Bitmap warning_sign {
             get {
                 object obj = ResourceManager.GetObject("warning-sign", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Warning64 {
+            get {
+                object obj = ResourceManager.GetObject("Warning64", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

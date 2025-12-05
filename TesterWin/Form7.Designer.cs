@@ -58,6 +58,14 @@ namespace ZidUtilities.TesterWin
             this.lblResults = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.btnSqlConnection = new System.Windows.Forms.Button();
+            this.grpMessageBox = new System.Windows.Forms.GroupBox();
+            this.btnMessageBoxAllIcons = new System.Windows.Forms.Button();
+            this.btnMessageBoxAbortRetryIgnore = new System.Windows.Forms.Button();
+            this.btnMessageBoxRetryCancel = new System.Windows.Forms.Button();
+            this.btnMessageBoxYesNoCancel = new System.Windows.Forms.Button();
+            this.btnMessageBoxYesNo = new System.Windows.Forms.Button();
+            this.btnMessageBoxOKCancel = new System.Windows.Forms.Button();
+            this.btnMessageBoxOK = new System.Windows.Forms.Button();
             this.pnlLeft.SuspendLayout();
             this.grpProcessing.SuspendLayout();
             this.grpComplexSelection.SuspendLayout();
@@ -68,11 +76,13 @@ namespace ZidUtilities.TesterWin
             this.pnlRight.SuspendLayout();
             this.pnlResultsHeader.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.grpMessageBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // pnlLeft
             // 
             this.pnlLeft.AutoScroll = true;
+            this.pnlLeft.Controls.Add(this.grpMessageBox);
             this.pnlLeft.Controls.Add(this.groupBox1);
             this.pnlLeft.Controls.Add(this.grpProcessing);
             this.pnlLeft.Controls.Add(this.grpComplexSelection);
@@ -309,15 +319,15 @@ namespace ZidUtilities.TesterWin
             this.cmbDialogStyle.Name = "cmbDialogStyle";
             this.cmbDialogStyle.Size = new System.Drawing.Size(227, 21);
             this.cmbDialogStyle.TabIndex = 1;
-            // 
+            //
             // lblDialogStyle
-            // 
+            //
             this.lblDialogStyle.AutoSize = true;
             this.lblDialogStyle.Location = new System.Drawing.Point(10, 51);
             this.lblDialogStyle.Name = "lblDialogStyle";
             this.lblDialogStyle.Size = new System.Drawing.Size(66, 13);
             this.lblDialogStyle.TabIndex = 0;
-            this.lblDialogStyle.Text = "Dialog Style:";
+            this.lblDialogStyle.Text = "Theme:";
             // 
             // pnlRight
             // 
@@ -374,18 +384,18 @@ namespace ZidUtilities.TesterWin
             this.lblResults.Text = "Results";
             // 
             // groupBox1
-            // 
+            //
             this.groupBox1.Controls.Add(this.btnSqlConnection);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.groupBox1.Location = new System.Drawing.Point(10, 598);
+            this.groupBox1.Location = new System.Drawing.Point(10, 858);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(337, 60);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Sql Connection Dialog";
-            // 
+            //
             // btnSqlConnection
-            // 
+            //
             this.btnSqlConnection.Location = new System.Drawing.Point(10, 23);
             this.btnSqlConnection.Name = "btnSqlConnection";
             this.btnSqlConnection.Size = new System.Drawing.Size(310, 25);
@@ -393,6 +403,93 @@ namespace ZidUtilities.TesterWin
             this.btnSqlConnection.Text = "Show MS SQL Connection Dialog";
             this.btnSqlConnection.UseVisualStyleBackColor = true;
             this.btnSqlConnection.Click += new System.EventHandler(this.btnSqlConnection_Click);
+            //
+            // grpMessageBox
+            //
+            this.grpMessageBox.Controls.Add(this.btnMessageBoxAllIcons);
+            this.grpMessageBox.Controls.Add(this.btnMessageBoxAbortRetryIgnore);
+            this.grpMessageBox.Controls.Add(this.btnMessageBoxRetryCancel);
+            this.grpMessageBox.Controls.Add(this.btnMessageBoxYesNoCancel);
+            this.grpMessageBox.Controls.Add(this.btnMessageBoxYesNo);
+            this.grpMessageBox.Controls.Add(this.btnMessageBoxOKCancel);
+            this.grpMessageBox.Controls.Add(this.btnMessageBoxOK);
+            this.grpMessageBox.Dock = System.Windows.Forms.DockStyle.Top;
+            this.grpMessageBox.Location = new System.Drawing.Point(10, 598);
+            this.grpMessageBox.Name = "grpMessageBox";
+            this.grpMessageBox.Size = new System.Drawing.Size(337, 260);
+            this.grpMessageBox.TabIndex = 7;
+            this.grpMessageBox.TabStop = false;
+            this.grpMessageBox.Text = "MessageBox Dialog";
+            //
+            // btnMessageBoxAllIcons
+            //
+            this.btnMessageBoxAllIcons.Location = new System.Drawing.Point(10, 220);
+            this.btnMessageBoxAllIcons.Name = "btnMessageBoxAllIcons";
+            this.btnMessageBoxAllIcons.Size = new System.Drawing.Size(310, 25);
+            this.btnMessageBoxAllIcons.TabIndex = 6;
+            this.btnMessageBoxAllIcons.Text = "Show All Icons";
+            this.btnMessageBoxAllIcons.UseVisualStyleBackColor = true;
+            this.btnMessageBoxAllIcons.Click += new System.EventHandler(this.btnMessageBoxAllIcons_Click);
+            //
+            // btnMessageBoxAbortRetryIgnore
+            //
+            this.btnMessageBoxAbortRetryIgnore.Location = new System.Drawing.Point(10, 189);
+            this.btnMessageBoxAbortRetryIgnore.Name = "btnMessageBoxAbortRetryIgnore";
+            this.btnMessageBoxAbortRetryIgnore.Size = new System.Drawing.Size(310, 25);
+            this.btnMessageBoxAbortRetryIgnore.TabIndex = 5;
+            this.btnMessageBoxAbortRetryIgnore.Text = "AbortRetryIgnore (Warning)";
+            this.btnMessageBoxAbortRetryIgnore.UseVisualStyleBackColor = true;
+            this.btnMessageBoxAbortRetryIgnore.Click += new System.EventHandler(this.btnMessageBoxAbortRetryIgnore_Click);
+            //
+            // btnMessageBoxRetryCancel
+            //
+            this.btnMessageBoxRetryCancel.Location = new System.Drawing.Point(10, 158);
+            this.btnMessageBoxRetryCancel.Name = "btnMessageBoxRetryCancel";
+            this.btnMessageBoxRetryCancel.Size = new System.Drawing.Size(310, 25);
+            this.btnMessageBoxRetryCancel.TabIndex = 4;
+            this.btnMessageBoxRetryCancel.Text = "RetryCancel (Error)";
+            this.btnMessageBoxRetryCancel.UseVisualStyleBackColor = true;
+            this.btnMessageBoxRetryCancel.Click += new System.EventHandler(this.btnMessageBoxRetryCancel_Click);
+            //
+            // btnMessageBoxYesNoCancel
+            //
+            this.btnMessageBoxYesNoCancel.Location = new System.Drawing.Point(10, 127);
+            this.btnMessageBoxYesNoCancel.Name = "btnMessageBoxYesNoCancel";
+            this.btnMessageBoxYesNoCancel.Size = new System.Drawing.Size(310, 25);
+            this.btnMessageBoxYesNoCancel.TabIndex = 3;
+            this.btnMessageBoxYesNoCancel.Text = "YesNoCancel (Question)";
+            this.btnMessageBoxYesNoCancel.UseVisualStyleBackColor = true;
+            this.btnMessageBoxYesNoCancel.Click += new System.EventHandler(this.btnMessageBoxYesNoCancel_Click);
+            //
+            // btnMessageBoxYesNo
+            //
+            this.btnMessageBoxYesNo.Location = new System.Drawing.Point(10, 96);
+            this.btnMessageBoxYesNo.Name = "btnMessageBoxYesNo";
+            this.btnMessageBoxYesNo.Size = new System.Drawing.Size(310, 25);
+            this.btnMessageBoxYesNo.TabIndex = 2;
+            this.btnMessageBoxYesNo.Text = "YesNo (Question)";
+            this.btnMessageBoxYesNo.UseVisualStyleBackColor = true;
+            this.btnMessageBoxYesNo.Click += new System.EventHandler(this.btnMessageBoxYesNo_Click);
+            //
+            // btnMessageBoxOKCancel
+            //
+            this.btnMessageBoxOKCancel.Location = new System.Drawing.Point(10, 65);
+            this.btnMessageBoxOKCancel.Name = "btnMessageBoxOKCancel";
+            this.btnMessageBoxOKCancel.Size = new System.Drawing.Size(310, 25);
+            this.btnMessageBoxOKCancel.TabIndex = 1;
+            this.btnMessageBoxOKCancel.Text = "OKCancel (Question)";
+            this.btnMessageBoxOKCancel.UseVisualStyleBackColor = true;
+            this.btnMessageBoxOKCancel.Click += new System.EventHandler(this.btnMessageBoxOKCancel_Click);
+            //
+            // btnMessageBoxOK
+            //
+            this.btnMessageBoxOK.Location = new System.Drawing.Point(10, 34);
+            this.btnMessageBoxOK.Name = "btnMessageBoxOK";
+            this.btnMessageBoxOK.Size = new System.Drawing.Size(310, 25);
+            this.btnMessageBoxOK.TabIndex = 0;
+            this.btnMessageBoxOK.Text = "OK (Information)";
+            this.btnMessageBoxOK.UseVisualStyleBackColor = true;
+            this.btnMessageBoxOK.Click += new System.EventHandler(this.btnMessageBoxOK_Click);
             // 
             // Form7
             // 
@@ -417,6 +514,7 @@ namespace ZidUtilities.TesterWin
             this.pnlResultsHeader.ResumeLayout(false);
             this.pnlResultsHeader.PerformLayout();
             this.groupBox1.ResumeLayout(false);
+            this.grpMessageBox.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -453,5 +551,13 @@ namespace ZidUtilities.TesterWin
         private System.Windows.Forms.Button btnTestAllStyles;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button btnSqlConnection;
+        private System.Windows.Forms.GroupBox grpMessageBox;
+        private System.Windows.Forms.Button btnMessageBoxOK;
+        private System.Windows.Forms.Button btnMessageBoxOKCancel;
+        private System.Windows.Forms.Button btnMessageBoxYesNo;
+        private System.Windows.Forms.Button btnMessageBoxYesNoCancel;
+        private System.Windows.Forms.Button btnMessageBoxRetryCancel;
+        private System.Windows.Forms.Button btnMessageBoxAbortRetryIgnore;
+        private System.Windows.Forms.Button btnMessageBoxAllIcons;
     }
 }

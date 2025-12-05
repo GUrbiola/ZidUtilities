@@ -4,9 +4,11 @@ using System.Drawing;
 namespace ZidUtilities.CommonCode.Win.Forms
 {
     /// <summary>
-    /// Defines color schemes for generic dialog forms.
-    /// Each style provides a distinct visual appearance with coordinated colors.
+    /// DEPRECATED: This enum has been replaced by ZidThemes for unified theming across all ZidUtilities controls and forms.
+    /// Please use ZidThemes instead for consistent styling.
+    /// This enum is kept for backward compatibility but is no longer actively used.
     /// </summary>
+    [Obsolete("DialogStyle has been deprecated. Please use ZidThemes instead for unified theming.", false)]
     public enum DialogStyle
     {
         /// <summary>
@@ -41,13 +43,16 @@ namespace ZidUtilities.CommonCode.Win.Forms
     }
 
     /// <summary>
-    /// Helper class to provide color schemes based on DialogStyle or ZidThemes.
+    /// Helper class to provide color schemes based on ZidThemes.
+    /// Provides backward compatibility for DialogStyle (deprecated).
     /// </summary>
     internal static class DialogStyleHelper
     {
         /// <summary>
         /// Gets the header background color for the specified style.
+        /// DEPRECATED: Use GetHeaderColor(ZidThemes) instead.
         /// </summary>
+        [Obsolete("Use GetHeaderColor(ZidThemes) instead.", false)]
         public static Color GetHeaderColor(DialogStyle style)
         {
             switch (style)
@@ -79,7 +84,9 @@ namespace ZidUtilities.CommonCode.Win.Forms
 
         /// <summary>
         /// Gets the header text color for the specified style.
+        /// DEPRECATED: Use GetHeaderTextColor(ZidThemes) instead.
         /// </summary>
+        [Obsolete("Use GetHeaderTextColor(ZidThemes) instead.", false)]
         public static Color GetHeaderTextColor(DialogStyle style)
         {
             return Color.White;
@@ -96,7 +103,9 @@ namespace ZidUtilities.CommonCode.Win.Forms
 
         /// <summary>
         /// Gets the accent color for the specified style.
+        /// DEPRECATED: Use GetAccentColor(ZidThemes) instead.
         /// </summary>
+        [Obsolete("Use GetAccentColor(ZidThemes) instead.", false)]
         public static Color GetAccentColor(DialogStyle style)
         {
             switch (style)

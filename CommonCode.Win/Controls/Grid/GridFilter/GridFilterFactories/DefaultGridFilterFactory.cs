@@ -3,9 +3,9 @@ using System.Data;
 using System.Collections;
 using System.Windows.Forms;
 
-using ZidUtilities.Win.Controls.Grid.GridFilter.GridFilters;
+using ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter.GridFilters;
 
-namespace ZidUtilities.Win.Controls.Grid.GridFilter.GridFilterFactories
+namespace ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter.GridFilterFactories
 {
 	/// <summary>
 	/// Default implementation for <see cref="IGridFilterFactory"/> which

@@ -16,7 +16,7 @@ namespace ZidUtilities.CommonCode.Win.Forms
         private TextInputFormat _format = TextInputFormat.None;
         private bool _required = false;
         private string _customValidationPattern = null;
-        private DialogStyle _style = DialogStyle.Default;
+        private ZidThemes _theme = ZidThemes.Default;
 
         #endregion
 
@@ -70,15 +70,15 @@ namespace ZidUtilities.CommonCode.Win.Forms
         }
 
         /// <summary>
-        /// Gets or sets the dialog style (color scheme).
+        /// Gets or sets the dialog theme (color scheme).
         /// </summary>
-        public DialogStyle Style
+        public ZidThemes Theme
         {
-            get { return _style; }
+            get { return _theme; }
             set
             {
-                _style = value;
-                ApplyStyle();
+                _theme = value;
+                ApplyTheme();
             }
         }
 
@@ -123,7 +123,7 @@ namespace ZidUtilities.CommonCode.Win.Forms
         public TextInputDialog()
         {
             InitializeComponent();
-            ApplyStyle();
+            ApplyTheme();
         }
 
         #endregion
@@ -131,13 +131,13 @@ namespace ZidUtilities.CommonCode.Win.Forms
         #region Private Methods
 
         /// <summary>
-        /// Applies the selected style to the dialog.
+        /// Applies the selected theme to the dialog.
         /// </summary>
-        private void ApplyStyle()
+        private void ApplyTheme()
         {
-            Color headerColor = DialogStyleHelper.GetHeaderColor(_style);
-            Color headerTextColor = DialogStyleHelper.GetHeaderTextColor(_style);
-            Color accentColor = DialogStyleHelper.GetAccentColor(_style);
+            Color headerColor = DialogStyleHelper.GetHeaderColor(_theme);
+            Color headerTextColor = DialogStyleHelper.GetHeaderTextColor(_theme);
+            Color accentColor = DialogStyleHelper.GetAccentColor(_theme);
 
             pnlHeader.BackColor = headerColor;
             lblMessage.ForeColor = headerTextColor;
@@ -310,7 +310,7 @@ namespace ZidUtilities.CommonCode.Win.Forms
         /// <summary>
         /// Shows a text input dialog and returns the result.
         /// </summary>
-        public static string ShowDialog(string title, string message, DialogStyle style = DialogStyle.Default,
+        public static string ShowDialog(string title, string message, ZidThemes theme = ZidThemes.Default,
             TextInputFormat format = TextInputFormat.None, bool required = false, string defaultValue = "",
             Image image = null, IWin32Window owner = null)
         {
@@ -318,7 +318,7 @@ namespace ZidUtilities.CommonCode.Win.Forms
             {
                 dialog.DialogTitle = title;
                 dialog.Message = message;
-                dialog.Style = style;
+                dialog.Theme = theme;
                 dialog.InputFormat = format;
                 dialog.Required = required;
                 dialog.InputText = defaultValue;

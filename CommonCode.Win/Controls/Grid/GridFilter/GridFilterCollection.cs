@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Windows.Forms;
 
-namespace ZidUtilities.Win.Controls.Grid.GridFilter
+namespace ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter
 {
 	/// <summary>
 	/// Typesafe collection of <see cref="IGridFilter"/>s.

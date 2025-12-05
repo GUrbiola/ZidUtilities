@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ZidUtilities.CommonCode.Win;
 using ZidUtilities.CommonCode.Win.Forms;
 
 namespace ZidUtilities.TesterWin
@@ -25,12 +26,12 @@ namespace ZidUtilities.TesterWin
         /// </summary>
         private void LoadComboBoxes()
         {
-            // Dialog styles
-            foreach (DialogStyle style in Enum.GetValues(typeof(DialogStyle)))
+            // ZidThemes
+            foreach (ZidThemes theme in Enum.GetValues(typeof(ZidThemes)))
             {
-                cmbDialogStyle.Items.Add(style);
+                cmbDialogStyle.Items.Add(theme);
             }
-            cmbDialogStyle.SelectedItem = DialogStyle.Default;
+            cmbDialogStyle.SelectedItem = ZidThemes.Default;
 
             // Text input formats
             foreach (TextInputFormat format in Enum.GetValues(typeof(TextInputFormat)))
@@ -44,13 +45,13 @@ namespace ZidUtilities.TesterWin
 
         private void btnTextInput_Click(object sender, EventArgs e)
         {
-            DialogStyle style = (DialogStyle)cmbDialogStyle.SelectedItem;
+            ZidThemes theme = (ZidThemes)cmbDialogStyle.SelectedItem;
             TextInputFormat format = (TextInputFormat)cmbInputFormat.SelectedItem;
 
             string result = TextInputDialog.ShowDialog(
                 "Text Input Test",
                 "Please enter some text:",
-                style,
+                theme,
                 format,
                 chkRequired.Checked,
                 "",
@@ -70,12 +71,12 @@ namespace ZidUtilities.TesterWin
 
         private void btnEmailInput_Click(object sender, EventArgs e)
         {
-            DialogStyle style = (DialogStyle)cmbDialogStyle.SelectedItem;
+            ZidThemes theme = (ZidThemes)cmbDialogStyle.SelectedItem;
 
             string result = TextInputDialog.ShowDialog(
                 "Email Input",
                 "Please enter your email address:",
-                style,
+                theme,
                 TextInputFormat.Email,
                 true,
                 "",
@@ -95,12 +96,12 @@ namespace ZidUtilities.TesterWin
 
         private void btnPhoneInput_Click(object sender, EventArgs e)
         {
-            DialogStyle style = (DialogStyle)cmbDialogStyle.SelectedItem;
+            ZidThemes theme = (ZidThemes)cmbDialogStyle.SelectedItem;
 
             string result = TextInputDialog.ShowDialog(
                 "Phone Number Input",
                 "Please enter your phone number:",
-                style,
+                theme,
                 TextInputFormat.PhoneNumber,
                 true,
                 "",
@@ -124,7 +125,7 @@ namespace ZidUtilities.TesterWin
 
         private void btnSingleSelection_Click(object sender, EventArgs e)
         {
-            DialogStyle style = (DialogStyle)cmbDialogStyle.SelectedItem;
+            ZidThemes theme = (ZidThemes)cmbDialogStyle.SelectedItem;
 
             List<string> fruits = new List<string>
             {
@@ -137,7 +138,7 @@ namespace ZidUtilities.TesterWin
                 "Select a Fruit",
                 "Please select your favorite fruit:",
                 fruits,
-                style,
+                theme,
                 chkRequired.Checked,
                 null,
                 this
@@ -155,7 +156,7 @@ namespace ZidUtilities.TesterWin
 
         private void btnSingleSelectionDataTable_Click(object sender, EventArgs e)
         {
-            DialogStyle style = (DialogStyle)cmbDialogStyle.SelectedItem;
+            ZidThemes theme = (ZidThemes)cmbDialogStyle.SelectedItem;
 
             // Create sample data table
             DataTable dt = new DataTable();
@@ -174,7 +175,7 @@ namespace ZidUtilities.TesterWin
                 dt,
                 "Name",
                 "ID",
-                style,
+                theme,
                 chkRequired.Checked,
                 null,
                 this
@@ -196,7 +197,7 @@ namespace ZidUtilities.TesterWin
 
         private void btnMultiSelection_Click(object sender, EventArgs e)
         {
-            DialogStyle style = (DialogStyle)cmbDialogStyle.SelectedItem;
+            ZidThemes theme = (ZidThemes)cmbDialogStyle.SelectedItem;
 
             List<string> colors = new List<string>
             {
@@ -209,7 +210,7 @@ namespace ZidUtilities.TesterWin
                 "Select Colors",
                 "Please select one or more colors:",
                 colors,
-                style,
+                theme,
                 chkRequired.Checked,
                 null,
                 this
@@ -231,7 +232,7 @@ namespace ZidUtilities.TesterWin
 
         private void btnComplexSelection_Click(object sender, EventArgs e)
         {
-            DialogStyle style = (DialogStyle)cmbDialogStyle.SelectedItem;
+            ZidThemes theme = (ZidThemes)cmbDialogStyle.SelectedItem;
 
             // Create sample data table
             DataTable dt = new DataTable();
@@ -260,7 +261,7 @@ namespace ZidUtilities.TesterWin
                 displayColumns,
                 keyColumns,
                 true, // Allow multiple selection
-                style,
+                theme,
                 chkRequired.Checked,
                 false,
                 null,
@@ -279,7 +280,7 @@ namespace ZidUtilities.TesterWin
 
         private void btnComplexSelectionSingle_Click(object sender, EventArgs e)
         {
-            DialogStyle style = (DialogStyle)cmbDialogStyle.SelectedItem;
+            ZidThemes theme = (ZidThemes)cmbDialogStyle.SelectedItem;
 
             // Sample products
             var products = new List<Product>
@@ -302,7 +303,7 @@ namespace ZidUtilities.TesterWin
                 displayProps,
                 keyProps,
                 false, // Single selection
-                style,
+                theme,
                 chkRequired.Checked,
                 false,
                 null,
@@ -325,7 +326,7 @@ namespace ZidUtilities.TesterWin
 
         private void btnProcessingIndeterminate_Click(object sender, EventArgs e)
         {
-            DialogStyle style = (DialogStyle)cmbDialogStyle.SelectedItem;
+            ZidThemes theme = (ZidThemes)cmbDialogStyle.SelectedItem;
 
             // Show processing dialog on a background thread
             Task.Run(() =>
@@ -333,7 +334,7 @@ namespace ZidUtilities.TesterWin
                 using (var dialog = ProcessingDialogManager.Show(
                     "Processing",
                     "Please wait while we process your request...",
-                    style,
+                    theme,
                     null,
                     true))
                 {
@@ -353,7 +354,7 @@ namespace ZidUtilities.TesterWin
 
         private void btnProcessingDeterminate_Click(object sender, EventArgs e)
         {
-            DialogStyle style = (DialogStyle)cmbDialogStyle.SelectedItem;
+            ZidThemes theme = (ZidThemes)cmbDialogStyle.SelectedItem;
 
             // Show processing dialog with progress
             Task.Run(() =>
@@ -361,7 +362,7 @@ namespace ZidUtilities.TesterWin
                 using (var dialog = ProcessingDialogManager.Show(
                     "Processing",
                     "Processing items...",
-                    style,
+                    theme,
                     null,
                     false))
                 {
@@ -390,12 +391,12 @@ namespace ZidUtilities.TesterWin
 
         private void btnTestAllStyles_Click(object sender, EventArgs e)
         {
-            foreach (DialogStyle style in Enum.GetValues(typeof(DialogStyle)))
+            foreach (ZidThemes theme in Enum.GetValues(typeof(ZidThemes)))
             {
                 string result = TextInputDialog.ShowDialog(
-                    $"{style} Style Test",
-                    $"This is a test of the {style} dialog style. Enter anything:",
-                    style,
+                    $"{theme} Theme Test",
+                    $"This is a test of the {theme} theme. Enter anything:",
+                    theme,
                     TextInputFormat.None,
                     false,
                     "",
@@ -405,12 +406,31 @@ namespace ZidUtilities.TesterWin
 
                 if (result != null)
                 {
-                    txtResults.AppendText($"{style}: {result}\r\n");
+                    txtResults.AppendText($"{theme}: {result}\r\n");
                 }
                 else
                 {
                     break;
                 }
+            }
+        }
+
+        #endregion
+
+        #region SqlConnectForm Tests
+
+        private void btnSqlConnection_Click(object sender, EventArgs e)
+        {
+            ZidThemes theme = (ZidThemes)cmbDialogStyle.SelectedItem;
+            SqlConnectForm sqlConnectForm = new SqlConnectForm();
+            sqlConnectForm.Theme = theme;
+            if (sqlConnectForm.ShowDialog(this) == DialogResult.OK)
+            {
+                txtResults.AppendText($"SQL Connection String: {sqlConnectForm.ConnectionString}\r\n");
+            }
+            else
+            {
+                txtResults.AppendText("SQL Connection: Cancelled\r\n");
             }
         }
 
@@ -428,20 +448,123 @@ namespace ZidUtilities.TesterWin
 
         #endregion
 
-        private void btnSqlConnection_Click(object sender, EventArgs e)
-        {
-            DialogStyle style = (DialogStyle)cmbDialogStyle.SelectedItem;
-            SqlConnectForm sqlConnectForm = new SqlConnectForm();
-            sqlConnectForm.Style = style;
-            if (sqlConnectForm.ShowDialog(this) == DialogResult.OK)
-            {
-                txtResults.AppendText($"SQL Connection String: {sqlConnectForm.ConnectionString}\r\n");
-            }
-            else
-            {
-                txtResults.AppendText("SQL Connection: Cancelled\r\n");
-            }
+        #region MessageBoxDialog Tests
 
+        private void btnMessageBoxOK_Click(object sender, EventArgs e)
+        {
+            ZidThemes theme = (ZidThemes)cmbDialogStyle.SelectedItem;
+
+            DialogResult result = MessageBoxDialog.Show(
+                "This is a simple message box with OK button.",
+                "Information",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information,
+                theme,
+                this
+            );
+
+            txtResults.AppendText($"MessageBox OK: {result}\r\n");
         }
+
+        private void btnMessageBoxOKCancel_Click(object sender, EventArgs e)
+        {
+            ZidThemes theme = (ZidThemes)cmbDialogStyle.SelectedItem;
+
+            DialogResult result = MessageBoxDialog.Show(
+                "Do you want to proceed with this operation?",
+                "Confirm",
+                MessageBoxButtons.OKCancel,
+                MessageBoxIcon.Question,
+                theme,
+                this
+            );
+
+            txtResults.AppendText($"MessageBox OKCancel: {result}\r\n");
+        }
+
+        private void btnMessageBoxYesNo_Click(object sender, EventArgs e)
+        {
+            ZidThemes theme = (ZidThemes)cmbDialogStyle.SelectedItem;
+
+            DialogResult result = MessageBoxDialog.Show(
+                "Do you want to save the changes?",
+                "Save Changes",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question,
+                theme,
+                this
+            );
+
+            txtResults.AppendText($"MessageBox YesNo: {result}\r\n");
+        }
+
+        private void btnMessageBoxYesNoCancel_Click(object sender, EventArgs e)
+        {
+            ZidThemes theme = (ZidThemes)cmbDialogStyle.SelectedItem;
+
+            DialogResult result = MessageBoxDialog.Show(
+                "Would you like to save your work before closing?\n\nYes - Save and close\nNo - Close without saving\nCancel - Don't close",
+                "Save Before Exit",
+                MessageBoxButtons.YesNoCancel,
+                MessageBoxIcon.Question,
+                theme,
+                this
+            );
+
+            txtResults.AppendText($"MessageBox YesNoCancel: {result}\r\n");
+        }
+
+        private void btnMessageBoxRetryCancel_Click(object sender, EventArgs e)
+        {
+            ZidThemes theme = (ZidThemes)cmbDialogStyle.SelectedItem;
+
+            DialogResult result = MessageBoxDialog.Show(
+                "Connection to the server failed. Would you like to retry?",
+                "Connection Error",
+                MessageBoxButtons.RetryCancel,
+                MessageBoxIcon.Error,
+                theme,
+                this
+            );
+
+            txtResults.AppendText($"MessageBox RetryCancel: {result}\r\n");
+        }
+
+        private void btnMessageBoxAbortRetryIgnore_Click(object sender, EventArgs e)
+        {
+            ZidThemes theme = (ZidThemes)cmbDialogStyle.SelectedItem;
+
+            DialogResult result = MessageBoxDialog.Show(
+                "An error occurred while processing the file.\n\nAbort - Stop all operations\nRetry - Try again\nIgnore - Skip this error",
+                "Processing Error",
+                MessageBoxButtons.AbortRetryIgnore,
+                MessageBoxIcon.Warning,
+                theme,
+                this
+            );
+
+            txtResults.AppendText($"MessageBox AbortRetryIgnore: {result}\r\n");
+        }
+
+        private void btnMessageBoxAllIcons_Click(object sender, EventArgs e)
+        {
+            ZidThemes theme = (ZidThemes)cmbDialogStyle.SelectedItem;
+
+            // Information
+            MessageBoxDialog.Show("This is an information message.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information, theme, this);
+
+            // Warning
+            MessageBoxDialog.Show("This is a warning message.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning, theme, this);
+
+            // Error
+            MessageBoxDialog.Show("This is an error message.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, theme, this);
+
+            // Question
+            MessageBoxDialog.Show("This is a question message.", "Question", MessageBoxButtons.OK, MessageBoxIcon.Question, theme, this);
+
+            txtResults.AppendText("MessageBox All Icons: Displayed all icon types\r\n");
+        }
+
+        #endregion
     }
 }

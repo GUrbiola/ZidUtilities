@@ -141,6 +141,12 @@
     <Compile Include="Controls\Grid\GridThemeHelper.cs" />
     <Compile Include="Controls\Grid\GridThemes.cs" />
     <Compile Include="Forms\DialogStyle.cs" />
+    <Compile Include="Forms\MessageBoxDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\MessageBoxDialog.Designer.cs">
+      <DependentUpon>MessageBoxDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="ZidThemes.cs" />
     <Compile Include="Controls\Grid\IZidGridPlugin.cs" />
     <Compile Include="Controls\Grid\Plugins\ColumnVisibilityPlugin.cs" />
@@ -259,6 +265,9 @@
     <EmbeddedResource Include="Controls\VerticalProgressBar.resx">
       <DependentUpon>VerticalProgressBar.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\MessageBoxDialog.resx">
+      <DependentUpon>MessageBoxDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\ProcessingDialog.resx">
       <DependentUpon>ProcessingDialog.cs</DependentUpon>
     </EmbeddedResource>
@@ -299,19 +308,19 @@
     <None Include="Resources\message.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Controls\AddressBar\GenericNode.ico" />
-    <Content Include="Controls\AddressBar\AddressBar.ico" />
-    <Content Include="Controls\Diff\DiffInspector.ico" />
-    <Content Include="Controls\Diff\SideToSideLineComparer.ico" />
-    <Content Include="Controls\Diff\SideToSideTextComparer.ico" />
-    <Content Include="Controls\Grid\GridFilter\DataGridFilterExtender.ico" />
-    <Content Include="Controls\Grid\ZidGrid.ico" />
-    <Content Include="Controls\ThemeManager.ico" />
-    <Content Include="Controls\VerticalProgressBar.ico" />
-    <Content Include="Controls\DoubleBufferedPanel.ico" />
-    <Content Include="Controls\AnimatedWaitTextBox.ico" />
+    <EmbeddedResource Include="Controls\AddressBar\GenericNode.ico" />
+    <EmbeddedResource Include="Controls\AddressBar\AddressBar.ico" />
+    <EmbeddedResource Include="Controls\Diff\DiffInspector.ico" />
+    <EmbeddedResource Include="Controls\Diff\SideToSideLineComparer.ico" />
+    <EmbeddedResource Include="Controls\Diff\SideToSideTextComparer.ico" />
+    <EmbeddedResource Include="Controls\Grid\GridFilter\DataGridFilterExtender.ico" />
+    <EmbeddedResource Include="Controls\Grid\ZidGrid.ico" />
+    <EmbeddedResource Include="Controls\ThemeManager.ico" />
+    <EmbeddedResource Include="Controls\VerticalProgressBar.ico" />
+    <EmbeddedResource Include="Controls\DoubleBufferedPanel.ico" />
+    <EmbeddedResource Include="Controls\AnimatedWaitTextBox.ico" />
     <Content Include="DataComparison\ComparisonReportTemplate.html" />
-    <Content Include="ExtendedEditor.ico" />
+    <EmbeddedResource Include="ExtendedEditor.ico" />
     <Content Include="Resources\Bookmark.png" />
     <Content Include="Resources\Book_32.png" />
     <Content Include="Resources\close_32x32.png" />

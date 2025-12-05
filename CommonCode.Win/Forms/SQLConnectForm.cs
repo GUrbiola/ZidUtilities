@@ -22,7 +22,7 @@ namespace ZidUtilities.CommonCode.Win.Forms
         /// </summary>
         SqlConnectionStringBuilder StrBuilder;
 
-        private DialogStyle _style = DialogStyle.Default;
+        private ZidThemes _theme = ZidThemes.Default;
 
         /// <summary>
         /// Gets the currently selected database name from the connection string builder.
@@ -30,15 +30,15 @@ namespace ZidUtilities.CommonCode.Win.Forms
         public string SelectedDB { get { return StrBuilder.InitialCatalog; } }
 
         /// <summary>
-        /// Gets or sets the dialog style (color scheme).
+        /// Gets or sets the dialog theme (color scheme).
         /// </summary>
-        public DialogStyle Style
+        public ZidThemes Theme
         {
-            get { return _style; }
+            get { return _theme; }
             set
             {
-                _style = value;
-                ApplyStyle();
+                _theme = value;
+                ApplyTheme();
             }
         }
 
@@ -73,17 +73,17 @@ namespace ZidUtilities.CommonCode.Win.Forms
         {
             InitializeComponent();
             StrBuilder = new SqlConnectionStringBuilder();
-            ApplyStyle();
+            ApplyTheme();
         }
 
         /// <summary>
-        /// Applies the selected style to the dialog.
+        /// Applies the selected theme to the dialog.
         /// </summary>
-        private void ApplyStyle()
+        private void ApplyTheme()
         {
-            Color headerColor = DialogStyleHelper.GetHeaderColor(_style);
-            Color headerTextColor = DialogStyleHelper.GetHeaderTextColor(_style);
-            Color accentColor = DialogStyleHelper.GetAccentColor(_style);
+            Color headerColor = DialogStyleHelper.GetHeaderColor(_theme);
+            Color headerTextColor = DialogStyleHelper.GetHeaderTextColor(_theme);
+            Color accentColor = DialogStyleHelper.GetAccentColor(_theme);
 
             pnlHeader.BackColor = headerColor;
             lblTitle.ForeColor = headerTextColor;

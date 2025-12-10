@@ -62,11 +62,11 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
-    <Reference Include="ZidUtilities.CommonCode, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ZidUtilities.CommonCode.1.0.0\lib\net48\ZidUtilities.CommonCode.dll</HintPath>
+    <Reference Include="ZidUtilities.CommonCode, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZidUtilities.CommonCode.1.0.2\lib\net48\ZidUtilities.CommonCode.dll</HintPath>
     </Reference>
-    <Reference Include="ZidUtilities.CommonCode.Files, Version=1.0.0.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ZidUtilities.CommonCode.Files.1.0.2\lib\net48\ZidUtilities.CommonCode.Files.dll</HintPath>
+    <Reference Include="ZidUtilities.CommonCode.Files, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZidUtilities.CommonCode.Files.1.0.3\lib\net48\ZidUtilities.CommonCode.Files.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -217,7 +217,6 @@
     <None Include="Resources\Play.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DataComparison\ComparisonReportTemplate.html" />
     <Content Include="Resources\Bookmark.png" />
     <Content Include="Resources\Comment.png" />
     <Content Include="Resources\DelBookmark.png" />

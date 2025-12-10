@@ -95,6 +95,9 @@ namespace ZidUtilities.TesterWin
             int yPos = 10;
 
             // Add test form buttons
+            AddTestButton(content, "UIGenerator Test (CRUD)", "Comprehensive test of UIGenerator for dynamic CRUD dialogs",
+                ref yPos, () => OpenForm(new FormUIGeneratorTest()));
+
             AddTestButton(content, "Theme Manager Test", "Test the ThemeManager component with various controls",
                 ref yPos, () => OpenForm(new FormThemeManagerTest()));
 

@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>$version$</version>
+    <version>1.0.2</version>
     <title>ZidUtilities.CommonCode</title>
     <authors>Gonzalo Urbiola</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -10,7 +10,7 @@
     <!-- <icon>icon.png</icon> -->
     <projectUrl>https://github.com/GUrbiola/ZidUtilities</projectUrl>
     <description>Library containing most of the code/methods that I most often use in my projects, from extensions, to serialization, data comparisons, diffengine, etc.</description>
-    <releaseNotes>First release version.</releaseNotes>
+    <releaseNotes>Removed physical file used as the html template for the data comparer class.</releaseNotes>
     <copyright>$copyright$</copyright>
     <tags>ZidUtilities Extensions CommonCode Helper DiffEngine ElCid Urbiola</tags>
 	<readme>README.md</readme>

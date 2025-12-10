@@ -5,6 +5,8 @@ using System.Drawing;
 using System.Drawing.Design;
 using System.Windows.Forms;
 using ZidUtilities.CommonCode.Win.Controls.Grid;
+using System.Reflection;
+using static System.Windows.Forms.Control;
 
 namespace ZidUtilities.CommonCode.Win.Controls
 {
@@ -147,6 +149,74 @@ namespace ZidUtilities.CommonCode.Win.Controls
 
             // Apply theme to all controls recursively
             ApplyThemeToControls(_parentForm.Controls);
+        }
+
+        public void ApplyThemeTo(object ctr)
+        {
+            if (ctr != null)
+            {
+                // Ensure we have theme colors
+                if (_themeColors == null)
+                    _themeColors = GridThemeHelper.GetThemeColors(_theme);
+
+                if (ctr is Form)
+                {
+                    Form ptrFrm = ctr as Form;
+                    if (_theme == ZidThemes.None)
+                    {
+                        // Reset to default appearance
+                        ResetToDefault(ptrFrm);
+                        ResetControlsToDefault(ptrFrm.Controls);
+                        return;
+                    }
+
+                    // Apply theme to the form itself
+                    ApplyThemeToForm(ptrFrm);
+
+                    // Apply theme to all controls recursively
+                    ApplyThemeToControls(ptrFrm.Controls);
+                }
+                else if (ctr is UserControl)
+                {
+                    UserControl ptrUsCo = ctr as UserControl;
+                    if (_theme == ZidThemes.None)
+                    {
+                        ResetControlsToDefault(ptrUsCo.Controls);
+                        return;
+                    }
+
+                    // Apply theme to all controls recursively
+                    ApplyThemeToControls(ptrUsCo.Controls);
+                }
+                else if (ctr is Panel)
+                {
+                    Panel ptrPan = ctr as Panel;
+                    if (_theme == ZidThemes.None)
+                    {
+                        ResetControlsToDefault(ptrPan.Controls);
+                        return;
+                    }
+
+                    // Apply theme to all controls recursively
+                    ApplyThemeToControls(ptrPan.Controls);
+                }
+                else
+                {
+                    if(ctr.HasControlsPropertyOfType<ControlCollection>())
+                    {
+                        ControlCollection controls = ctr.GetProperty("Controls") as ControlCollection;
+
+                        if (_theme == ZidThemes.None)
+                        {
+                            ResetControlsToDefault(controls);
+                            return;
+                        }
+
+                        // Apply theme to all controls recursively
+                        ApplyThemeToControls(controls);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -1040,6 +1110,77 @@ namespace ZidUtilities.CommonCode.Win.Controls
         {
             e.ArrowColor = _themeColors.HeaderForeColor;
             base.OnRenderArrow(e);
+        }
+    }
+
+    public static class ControlExtensions
+    {
+        public static void ApplyTheme(this Control control, ZidThemes theme)
+        {
+            // Extension method to apply theme to an individual control
+            var themeManager = new ThemeManager { Theme = theme };
+            themeManager.ApplyThemeTo(control);
+        }
+
+        public static void ResetTheme(this Control control)
+        {
+            control.ApplyTheme(ZidThemes.None);
+        }
+    }
+
+    public static class ReflectionHelper
+    {
+        public static bool HasControlsPropertyOfType<T>(this object obj)
+        {
+            var type = obj?.GetType();
+            PropertyInfo prop = type?.GetProperty("Controls", BindingFlags.Public | BindingFlags.Instance);
+            bool hasControlsPropertyOfCorrectType = false;
+
+            if (prop != null)
+            {
+                // Accept exact type or derived types:
+                hasControlsPropertyOfCorrectType = typeof(T).IsAssignableFrom(prop.PropertyType);
+
+                // Optionally check the runtime value isn't null:
+                var value = prop.GetValue(obj);
+                bool valueNotNull = value != null;
+            }
+
+            return hasControlsPropertyOfCorrectType;
+        }
+
+        public static object GetProperty(this object obj, string name)
+        {
+            // Validate inputs
+            if (obj == null || string.IsNullOrEmpty(name))
+                return null;
+
+            var type = obj.GetType();
+
+            // Only consider public properties (instance or static) - "accessible" implies public here
+            var prop = type.GetProperty(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
+            if (prop == null)
+                return null;
+
+            // Do not attempt to handle indexer properties
+            var indexParams = prop.GetIndexParameters();
+            if (indexParams != null && indexParams.Length > 0)
+                return null;
+
+            // Must be readable
+            if (!prop.CanRead)
+                return null;
+
+            try
+            {
+                // Safely get the value. For static properties the target parameter is ignored.
+                return prop.GetValue(obj);
+            }
+            catch
+            {
+                // Any exception while accessing -> treat as not accessible
+                return null;
+            }
         }
     }
 }

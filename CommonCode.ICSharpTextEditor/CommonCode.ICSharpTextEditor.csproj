@@ -63,10 +63,10 @@
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
     <Reference Include="ZidUtilities.CommonCode, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ZidUtilities.CommonCode.1.0.2\lib\net48\ZidUtilities.CommonCode.dll</HintPath>
+      <HintPath>..\packages\ZidUtilities.CommonCode.1.0.3\lib\net48\ZidUtilities.CommonCode.dll</HintPath>
     </Reference>
-    <Reference Include="ZidUtilities.CommonCode.Files, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ZidUtilities.CommonCode.Files.1.0.3\lib\net48\ZidUtilities.CommonCode.Files.dll</HintPath>
+    <Reference Include="ZidUtilities.CommonCode.Files, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZidUtilities.CommonCode.Files.1.0.4\lib\net48\ZidUtilities.CommonCode.Files.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

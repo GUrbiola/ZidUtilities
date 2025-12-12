@@ -149,6 +149,9 @@ namespace ZidUtilities.CommonCode
         /// <returns>The start offset of the token, or -1 if the index is out of range.</returns>
         public int GetStartOf(int tokenIndex)
         {
+            if (tokenIndex < 0)
+                return -1;
+
             if (tokenIndex < List.Count)
                 return StartOffsets[tokenIndex];
             return -1;
@@ -172,6 +175,9 @@ namespace ZidUtilities.CommonCode
         /// <returns>The end offset of the token, or -1 if the index is out of range.</returns>
         public int GetEndOf(int tokenIndex)
         {
+            if (tokenIndex < 0)
+                return -1;
+
             if (tokenIndex < List.Count)
                 return EndOffsets[tokenIndex];
             return -1;
@@ -195,6 +201,9 @@ namespace ZidUtilities.CommonCode
         /// <returns>The length of the token's text, or -1 if the index is out of range.</returns>
         public int GetLengthOf(int tokenIndex)
         {
+            if (tokenIndex < 0)
+                return -1;
+
             if (tokenIndex < List.Count)
                 return TokenLengths[tokenIndex];
             return -1;
@@ -218,6 +227,8 @@ namespace ZidUtilities.CommonCode
         /// <returns>The <see cref="Token"/> at the given index, or null if the index is out of range.</returns>
         public Token GetToken(int tokenIndex)
         {
+            if(tokenIndex < 0)
+                return null;
             return tokenIndex < List.Count ? List[tokenIndex] : null;
         }
 
@@ -227,6 +238,9 @@ namespace ZidUtilities.CommonCode
         /// <param name="tokenIndex">The index of the token to remove.</param>
         public void RemoveTokenAt(int tokenIndex)
         {
+            if (tokenIndex < 0)
+                return;
+
             if (tokenIndex < List.Count)
             {
                 List.RemoveAt(tokenIndex);

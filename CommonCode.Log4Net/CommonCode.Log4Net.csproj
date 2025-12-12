@@ -51,7 +51,7 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="ZidUtilities.CommonCode, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ZidUtilities.CommonCode.1.0.2\lib\net48\ZidUtilities.CommonCode.dll</HintPath>
+      <HintPath>..\packages\ZidUtilities.CommonCode.1.0.3\lib\net48\ZidUtilities.CommonCode.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

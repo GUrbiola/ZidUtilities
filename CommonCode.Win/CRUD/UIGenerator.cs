@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using ZidUtilities.CommonCode.Win.Controls;
+using ZidUtilities.CommonCode.Win.Forms;
 
 namespace ZidUtilities.CommonCode.Win.CRUD
 {
@@ -27,6 +28,7 @@ namespace ZidUtilities.CommonCode.Win.CRUD
         private int _columnCount = 2;
         private string _htmlLayout = null;
         private List<List<LayoutCell>> _parsedLayout = null;
+        private int _formWidth = 500;
 
         #endregion
 
@@ -87,6 +89,20 @@ namespace ZidUtilities.CommonCode.Win.CRUD
         {
             get { return _theme; }
             set { _theme = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the width for generated dialogs. Default is 500.
+        /// </summary>
+        public int FormWidth
+        {
+            get { return _formWidth; }
+            set
+            {
+                if (value < 100)
+                    throw new ArgumentException("FormWidth must be at least 100 pixels.", nameof(value));
+                _formWidth = value;
+            }
         }
 
         #endregion
@@ -180,6 +196,46 @@ namespace ZidUtilities.CommonCode.Win.CRUD
                 throw new ArgumentException($"Field '{fieldName}' not found.", nameof(fieldName));
 
             _fields[fieldName].IsPrimaryKey = true;
+        }
+
+        /// <summary>
+        /// Sets the format for a field.
+        /// </summary>
+        /// <param name="fieldName">Name of the field</param>
+        /// <param name="format">Field format type</param>
+        /// <param name="formatConfig">Optional format configuration</param>
+        public void SetFieldFormat(string fieldName, FieldFormat format, FormatConfig formatConfig = null)
+        {
+            if (!_fields.ContainsKey(fieldName))
+                throw new ArgumentException($"Field '{fieldName}' not found.", nameof(fieldName));
+
+            _fields[fieldName].Format = format;
+            _fields[fieldName].FormatConfig = formatConfig;
+        }
+
+        /// <summary>
+        /// Marks a field as required.
+        /// </summary>
+        /// <param name="fieldName">Name of the field</param>
+        public void SetRequired(string fieldName)
+        {
+            if (!_fields.ContainsKey(fieldName))
+                throw new ArgumentException($"Field '{fieldName}' not found.", nameof(fieldName));
+
+            _fields[fieldName].IsRequired = true;
+        }
+
+        /// <summary>
+        /// Sets a custom validation method for a field.
+        /// </summary>
+        /// <param name="fieldName">Name of the field</param>
+        /// <param name="validationMethod">Validation method that returns null if valid, or an error message if invalid</param>
+        public void SetValidation(string fieldName, Func<object, string> validationMethod)
+        {
+            if (!_fields.ContainsKey(fieldName))
+                throw new ArgumentException($"Field '{fieldName}' not found.", nameof(fieldName));
+
+            _fields[fieldName].ValidationMethod = validationMethod;
         }
 
         #endregion
@@ -376,6 +432,66 @@ namespace ZidUtilities.CommonCode.Win.CRUD
             }
         }
 
+        /// <summary>
+        /// Clears the field format for a field.
+        /// </summary>
+        public void ClearFieldFormat(string fieldName)
+        {
+            if (_fields.ContainsKey(fieldName))
+            {
+                _fields[fieldName].Format = FieldFormat.Default;
+                _fields[fieldName].FormatConfig = null;
+            }
+        }
+
+        /// <summary>
+        /// Clears all field formats.
+        /// </summary>
+        public void ClearAllFieldFormats()
+        {
+            foreach (var field in _fields.Values)
+            {
+                field.Format = FieldFormat.Default;
+                field.FormatConfig = null;
+            }
+        }
+
+        /// <summary>
+        /// Clears the required flag for a field.
+        /// </summary>
+        public void ClearRequired(string fieldName)
+        {
+            if (_fields.ContainsKey(fieldName))
+                _fields[fieldName].IsRequired = false;
+        }
+
+        /// <summary>
+        /// Clears all required flags.
+        /// </summary>
+        public void ClearAllRequired()
+        {
+            foreach (var field in _fields.Values)
+                field.IsRequired = false;
+        }
+
+        /// <summary>
+        /// Clears the validation method for a field.
+        /// </summary>
+        public void ClearValidation(string fieldName)
+        {
+            if (_fields.ContainsKey(fieldName))
+                _fields[fieldName].ValidationMethod = null;
+        }
+
+        /// <summary>
+        /// Clears all validation methods.
+        /// </summary>
+        public void ClearAllValidations()
+        {
+            foreach (var field in _fields.Values)
+                field.ValidationMethod = null;
+        }
+
         #endregion
 
         #region Layout Configuration Methods
@@ -517,14 +633,33 @@ namespace ZidUtilities.CommonCode.Win.CRUD
         public CRUDResult ShowUpdateDialog(DataRow dataRow)
         {
             if (dataRow == null) throw new ArgumentNullException(nameof(dataRow));
+            return ShowUpdateDialog(ConvertDataRowToValues(dataRow));
+        }
 
-            var currentValues = new Dictionary<string, object>();
-            foreach (DataColumn col in dataRow.Table.Columns)
-            {
-                currentValues[col.ColumnName] = dataRow[col];
-            }
+        /// <summary>
+        /// Shows an update dialog for modifying an existing record with explicit column mapping.
+        /// Use this when DataRow column names don't match field names, or when you need more control.
+        /// </summary>
+        /// <param name="dataRow">DataRow containing current values</param>
+        /// <param name="columnMapping">Maps DataRow column names to field names (DataRow column → Field name)</param>
+        /// <returns>CRUDResult containing the new values and SQL scripts, or null if cancelled</returns>
+        public CRUDResult ShowUpdateDialog(DataRow dataRow, Dictionary<string, string> columnMapping)
+        {
+            if (dataRow == null) throw new ArgumentNullException(nameof(dataRow));
+            if (columnMapping == null) throw new ArgumentNullException(nameof(columnMapping));
+            return ShowUpdateDialog(ConvertDataRowToValues(dataRow, columnMapping));
+        }
 
-            return ShowUpdateDialog(currentValues);
+        /// <summary>
+        /// Diagnostic method to see what values will be extracted from a DataRow.
+        /// Use this to debug issues with ShowUpdateDialog or ShowDeleteDialog.
+        /// </summary>
+        /// <param name="dataRow">DataRow to analyze</param>
+        /// <returns>Dictionary showing field names and their matched values</returns>
+        public Dictionary<string, object> PreviewDataRowValues(DataRow dataRow)
+        {
+            if (dataRow == null) throw new ArgumentNullException(nameof(dataRow));
+            return ConvertDataRowToValues(dataRow);
         }
 
         /// <summary>
@@ -554,14 +689,162 @@ namespace ZidUtilities.CommonCode.Win.CRUD
         public CRUDResult ShowDeleteDialog(DataRow dataRow)
         {
             if (dataRow == null) throw new ArgumentNullException(nameof(dataRow));
+            return ShowDeleteDialog(ConvertDataRowToValues(dataRow));
+        }
 
+        /// <summary>
+        /// Shows a delete confirmation dialog with read-only field values and explicit column mapping.
+        /// </summary>
+        /// <param name="dataRow">DataRow containing current values</param>
+        /// <param name="columnMapping">Maps DataRow column names to field names (DataRow column → Field name)</param>
+        /// <returns>CRUDResult containing the values and DELETE SQL scripts, or null if cancelled</returns>
+        public CRUDResult ShowDeleteDialog(DataRow dataRow, Dictionary<string, string> columnMapping)
+        {
+            if (dataRow == null) throw new ArgumentNullException(nameof(dataRow));
+            if (columnMapping == null) throw new ArgumentNullException(nameof(columnMapping));
+            return ShowDeleteDialog(ConvertDataRowToValues(dataRow, columnMapping));
+        }
+
+        #endregion
+
+        #region Private Helper Methods
+
+        /// <summary>
+        /// Converts a DataRow to a values dictionary with intelligent matching for foreign keys and list fields.
+        /// Matches values by both key (value) and display text, making it easy to use DataRows directly.
+        /// </summary>
+        /// <param name="dataRow">DataRow to convert</param>
+        /// <returns>Dictionary of field names to values</returns>
+        private Dictionary<string, object> ConvertDataRowToValues(DataRow dataRow)
+        {
+            return ConvertDataRowToValues(dataRow, null);
+        }
+
+        /// <summary>
+        /// Converts a DataRow to a values dictionary with intelligent matching for foreign keys and list fields.
+        /// </summary>
+        /// <param name="dataRow">DataRow to convert</param>
+        /// <param name="columnMapping">Optional mapping of DataRow column names to field names</param>
+        /// <returns>Dictionary of field names to values</returns>
+        private Dictionary<string, object> ConvertDataRowToValues(DataRow dataRow, Dictionary<string, string> columnMapping)
+        {
             var currentValues = new Dictionary<string, object>();
+
+            // First pass: Add all values from DataRow columns that match field names
             foreach (DataColumn col in dataRow.Table.Columns)
             {
-                currentValues[col.ColumnName] = dataRow[col];
+                string fieldName = col.ColumnName;
+
+                // Check if there's a mapping for this column
+                if (columnMapping != null && columnMapping.ContainsKey(col.ColumnName))
+                {
+                    fieldName = columnMapping[col.ColumnName];
+                }
+
+                // Add value if field exists
+                if (_fields.ContainsKey(fieldName))
+                {
+                    currentValues[fieldName] = dataRow[col];
+                }
             }
 
-            return ShowDeleteDialog(currentValues);
+            // Second pass: Process foreign keys and list fields for intelligent matching
+            foreach (var field in _fields.Values)
+            {
+                // Skip if we don't have a value for this field
+                if (!currentValues.ContainsKey(field.FieldName))
+                {
+                    currentValues[field.FieldName] = DBNull.Value;
+                    continue;
+                }
+
+                object value = currentValues[field.FieldName];
+
+                // Skip if value is null or DBNull
+                if (value == null || value == DBNull.Value)
+                    continue;
+
+                // Handle foreign key fields - try to match by both key and display value
+                if (field.ForeignKeyInfo != null && field.ForeignKeyInfo.LookupValues != null)
+                {
+                    object matchedValue = MatchValueInLookup(value, field.ForeignKeyInfo.LookupValues);
+                    currentValues[field.FieldName] = matchedValue;
+                }
+                // Handle list format fields - try to match by both key and display value
+                else if (field.Format == FieldFormat.List &&
+                         field.FormatConfig != null &&
+                         field.FormatConfig.ListItems != null)
+                {
+                    object matchedValue = MatchValueInLookup(value, field.FormatConfig.ListItems);
+                    currentValues[field.FieldName] = matchedValue;
+                }
+            }
+
+            return currentValues;
+        }
+
+        /// <summary>
+        /// Matches a value from a DataRow against a lookup dictionary (for foreign keys or lists).
+        /// Tries to match by value first, then by display key.
+        /// </summary>
+        /// <param name="dataRowValue">Value from the DataRow</param>
+        /// <param name="lookupValues">Lookup dictionary</param>
+        /// <returns>Matched value or original value if no match found</returns>
+        private object MatchValueInLookup(object dataRowValue, Dictionary<string, object> lookupValues)
+        {
+            if (dataRowValue == null || dataRowValue == DBNull.Value)
+                return dataRowValue;
+
+            // Try to match by value (the actual stored value)
+            foreach (var kvp in lookupValues)
+            {
+                if (kvp.Value != null && kvp.Value != DBNull.Value)
+                {
+                    // Exact match
+                    if (kvp.Value.Equals(dataRowValue))
+                        return kvp.Value;
+
+                    // Try numeric comparison for different numeric types (int vs long vs decimal etc)
+                    if (IsNumericType(kvp.Value) && IsNumericType(dataRowValue))
+                    {
+                        try
+                        {
+                            if (Convert.ToDecimal(kvp.Value) == Convert.ToDecimal(dataRowValue))
+                                return kvp.Value;
+                        }
+                        catch
+                        {
+                            // Conversion failed, continue to next comparison
+                        }
+                    }
+
+                    // String comparison match
+                    if (kvp.Value.ToString() == dataRowValue.ToString())
+                        return kvp.Value;
+                }
+            }
+
+            // Try to match by display key (in case DataRow contains display text)
+            string dataRowValueStr = dataRowValue.ToString();
+            foreach (var kvp in lookupValues)
+            {
+                // Match by display key
+                if (kvp.Key.Equals(dataRowValueStr, StringComparison.OrdinalIgnoreCase))
+                    return kvp.Value;
+            }
+
+            // No match found, return original value
+            return dataRowValue;
+        }
+
+        /// <summary>
+        /// Checks if an object is a numeric type.
+        /// </summary>
+        private bool IsNumericType(object value)
+        {
+            return value is sbyte || value is byte || value is short || value is ushort ||
+                   value is int || value is uint || value is long || value is ulong ||
+                   value is float || value is double || value is decimal;
         }
 
         #endregion
@@ -580,6 +863,7 @@ namespace ZidUtilities.CommonCode.Win.CRUD
                 using (var reader = cmd.ExecuteReader(CommandBehavior.SchemaOnly))
                 {
                     var schemaTable = reader.GetSchemaTable();
+                    int order = 0;
                     foreach (DataRow row in schemaTable.Rows)
                     {
                         var fieldName = row["ColumnName"].ToString();
@@ -589,7 +873,8 @@ namespace ZidUtilities.CommonCode.Win.CRUD
                             DataType = (Type)row["DataType"],
                             AllowNull = (bool)row["AllowDBNull"],
                             MaxLength = row["ColumnSize"] != DBNull.Value ? Convert.ToInt32(row["ColumnSize"]) : -1,
-                            IsAutoIncrement = row["IsAutoIncrement"] != DBNull.Value && (bool)row["IsAutoIncrement"]
+                            IsAutoIncrement = row["IsAutoIncrement"] != DBNull.Value && (bool)row["IsAutoIncrement"],
+                            Order = order++
                         };
 
                         _fields[fieldName] = fieldMetadata;
@@ -660,6 +945,7 @@ namespace ZidUtilities.CommonCode.Win.CRUD
 
         private void LoadSchemaFromDataTable(DataTable dataTable)
         {
+            int order = 0;
             foreach (DataColumn col in dataTable.Columns)
             {
                 var fieldMetadata = new FieldMetadata
@@ -668,7 +954,8 @@ namespace ZidUtilities.CommonCode.Win.CRUD
                     DataType = col.DataType,
                     AllowNull = col.AllowDBNull,
                     MaxLength = col.MaxLength,
-                    IsAutoIncrement = col.AutoIncrement
+                    IsAutoIncrement = col.AutoIncrement,
+                    Order = order++
                 };
 
                 _fields[col.ColumnName] = fieldMetadata;
@@ -682,6 +969,7 @@ namespace ZidUtilities.CommonCode.Win.CRUD
 
         private void LoadSchemaFromDictionary(Dictionary<string, object> fields)
         {
+            int order = 0;
             foreach (var kvp in fields)
             {
                 var fieldMetadata = new FieldMetadata
@@ -689,7 +977,8 @@ namespace ZidUtilities.CommonCode.Win.CRUD
                     FieldName = kvp.Key,
                     DataType = kvp.Value?.GetType() ?? typeof(string),
                     AllowNull = true,
-                    MaxLength = -1
+                    MaxLength = -1,
+                    Order = order++
                 };
 
                 _fields[kvp.Key] = fieldMetadata;
@@ -702,6 +991,9 @@ namespace ZidUtilities.CommonCode.Win.CRUD
 
         private Form CreateCRUDForm(string title, CRUDOperation operation, Dictionary<string, object> currentValues)
         {
+            // Store currentValues for use in Load and Shown events
+            var storedCurrentValues = currentValues;
+
             var form = new Form
             {
                 Text = title,
@@ -709,26 +1001,30 @@ namespace ZidUtilities.CommonCode.Win.CRUD
                 FormBorderStyle = FormBorderStyle.FixedDialog,
                 MaximizeBox = false,
                 MinimizeBox = false,
-                Width = 500,
+                ClientSize = new Size(_formWidth - 16, 100), // Set initial client size
                 AutoSize = true,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                Padding = new Padding(10)
+                Padding = new Padding(10),
+                MinimumSize = new Size(_formWidth, 100),
+                MaximumSize = new Size(_formWidth, Screen.PrimaryScreen.WorkingArea.Height),
+                AutoScroll = true
             };
 
             TableLayoutPanel mainPanel;
 
             // Generate layout based on mode
+            // Pass null for currentValues during control creation - values will be set in Shown event
             switch (_layoutMode)
             {
                 case LayoutMode.HtmlTable:
-                    mainPanel = CreateHtmlTableLayout(operation, currentValues);
+                    mainPanel = CreateHtmlTableLayout(operation, null);
                     break;
                 case LayoutMode.ColumnCount:
-                    mainPanel = CreateColumnCountLayout(operation, currentValues);
+                    mainPanel = CreateColumnCountLayout(operation, null);
                     break;
                 case LayoutMode.Auto:
                 default:
-                    mainPanel = CreateAutoLayout(operation, currentValues);
+                    mainPanel = CreateAutoLayout(operation, null);
                     break;
             }
 
@@ -767,7 +1063,46 @@ namespace ZidUtilities.CommonCode.Win.CRUD
 
                         if (mainControl != null && confirmControl != null && mainControl.Text != confirmControl.Text)
                         {
-                            MessageBox.Show($"Password confirmation for '{field.Alias ?? field.FieldName}' does not match.",
+                            MessageBoxDialog.Show($"Password confirmation for '{field.Alias ?? field.FieldName}' does not match.",
+                                "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            form.DialogResult = DialogResult.None;
+                            return;
+                        }
+                    }
+                }
+
+                // Validate required fields and custom validations
+                foreach (var field in _fields.Values)
+                {
+                    // Skip excluded fields and auto-increment fields on insert
+                    if (field.IsExcluded || (operation == CRUDOperation.Insert && field.IsAutoIncrement))
+                        continue;
+
+                    // Get the control value
+                    object value = GetControlValue(form, field);
+
+                    // Validate required fields
+                    if (field.IsRequired && !field.IsPrimaryKey)
+                    {
+                        bool isEmpty = value == null || value == DBNull.Value ||
+                                      (value is string str && string.IsNullOrWhiteSpace(str));
+
+                        if (isEmpty)
+                        {
+                            MessageBoxDialog.Show($"Field '{field.Alias ?? field.FieldName}' is required.",
+                                "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            form.DialogResult = DialogResult.None;
+                            return;
+                        }
+                    }
+
+                    // Validate custom validation method
+                    if (field.ValidationMethod != null)
+                    {
+                        string validationError = field.ValidationMethod(value);
+                        if (!string.IsNullOrEmpty(validationError))
+                        {
+                            MessageBoxDialog.Show($"Validation failed for '{field.Alias ?? field.FieldName}':\n{validationError}",
                                 "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             form.DialogResult = DialogResult.None;
                             return;
@@ -784,9 +1119,180 @@ namespace ZidUtilities.CommonCode.Win.CRUD
             form.AcceptButton = btnOK;
             form.CancelButton = btnCancel;
 
+            // Hook Load event to populate list controls (ComboBox, ListBox, etc.) with their possible values
+            form.Load += (s, e) =>
+            {
+                PopulateListControls(form);
+            };
+
+            // Hook Shown event to set the actual values from currentValues
+            form.Shown += (s, e) =>
+            {
+                if (storedCurrentValues != null)
+                {
+                    SetControlValues(form, storedCurrentValues);
+                }
+            };
+
             ApplyThemeToForm(form);
 
             return form;
+        }
+
+        /// <summary>
+        /// Populates list controls (ComboBox, ListBox, etc.) with their possible values.
+        /// Called in the Load event.
+        /// </summary>
+        private void PopulateListControls(Form form)
+        {
+            foreach (Control control in GetAllControls(form))
+            {
+                // Handle ComboBox controls
+                if (control is ComboBox combo && combo.Tag is FieldMetadata field)
+                {
+                    // Foreign key ComboBox
+                    if (field.ForeignKeyInfo != null)
+                    {
+                        var items = new List<KeyValuePair<string, object>>();
+                        if (field.AllowNull)
+                            items.Add(new KeyValuePair<string, object>("(NULL)", DBNull.Value));
+                        items.AddRange(field.ForeignKeyInfo.LookupValues);
+                        combo.DataSource = items;
+                    }
+                    // List format ComboBox
+                    else if (field.Format == FieldFormat.List && field.FormatConfig != null && field.FormatConfig.ListItems != null)
+                    {
+                        var items = new List<KeyValuePair<string, object>>();
+                        if (field.AllowNull)
+                            items.Add(new KeyValuePair<string, object>("(NULL)", DBNull.Value));
+                        items.AddRange(field.FormatConfig.ListItems);
+                        combo.DataSource = items;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets control values from the currentValues dictionary.
+        /// Called in the Shown event after all controls are populated.
+        /// </summary>
+        private void SetControlValues(Form form, Dictionary<string, object> currentValues)
+        {
+            foreach (var kvp in currentValues)
+            {
+                string fieldName = kvp.Key;
+                object currentValue = kvp.Value;
+
+                if (!_fields.ContainsKey(fieldName))
+                    continue;
+
+                var field = _fields[fieldName];
+
+                // Find the control
+                var controls = form.Controls.Find(fieldName, true);
+                if (controls.Length == 0)
+                {
+                    // Try to find panel for formatted controls
+                    controls = form.Controls.Find(fieldName + "_Panel", true);
+                }
+                if (controls.Length == 0)
+                    continue;
+
+                var control = controls[0];
+
+                // Set value based on control type
+                if (control is ComboBox combo)
+                {
+                    if (currentValue != null && currentValue != DBNull.Value)
+                    {
+                        // Set SelectedValue for data-bound ComboBox
+                        combo.SelectedValue = currentValue;
+                    }
+                }
+                else if (control is TextBox tb)
+                {
+                    if (field.MaskInfo != null && field.MaskInfo.MaskType == MaskType.Custom && field.MaskInfo.MaskMethod != null)
+                    {
+                        tb.Text = field.MaskInfo.MaskMethod(currentValue?.ToString() ?? "");
+                    }
+                    else
+                    {
+                        tb.Text = currentValue?.ToString() ?? "";
+                    }
+                }
+                else if (control is CheckBox chk)
+                {
+                    chk.Checked = currentValue != null && currentValue != DBNull.Value &&
+                                  (Convert.ToInt32(currentValue) == 1 || Convert.ToBoolean(currentValue));
+                }
+                else if (control is DateTimePicker dtp)
+                {
+                    if (currentValue != null && currentValue != DBNull.Value)
+                    {
+                        if (currentValue is DateTime dt)
+                            dtp.Value = dt;
+                        else if (DateTime.TryParse(currentValue.ToString(), out DateTime parsedDate))
+                            dtp.Value = parsedDate;
+                    }
+                }
+                else if (control is NumericUpDown num)
+                {
+                    if (currentValue != null && currentValue != DBNull.Value)
+                        num.Value = Convert.ToDecimal(currentValue);
+                }
+                else if (control is Panel panel)
+                {
+                    // Handle formatted controls in panels
+                    SetFormattedControlValue(panel, field, currentValue);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets value for formatted controls that are inside panels.
+        /// </summary>
+        private void SetFormattedControlValue(Panel panel, FieldMetadata field, object currentValue)
+        {
+            switch (field.Format)
+            {
+                case FieldFormat.File:
+                case FieldFormat.Folder:
+                    var textBox = panel.Controls.Find(field.FieldName + "_TextBox", false).FirstOrDefault() as TextBox;
+                    if (textBox != null)
+                        textBox.Text = currentValue?.ToString() ?? "";
+                    break;
+
+                case FieldFormat.DateTime:
+                    var datePicker = panel.Controls.Find(field.FieldName + "_Date", false).FirstOrDefault() as DateTimePicker;
+                    var timePicker = panel.Controls.Find(field.FieldName + "_Time", false).FirstOrDefault() as DateTimePicker;
+                    if (datePicker != null && timePicker != null && currentValue != null && currentValue != DBNull.Value)
+                    {
+                        DateTime dt = DateTime.Now;
+                        if (currentValue is DateTime dateTime)
+                            dt = dateTime;
+                        else if (DateTime.TryParse(currentValue.ToString(), out DateTime parsed))
+                            dt = parsed;
+
+                        datePicker.Value = dt;
+                        timePicker.Value = dt;
+                    }
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Recursively gets all controls in a form, including nested controls.
+        /// </summary>
+        private IEnumerable<Control> GetAllControls(Control container)
+        {
+            foreach (Control control in container.Controls)
+            {
+                yield return control;
+                foreach (Control child in GetAllControls(control))
+                {
+                    yield return child;
+                }
+            }
         }
 
         private TableLayoutPanel CreateAutoLayout(CRUDOperation operation, Dictionary<string, object> currentValues)
@@ -820,7 +1326,7 @@ namespace ZidUtilities.CommonCode.Win.CRUD
 
             int rowIndex = 0;
             int colIndex = 0;
-            var sortedFields = _fields.Values.OrderBy(f => f.FieldName).ToList();
+            var sortedFields = _fields.Values.OrderBy(f => f.Order).ToList();
 
             foreach (var field in sortedFields)
             {
@@ -982,7 +1488,8 @@ namespace ZidUtilities.CommonCode.Win.CRUD
             Control inputControl = CreateInputControl(field, operation, currentValues);
             inputControl.Name = field.FieldName;
             inputControl.Tag = field;
-            inputControl.Width = 300 * colSpan;
+            inputControl.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            inputControl.MinimumSize = new Size(150, 0);
 
             // Ensure row exists
             while (panel.RowCount <= rowIndex)
@@ -1011,7 +1518,8 @@ namespace ZidUtilities.CommonCode.Win.CRUD
                 {
                     Name = field.FieldName + "_Confirm",
                     PasswordChar = '\u2022',
-                    Width = 300 * colSpan
+                    Anchor = AnchorStyles.Left | AnchorStyles.Right,
+                    MinimumSize = new Size(150, 0)
                 };
 
                 if (operation == CRUDOperation.Delete)
@@ -1043,28 +1551,25 @@ namespace ZidUtilities.CommonCode.Win.CRUD
             if (currentValues != null && currentValues.ContainsKey(field.FieldName))
                 currentValue = currentValues[field.FieldName];
 
+            // Check for custom format first
+            if (field.Format != FieldFormat.Default)
+            {
+                control = CreateFormattedControl(field, currentValue);
+            }
             // Foreign key - use ComboBox
-            if (field.ForeignKeyInfo != null)
+            else if (field.ForeignKeyInfo != null)
             {
                 var combo = new ComboBox
                 {
                     DropDownStyle = ComboBoxStyle.DropDownList,
                     DisplayMember = "Key",
-                    ValueMember = "Value"
+                    ValueMember = "Value",
+                    Name = field.FieldName,
+                    Tag = field  // Store FieldMetadata for PopulateListControls to find
                 };
 
-                var items = new List<KeyValuePair<string, object>>();
-                if (field.AllowNull)
-                    items.Add(new KeyValuePair<string, object>("(NULL)", DBNull.Value));
-
-                items.AddRange(field.ForeignKeyInfo.LookupValues);
-                combo.DataSource = items;
-
-                if (currentValue != null && currentValue != DBNull.Value)
-                {
-                    var item = items.FirstOrDefault(i => i.Value?.ToString() == currentValue.ToString());
-                    combo.SelectedItem = item;
-                }
+                // Don't populate items here - will be done in Load event via PopulateListControls
+                // Don't set value here - will be done in Shown event via SetControlValues
 
                 control = combo;
             }
@@ -1073,8 +1578,9 @@ namespace ZidUtilities.CommonCode.Win.CRUD
             {
                 var checkbox = new CheckBox
                 {
-                    Checked = currentValue != null && currentValue != DBNull.Value && Convert.ToBoolean(currentValue)
+                    Name = field.FieldName
                 };
+                // Don't set Checked here - will be set in Shown event
                 control = checkbox;
             }
             // DateTime - use DateTimePicker
@@ -1082,12 +1588,10 @@ namespace ZidUtilities.CommonCode.Win.CRUD
             {
                 var picker = new DateTimePicker
                 {
-                    Format = DateTimePickerFormat.Short
+                    Format = DateTimePickerFormat.Short,
+                    Name = field.FieldName
                 };
-
-                if (currentValue != null && currentValue != DBNull.Value)
-                    picker.Value = Convert.ToDateTime(currentValue);
-
+                // Don't set Value here - will be set in Shown event
                 control = picker;
             }
             // Numeric types - use NumericUpDown
@@ -1100,12 +1604,10 @@ namespace ZidUtilities.CommonCode.Win.CRUD
                 {
                     Maximum = decimal.MaxValue,
                     Minimum = decimal.MinValue,
-                    DecimalPlaces = (field.DataType == typeof(decimal) || field.DataType == typeof(double) || field.DataType == typeof(float)) ? 2 : 0
+                    DecimalPlaces = (field.DataType == typeof(decimal) || field.DataType == typeof(double) || field.DataType == typeof(float)) ? 2 : 0,
+                    Name = field.FieldName
                 };
-
-                if (currentValue != null && currentValue != DBNull.Value)
-                    numeric.Value = Convert.ToDecimal(currentValue);
-
+                // Don't set Value here - will be set in Shown event
                 control = numeric;
             }
             // Large text - use multiline TextBox
@@ -1116,9 +1618,9 @@ namespace ZidUtilities.CommonCode.Win.CRUD
                     Multiline = true,
                     Height = 100,
                     ScrollBars = ScrollBars.Vertical,
-                    Text = currentValue?.ToString() ?? ""
+                    Name = field.FieldName
                 };
-
+                // Don't set Text here - will be set in Shown event
                 control = textBox;
             }
             // Default - use TextBox
@@ -1126,7 +1628,8 @@ namespace ZidUtilities.CommonCode.Win.CRUD
             {
                 var textBox = new TextBox
                 {
-                    MaxLength = field.MaxLength > 0 ? field.MaxLength : 32767
+                    MaxLength = field.MaxLength > 0 ? field.MaxLength : 32767,
+                    Name = field.FieldName
                 };
 
                 // Apply password masking
@@ -1134,25 +1637,22 @@ namespace ZidUtilities.CommonCode.Win.CRUD
                 {
                     textBox.PasswordChar = '\u2022';
                 }
-                // Apply custom masking
-                else if (field.MaskInfo != null && field.MaskInfo.MaskType == MaskType.Custom)
-                {
-                    if (currentValue != null && field.MaskInfo.MaskMethod != null)
-                        textBox.Text = field.MaskInfo.MaskMethod(currentValue.ToString());
-                }
-                else
-                {
-                    textBox.Text = currentValue?.ToString() ?? "";
-                }
 
+                // Don't set Text here - will be set in Shown event
                 control = textBox;
             }
 
-            // Make control read-only for delete operation or primary key in update
+            // Make control disabled for delete operation or primary key in update
             if (operation == CRUDOperation.Delete || (operation == CRUDOperation.Update && field.IsPrimaryKey))
             {
                 if (control is TextBox tb)
-                    tb.ReadOnly = true;
+                {
+                    // For primary keys on update, disable instead of readonly for better visual indication
+                    if (operation == CRUDOperation.Update && field.IsPrimaryKey)
+                        tb.Enabled = false;
+                    else
+                        tb.ReadOnly = true;
+                }
                 else if (control is ComboBox cb)
                     cb.Enabled = false;
                 else if (control is CheckBox chk)
@@ -1161,9 +1661,218 @@ namespace ZidUtilities.CommonCode.Win.CRUD
                     dtp.Enabled = false;
                 else if (control is NumericUpDown num)
                     num.Enabled = false;
+                else if (control is Panel pnl)
+                {
+                    foreach (Control c in pnl.Controls)
+                    {
+                        if (c is TextBox txtBox)
+                        {
+                            // For primary keys on update, disable instead of readonly
+                            if (operation == CRUDOperation.Update && field.IsPrimaryKey)
+                                txtBox.Enabled = false;
+                            else
+                                txtBox.ReadOnly = true;
+                        }
+                        else if (c is Button btn)
+                            btn.Enabled = false;
+                        else if (c is DateTimePicker dtPicker)
+                            dtPicker.Enabled = false;
+                    }
+                }
             }
 
             return control;
+        }
+
+        private Control CreateFormattedControl(FieldMetadata field, object currentValue)
+        {
+            switch (field.Format)
+            {
+                case FieldFormat.Date:
+                    var datePicker = new DateTimePicker
+                    {
+                        Format = DateTimePickerFormat.Short
+                    };
+                    if (currentValue != null && currentValue != DBNull.Value)
+                    {
+                        if (currentValue is DateTime dt)
+                            datePicker.Value = dt;
+                        else if (DateTime.TryParse(currentValue.ToString(), out DateTime parsedDate))
+                            datePicker.Value = parsedDate;
+                    }
+                    return datePicker;
+
+                case FieldFormat.Time:
+                    var timePicker = new DateTimePicker
+                    {
+                        Format = DateTimePickerFormat.Time,
+                        ShowUpDown = true
+                    };
+                    if (currentValue != null && currentValue != DBNull.Value)
+                    {
+                        if (currentValue is DateTime dt)
+                            timePicker.Value = dt;
+                        else if (DateTime.TryParse(currentValue.ToString(), out DateTime parsedTime))
+                            timePicker.Value = parsedTime;
+                    }
+                    return timePicker;
+
+                case FieldFormat.DateTime:
+                    var dateTimePanel = new Panel
+                    {
+                        Height = 25,
+                        Name = field.FieldName + "_Panel"
+                    };
+                    var datePickerDT = new DateTimePicker
+                    {
+                        Format = DateTimePickerFormat.Short,
+                        Name = field.FieldName + "_Date",
+                        Width = 120,
+                        Location = new Point(0, 0),
+                        Anchor = AnchorStyles.Left | AnchorStyles.Top
+                    };
+                    var timePickerDT = new DateTimePicker
+                    {
+                        Format = DateTimePickerFormat.Time,
+                        ShowUpDown = true,
+                        Name = field.FieldName + "_Time",
+                        Width = 100,
+                        Location = new Point(125, 0),
+                        Anchor = AnchorStyles.Left | AnchorStyles.Top
+                    };
+                    // Don't set Value here - will be set in Shown event
+                    dateTimePanel.Controls.Add(datePickerDT);
+                    dateTimePanel.Controls.Add(timePickerDT);
+                    return dateTimePanel;
+
+                case FieldFormat.File:
+                    var filePanel = new Panel
+                    {
+                        Height = 25,
+                        Name = field.FieldName + "_Panel"
+                    };
+                    var fileTextBox = new TextBox
+                    {
+                        Name = field.FieldName + "_TextBox",
+                        ReadOnly = true,
+                        Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top,
+                        Location = new Point(0, 0)
+                        // Don't set Text here - will be set in Shown event
+                    };
+                    var fileBrowseButton = new Button
+                    {
+                        Text = "...",
+                        Name = field.FieldName + "_Button",
+                        Width = 30,
+                        Anchor = AnchorStyles.Right | AnchorStyles.Top,
+                        Location = new Point(0, -1)
+                    };
+                    fileBrowseButton.Click += (s, e) =>
+                    {
+                        using (var ofd = new OpenFileDialog())
+                        {
+                            if (field.FormatConfig != null && !string.IsNullOrEmpty(field.FormatConfig.FileFilter))
+                                ofd.Filter = field.FormatConfig.FileFilter;
+                            if (ofd.ShowDialog() == DialogResult.OK)
+                                fileTextBox.Text = ofd.FileName;
+                        }
+                    };
+                    filePanel.Controls.Add(fileBrowseButton);
+                    filePanel.Controls.Add(fileTextBox);
+                    // Position button on the right
+                    fileBrowseButton.Left = filePanel.Width - fileBrowseButton.Width;
+                    // Size textbox to leave room for button
+                    fileTextBox.Width = filePanel.Width - fileBrowseButton.Width - 5;
+                    return filePanel;
+
+                case FieldFormat.Folder:
+                    var folderPanel = new Panel
+                    {
+                        Height = 25,
+                        Name = field.FieldName + "_Panel"
+                    };
+                    var folderTextBox = new TextBox
+                    {
+                        Name = field.FieldName + "_TextBox",
+                        ReadOnly = true,
+                        Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top,
+                        Location = new Point(0, 0)
+                        // Don't set Text here - will be set in Shown event
+                    };
+                    var folderBrowseButton = new Button
+                    {
+                        Text = "...",
+                        Name = field.FieldName + "_Button",
+                        Width = 30,
+                        Anchor = AnchorStyles.Right | AnchorStyles.Top,
+                        Location = new Point(0, -1)
+                    };
+                    folderBrowseButton.Click += (s, e) =>
+                    {
+                        using (var fbd = new FolderBrowserDialog())
+                        {
+                            if (!string.IsNullOrEmpty(folderTextBox.Text))
+                                fbd.SelectedPath = folderTextBox.Text;
+                            if (fbd.ShowDialog() == DialogResult.OK)
+                                folderTextBox.Text = fbd.SelectedPath;
+                        }
+                    };
+                    folderPanel.Controls.Add(folderBrowseButton);
+                    folderPanel.Controls.Add(folderTextBox);
+                    // Position button on the right
+                    folderBrowseButton.Left = folderPanel.Width - folderBrowseButton.Width;
+                    // Size textbox to leave room for button
+                    folderTextBox.Width = folderPanel.Width - folderBrowseButton.Width - 5;
+                    return folderPanel;
+
+                case FieldFormat.List:
+                    var listCombo = new ComboBox
+                    {
+                        DropDownStyle = ComboBoxStyle.DropDownList,
+                        DisplayMember = "Key",
+                        ValueMember = "Value",
+                        Name = field.FieldName,
+                        Tag = field  // Store FieldMetadata for PopulateListControls to find
+                    };
+
+                    // Don't populate items here - will be done in Load event via PopulateListControls
+                    // Don't set value here - will be done in Shown event via SetControlValues
+
+                    return listCombo;
+
+                case FieldFormat.Integer:
+                    var intNumeric = new NumericUpDown
+                    {
+                        DecimalPlaces = 0,
+                        Maximum = field.FormatConfig?.MaxValue ?? decimal.MaxValue,
+                        Minimum = field.FormatConfig?.MinValue ?? decimal.MinValue,
+                        Name = field.FieldName
+                    };
+                    // Don't set Value here - will be set in Shown event
+                    return intNumeric;
+
+                case FieldFormat.Check:
+                    var checkBox = new CheckBox
+                    {
+                        Name = field.FieldName
+                    };
+                    // Don't set Checked here - will be set in Shown event
+                    return checkBox;
+
+                case FieldFormat.Float:
+                    var floatNumeric = new NumericUpDown
+                    {
+                        DecimalPlaces = 2,
+                        Maximum = field.FormatConfig?.MaxValue ?? decimal.MaxValue,
+                        Minimum = field.FormatConfig?.MinValue ?? decimal.MinValue,
+                        Name = field.FieldName
+                    };
+                    // Don't set Value here - will be set in Shown event
+                    return floatNumeric;
+
+                default:
+                    return new TextBox { Name = field.FieldName }; // Don't set Text - will be set in Shown event
+            }
         }
 
         private void ApplyThemeToForm(Form form)
@@ -1187,12 +1896,22 @@ namespace ZidUtilities.CommonCode.Win.CRUD
 
                 var controls = dialog.Controls.Find(field.FieldName, true);
                 if (controls.Length == 0)
+                {
+                    // Try to find panel for formatted controls
+                    controls = dialog.Controls.Find(field.FieldName + "_Panel", true);
+                }
+                if (controls.Length == 0)
                     continue;
 
                 var control = controls[0];
                 object value = null;
 
-                if (control is TextBox tb)
+                // Handle formatted controls
+                if (control is Panel panel)
+                {
+                    value = ExtractValueFromFormattedControl(panel, field);
+                }
+                else if (control is TextBox tb)
                 {
                     value = string.IsNullOrWhiteSpace(tb.Text) ? (object)DBNull.Value : tb.Text;
 
@@ -1208,11 +1927,21 @@ namespace ZidUtilities.CommonCode.Win.CRUD
                 }
                 else if (control is CheckBox chk)
                 {
-                    value = chk.Checked;
+                    // For Check format, return 1 or 0
+                    if (field.Format == FieldFormat.Check)
+                        value = chk.Checked ? 1 : 0;
+                    else
+                        value = chk.Checked;
                 }
                 else if (control is DateTimePicker dtp)
                 {
-                    value = dtp.Value;
+                    // Format based on field format
+                    if (field.Format == FieldFormat.Date)
+                        value = dtp.Value.ToString("yyyy-MM-dd");
+                    else if (field.Format == FieldFormat.Time)
+                        value = dtp.Value.ToString("HH:mm:ss");
+                    else
+                        value = dtp.Value;
                 }
                 else if (control is NumericUpDown num)
                 {
@@ -1234,6 +1963,83 @@ namespace ZidUtilities.CommonCode.Win.CRUD
             result.AccessScript = GenerateAccessScript(operation, result, originalValues);
 
             return result;
+        }
+
+        private object ExtractValueFromFormattedControl(Panel panel, FieldMetadata field)
+        {
+            switch (field.Format)
+            {
+                case FieldFormat.File:
+                case FieldFormat.Folder:
+                    var textBox = panel.Controls.Find(field.FieldName + "_TextBox", false).FirstOrDefault() as TextBox;
+                    if (textBox != null)
+                        return string.IsNullOrWhiteSpace(textBox.Text) ? (object)DBNull.Value : textBox.Text;
+                    break;
+
+                case FieldFormat.DateTime:
+                    var datePicker = panel.Controls.Find(field.FieldName + "_Date", false).FirstOrDefault() as DateTimePicker;
+                    var timePicker = panel.Controls.Find(field.FieldName + "_Time", false).FirstOrDefault() as DateTimePicker;
+                    if (datePicker != null && timePicker != null)
+                    {
+                        var combinedDateTime = new DateTime(
+                            datePicker.Value.Year,
+                            datePicker.Value.Month,
+                            datePicker.Value.Day,
+                            timePicker.Value.Hour,
+                            timePicker.Value.Minute,
+                            timePicker.Value.Second
+                        );
+                        return combinedDateTime.ToString("yyyy-MM-ddTHH:mm:ss");
+                    }
+                    break;
+            }
+            return DBNull.Value;
+        }
+
+        private object GetControlValue(Form form, FieldMetadata field)
+        {
+            var controls = form.Controls.Find(field.FieldName, true);
+            if (controls.Length == 0)
+            {
+                // Try to find panel for formatted controls
+                controls = form.Controls.Find(field.FieldName + "_Panel", true);
+            }
+            if (controls.Length == 0)
+                return null;
+
+            var control = controls[0];
+
+            if (control is Panel panel)
+            {
+                return ExtractValueFromFormattedControl(panel, field);
+            }
+            else if (control is TextBox tb)
+            {
+                return string.IsNullOrWhiteSpace(tb.Text) ? (object)DBNull.Value : tb.Text;
+            }
+            else if (control is ComboBox cb)
+            {
+                return cb.SelectedValue ?? DBNull.Value;
+            }
+            else if (control is CheckBox chk)
+            {
+                return field.Format == FieldFormat.Check ? (chk.Checked ? 1 : 0) : (object)chk.Checked;
+            }
+            else if (control is DateTimePicker dtp)
+            {
+                if (field.Format == FieldFormat.Date)
+                    return dtp.Value.ToString("yyyy-MM-dd");
+                else if (field.Format == FieldFormat.Time)
+                    return dtp.Value.ToString("HH:mm:ss");
+                else
+                    return dtp.Value;
+            }
+            else if (control is NumericUpDown num)
+            {
+                return num.Value;
+            }
+
+            return null;
         }
 
         #endregion
@@ -1417,6 +2223,11 @@ namespace ZidUtilities.CommonCode.Win.CRUD
         public object ExclusionDefaultValue { get; set; }
         public MaskInfo MaskInfo { get; set; }
         public ForeignKeyInfo ForeignKeyInfo { get; set; }
+        public FieldFormat Format { get; set; }
+        public FormatConfig FormatConfig { get; set; }
+        public bool IsRequired { get; set; }
+        public Func<object, string> ValidationMethod { get; set; }
+        public int Order { get; set; }
     }
 
     /// <summary>
@@ -1437,6 +2248,34 @@ namespace ZidUtilities.CommonCode.Win.CRUD
         None,
         Password,
         Custom
+    }
+
+    /// <summary>
+    /// Field format types.
+    /// </summary>
+    public enum FieldFormat
+    {
+        Default,
+        Date,
+        Time,
+        DateTime,
+        File,
+        Folder,
+        List,
+        Integer,
+        Check,
+        Float
+    }
+
+    /// <summary>
+    /// Configuration for field formats.
+    /// </summary>
+    public class FormatConfig
+    {
+        public decimal? MinValue { get; set; }
+        public decimal? MaxValue { get; set; }
+        public string FileFilter { get; set; }
+        public Dictionary<string, object> ListItems { get; set; }
     }
 
     /// <summary>

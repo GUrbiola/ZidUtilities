@@ -2,21 +2,21 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>1.0.4</version>
+    <version>1.0.7</version>
     <title>ZidUtilities.CommonCode.Files</title>
     <authors>Gonzalo Urbiola</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
-    <!-- <icon>icon.png</icon> -->
+    <icon>ZidIcon.png</icon>
     <projectUrl>https://github.com/GUrbiola/ZidUtilities</projectUrl>
     <description>Library Classes to import data from files or export data to files.</description>
-    <releaseNotes>Updated reference to CommonCode 1.0.3.</releaseNotes>
+    <releaseNotes>Proper reading of CSV files(fields with commas, quoted fields, escaped quotes, embedded new lines) .</releaseNotes>
     <copyright>$copyright$</copyright>
     <tags>ZidUtilities File Export Import ElCid Urbiola</tags>
 	<readme>README.md</readme>
   </metadata>
   <files>
     <file src="README.md" target="\" />
+    <file src="ZidIcon.png" target="\" />
   </files>  
-
 </package>

@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>1.0.8</version>
+    <version>1.0.16</version>
     <title>ZidUtilities.CommonCode.Win</title>
     <authors>Gonzalo Urbiola</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -10,7 +10,7 @@
     <!-- <icon>icon.png</icon> -->
     <projectUrl>https://github.com/GUrbiola/ZidUtilities</projectUrl>
     <description>Custom controls for winforms projects. ThemeManager, Grid, Toast Notifications, BreadCrumb Bar, Diff Viewers, etc.</description>
-    <releaseNotes>Added code to be able to apply styles/themes to controls other than a form.</releaseNotes>
+    <releaseNotes>ZidGrid plugin for special copy now escapes characters depending on the option selected.</releaseNotes>
     <copyright>$copyright$</copyright>
     <tags>ZidUtilities CustomControls Themes ZidGrid CustomGrid Toast ToastNotification Diff DiffViewer CustommForms Skins ElCid Urbiola</tags>
 	<readme>README.md</readme>

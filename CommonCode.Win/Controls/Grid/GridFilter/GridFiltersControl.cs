@@ -740,17 +740,35 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.GridFilter
             if (_initCounter > 0)
                 return;
 
+            // Check if this control is being disposed or already disposed
+            if (this.Disposing || this.IsDisposed)
+                return;
+
             //first clean up what has beed done before
-            foreach (DataGridViewColumn column in _columnToGridFilterHash.Keys)
+            // Create a copy of the keys to avoid collection modification issues
+            DataGridViewColumn[] columns = new DataGridViewColumn[_columnToGridFilterHash.Keys.Count];
+            _columnToGridFilterHash.Keys.CopyTo(columns, 0);
+
+            foreach (DataGridViewColumn column in columns)
             {
                 IGridFilter gridFilter = _columnToGridFilterHash[column] as IGridFilter;
+                if (gridFilter == null)
+                    continue;
+
                 gridFilter.Changed -= new EventHandler(OnFilterChanged);
-                gridFilter.FilterControl.KeyPress -= new KeyPressEventHandler(OnFilterControlKeyPress);
-                gridFilter.FilterControl.Leave -= new EventHandler(OnFilterControlLeave);
-                if (this.Controls.Contains(gridFilter.FilterControl))
+
+                // Check if FilterControl is not null and not disposed before accessing it
+                if (gridFilter.FilterControl != null && !gridFilter.FilterControl.IsDisposed)
                 {
-                    this.Controls.Remove(gridFilter.FilterControl);
-                    gridFilter.FilterControl.Dispose();
+                    gridFilter.FilterControl.KeyPress -= new KeyPressEventHandler(OnFilterControlKeyPress);
+                    gridFilter.FilterControl.Leave -= new EventHandler(OnFilterControlLeave);
+
+                    // Safely remove control if it exists and parent is not disposing
+                    if (!this.Disposing && !this.IsDisposed && this.Controls.Contains(gridFilter.FilterControl))
+                    {
+                        this.Controls.Remove(gridFilter.FilterControl);
+                        gridFilter.FilterControl.Dispose();
+                    }
                 }
                 OnGridFilterUnbound(new GridFilterEventArgs(column, gridFilter));
             }

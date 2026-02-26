@@ -167,10 +167,12 @@ namespace ZidUtilities.CommonCode.Files
         public DataTable ImportResultDataTable { get; private set; }
         public bool WasCleanExecution { get { return Errors.Count == 0; } }
 
+
         private BackgroundWorker AsyncImporter;
         private bool RunningAsync;
         private int ThRecordCount;
         private int ThCurrentRecord;
+        private Encoding FileEncoding = Encoding.UTF8;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataImporter"/> class with default settings.
@@ -193,6 +195,15 @@ namespace ZidUtilities.CommonCode.Files
             Errors = new List<ErorrInfo>();
             ImportResultDataTable = null;
             DataStructure = new DataStructure();
+        }
+
+        /// <summary>
+        /// Allows to change the default encoding to use to read the file
+        /// </summary>
+        /// <param name="Encoding">Encoding to use</param>
+        public void SetEncoding(Encoding Encoding)
+        {
+            FileEncoding = Encoding;
         }
 
         /// <summary>
@@ -277,9 +288,7 @@ namespace ZidUtilities.CommonCode.Files
                         ImportFromTxtFile();
                         break;
                     case ImportFrom.CSV:
-                        Separator = Delimiter.Separator;
-                        SeparatorChar = ',';
-                        ImportFromTxtFile();
+                        ImportFromCsvFile();
                         break;
                     case ImportFrom.XLS:
                     case ImportFrom.XLSX:
@@ -358,7 +367,7 @@ namespace ZidUtilities.CommonCode.Files
             int RowNumber = 0, position, lenght, auxint;
             string[] RawData;
 
-            using (StreamReader Rdr = new StreamReader(FileName))
+            using (StreamReader Rdr = new StreamReader(FileName, FileEncoding))
             {
                 if (FileHeader)
                 {
@@ -494,10 +503,7 @@ namespace ZidUtilities.CommonCode.Files
                     else
                     {
                         #region Code to read a file with a especified delimiter
-                        if (ImportType == ImportFrom.CSV)
-                            RawData = ReadCSVRow(line).ToArray();
-                        else
-                            RawData = line.Split(Separator == Delimiter.Tab ? new char[] { '\t' } : new char[] { SeparatorChar });
+                        RawData = line.Split(Separator == Delimiter.Tab ? new char[] { '\t' } : new char[] { SeparatorChar });
 
                         try
                         {
@@ -593,41 +599,246 @@ namespace ZidUtilities.CommonCode.Files
         }
 
         /// <summary>
-        /// Parses a single CSV row into a list of field values, handling quoted fields.
+        /// RFC 4180 compliant CSV parser that reads records directly from a <see cref="StreamReader"/>.
+        /// Correctly handles quoted fields containing commas, embedded newlines, and escaped double-quotes (<c>""</c>).
         /// </summary>
-        /// <param name="line">The CSV line text to parse.</param>
-        /// <remarks>
-        /// This method handles the parsing of CSV fields, including those containing commas
-        /// enclosed in double quotes. It accumulates character data into fields while respecting
-        /// the quoting, and then adds each completed field to the result list.
-        /// </remarks>
-        /// <returns>A list of field values extracted from the CSV line in order. Quoted values are preserved without quotes.</returns>
-        private List<string> ReadCSVRow(string line)
+        /// <param name="reader">An open StreamReader positioned at the start of the data to parse.</param>
+        /// <returns>
+        /// An enumerable sequence of records, where each record is a <see cref="List{String}"/> of field values.
+        /// Enclosing double-quotes are stripped and <c>""</c> escape sequences are converted to a single <c>"</c>.
+        /// </returns>
+        private IEnumerable<List<string>> ReadCsvRecords(StreamReader reader)
         {
-            List<string> back = new List<string>();
-            string curField = "";
-            bool quotedValue = false;
-            for (int i = 0; i < line.Length; i++)
+            var field = new StringBuilder();
+            var record = new List<string>();
+            bool inQuotes = false;
+
+            while (!reader.EndOfStream)
             {
-                if (!quotedValue && line[i] == ',')
+                int ch = reader.Read();
+                if (ch == -1)
+                    break;
+
+                char c = (char)ch;
+
+                if (inQuotes)
                 {
-                    back.Add(curField);
-                    curField = "";
-                }
-                else
-                {
-                    if (line[i] == '"')
+                    if (c == '"')
                     {
-                        quotedValue = !quotedValue;
+                        if (reader.Peek() == '"')
+                        {
+                            // Escaped double-quote ("") → literal "
+                            reader.Read();
+                            field.Append('"');
+                        }
+                        else
+                        {
+                            // Closing quote
+                            inQuotes = false;
+                        }
                     }
                     else
                     {
-                        curField += line[i].ToString();
+                        // Embedded character (including \r and \n inside a quoted field)
+                        field.Append(c);
+                    }
+                }
+                else
+                {
+                    if (c == '"')
+                    {
+                        inQuotes = true;
+                    }
+                    else if (c == ',')
+                    {
+                        record.Add(field.ToString());
+                        field.Clear();
+                    }
+                    else if (c == '\r')
+                    {
+                        // CRLF line ending — consume the \n
+                        if (reader.Peek() == '\n')
+                            reader.Read();
+
+                        record.Add(field.ToString());
+                        field.Clear();
+                        yield return record;
+                        record = new List<string>();
+                    }
+                    else if (c == '\n')
+                    {
+                        // LF-only line ending
+                        record.Add(field.ToString());
+                        field.Clear();
+                        yield return record;
+                        record = new List<string>();
+                    }
+                    else
+                    {
+                        field.Append(c);
                     }
                 }
             }
-            back.Add(curField);
-            return back;
+
+            // Flush any trailing record not terminated by a newline
+            if (record.Count > 0 || field.Length > 0)
+            {
+                record.Add(field.ToString());
+                yield return record;
+            }
+        }
+
+        /// <summary>
+        /// Reads data from a CSV file using a strict RFC 4180 parser and fills <see cref="ImportResultDataTable"/>.
+        /// Correctly handles quoted fields that contain commas, double-quotes (<c>""</c> escaping), and embedded newlines.
+        /// </summary>
+        private void ImportFromCsvFile()
+        {
+            float auxfloat;
+            DateTime auxdate;
+            bool auxbool;
+            int auxint;
+            int RowNumber = 0;
+
+            using (StreamReader Rdr = new StreamReader(FileName, FileEncoding))
+            {
+                IEnumerator<List<string>> records = ReadCsvRecords(Rdr).GetEnumerator();
+
+                if (FileHeader)
+                {
+                    if (!records.MoveNext())
+                        return; // empty file
+
+                    List<string> headerFields = records.Current;
+
+                    if (DataStructure == null || DataStructure.Fields == null || DataStructure.Fields.Count == 0)
+                    {
+                        DataStructure = new DataStructure();
+                        DataStructure.Name = "Table1";
+                        foreach (string s in headerFields)
+                            DataStructure.Fields.Add(new Field(s));
+
+                        ImportResultDataTable = new DataTable();
+                        foreach (Field f in DataStructure.Fields)
+                        {
+                            DataColumn aux = new DataColumn(f.Name);
+                            aux.AllowDBNull = f.Nullable;
+                            switch (f.FieldType)
+                            {
+                                case FieldType.Integer:
+                                    aux.DataType = typeof(int);
+                                    break;
+                                case FieldType.FloatingPoint:
+                                    aux.DataType = typeof(float);
+                                    break;
+                                case FieldType.Character:
+                                    aux.DataType = typeof(char);
+                                    break;
+                                case FieldType.String:
+                                    aux.DataType = typeof(string);
+                                    if (f.Length > 0)
+                                        aux.MaxLength = f.Length;
+                                    break;
+                                case FieldType.Date:
+                                    aux.DataType = typeof(DateTime);
+                                    break;
+                                case FieldType.Bit:
+                                    aux.DataType = typeof(bool);
+                                    break;
+                            }
+                            ImportResultDataTable.Columns.Add(aux);
+                        }
+                    }
+                }
+
+                while (records.MoveNext())
+                {
+                    List<string> RawData = records.Current;
+                    RowNumber++;
+                    ThCurrentRecord = RowNumber;
+
+                    try
+                    {
+                        DataRow rw = ImportResultDataTable.NewRow();
+                        for (int Index2 = 0; Index2 < Math.Min(RawData.Count, DataStructure.Fields.Count); Index2++)
+                        {
+                            string data = RawData[Index2];
+                            switch (DataStructure.Fields[Index2].FieldType)
+                            {
+                                case FieldType.Integer:
+                                    if (int.TryParse(data, out auxint))
+                                        rw[Index2] = auxint;
+                                    else if (!DataStructure.Fields[Index2].Nullable)
+                                        rw[Index2] = 0;
+                                    break;
+                                case FieldType.FloatingPoint:
+                                    if (float.TryParse(data, out auxfloat))
+                                        rw[Index2] = auxfloat;
+                                    else if (!DataStructure.Fields[Index2].Nullable)
+                                        rw[Index2] = 0;
+                                    break;
+                                case FieldType.Character:
+                                    if (!String.IsNullOrEmpty(data))
+                                        rw[Index2] = data[0];
+                                    else if (!DataStructure.Fields[Index2].Nullable)
+                                        rw[Index2] = '-';
+                                    break;
+                                case FieldType.Date:
+                                    if (DateTime.TryParse(data, out auxdate))
+                                        rw[Index2] = auxdate;
+                                    else if (!DataStructure.Fields[Index2].Nullable)
+                                        rw[Index2] = new DateTime(1900, 1, 1);
+                                    break;
+                                case FieldType.Bit:
+                                    if (bool.TryParse(data, out auxbool))
+                                        rw[Index2] = auxbool;
+                                    else if (!DataStructure.Fields[Index2].Nullable)
+                                        rw[Index2] = false;
+                                    break;
+                                case FieldType.String:
+                                default:
+                                    rw[Index2] = data;
+                                    break;
+                            }
+                        }
+                        ImportResultDataTable.Rows.Add(rw);
+                    }
+                    catch (Exception ex)
+                    {
+                        AddError(ex.Message, RowNumber);
+                    }
+
+                    if (ThRecordCount > 100)
+                    {
+                        if (RowNumber % (ThRecordCount / 100) == 0)
+                        {
+                            if (RunningAsync)
+                            {
+                                if (AsyncImporter != null && AsyncImporter.IsBusy)
+                                    AsyncImporter.ReportProgress(0, RowNumber);
+                            }
+                            else
+                            {
+                                if (OnProgress != null)
+                                    OnProgress(DateTime.Now, ThRecordCount, RowNumber, ImportType);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (RunningAsync)
+                        {
+                            if (AsyncImporter != null && AsyncImporter.IsBusy)
+                                AsyncImporter.ReportProgress(0, RowNumber);
+                        }
+                        else
+                        {
+                            if (OnProgress != null)
+                                OnProgress(DateTime.Now, ThRecordCount, RowNumber, ImportType);
+                        }
+                    }
+                }
+            }
         }
 
         #region Auxiliar Code
@@ -646,7 +857,7 @@ namespace ZidUtilities.CommonCode.Files
             {
                 if (ImportType == ImportFrom.TXT || ImportType == ImportFrom.CSV)
                 {
-                    using (StreamReader Rdr = new StreamReader(FileName))
+                    using (StreamReader Rdr = new StreamReader(FileName, FileEncoding))
                     {
                         while (Rdr.ReadLine() != null)
                             back++;
@@ -819,9 +1030,7 @@ namespace ZidUtilities.CommonCode.Files
                     ImportFromTxtFile();
                     break;
                 case ImportFrom.CSV:
-                    Separator = Delimiter.Separator;
-                    SeparatorChar = ',';
-                    ImportFromTxtFile();
+                    ImportFromCsvFile();
                     break;
                 case ImportFrom.XLS:
                 case ImportFrom.XLSX:

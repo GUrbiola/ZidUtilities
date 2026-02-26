@@ -190,6 +190,8 @@ namespace ZidUtilities.CommonCode.Files
         private int ThCurPercentage;
         private bool ThIsStream;
         private Stream ThStream;
+        private bool DefaultEncoding = true;
+        private Encoding FileEncoding = Encoding.UTF8;
 
         private BackgroundWorker AsyncExporter;
 
@@ -212,6 +214,16 @@ namespace ZidUtilities.CommonCode.Files
             Widhts = new List<int>();
             AutoCellAdjust = WidthAdjust.ByHeaders;
             UseDefaultSheetNames = true;
+        }
+
+        /// <summary>
+        /// Allows to change the default encoding to use to read the file
+        /// </summary>
+        /// <param name="Encoding">Encoding to use</param>
+        public void SetEncoding(Encoding Encoding)
+        {
+            DefaultEncoding = false;
+            FileEncoding = Encoding;
         }
 
         /// <summary>
@@ -860,7 +872,11 @@ namespace ZidUtilities.CommonCode.Files
         private Stream CreateTXT(DataSet dataSet)
         {
             MemoryStream memoryStream = new MemoryStream();
-            TextWriter tw = new StreamWriter(memoryStream);
+            TextWriter tw;
+            if (DefaultEncoding)
+                tw = new StreamWriter(memoryStream);
+            else
+                tw = new StreamWriter(memoryStream, FileEncoding);
 
             if (!DelimitedByLenght)
             {
@@ -1008,7 +1024,13 @@ namespace ZidUtilities.CommonCode.Files
         {
             string csvSeparator = ",";
             MemoryStream memoryStream = new MemoryStream();
-            TextWriter tw = new StreamWriter(memoryStream);
+            
+            TextWriter tw;
+            if (DefaultEncoding)
+                tw = new StreamWriter(memoryStream);
+            else
+                tw = new StreamWriter(memoryStream, FileEncoding);
+
             foreach (DataTable table in dataSet.Tables)
             {
                 string curLine;

@@ -401,7 +401,14 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
             // Headers
             if (includeHeaders)
             {
-                sb.AppendLine(string.Join(delimiter.ToString(), columns.Select(c => c.HeaderText)));
+                if (delimiter == ',')
+                {
+                    sb.AppendLine(string.Join(",", columns.Select(c => CsvEscape(c.HeaderText))));
+                }
+                else
+                {
+                    sb.AppendLine(string.Join(delimiter.ToString(), columns.Select(c => c.HeaderText)));
+                }
             }
 
             // Rows
@@ -413,10 +420,10 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
                     var cellValue = row.Cells[column.Index].Value;
                     string value = cellValue == null ? "" : cellValue.ToString();
 
-                    // Escape if needed
-                    if (delimiter == ',' && value.Contains(','))
+                    // Escape if CSV format
+                    if (delimiter == ',')
                     {
-                        value = "\"" + value.Replace("\"", "\"\"") + "\"";
+                        value = CsvEscape(value);
                     }
 
                     values.Add(value);
@@ -551,7 +558,7 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
                     }
                     else if (cellValue is string || cellValue is DateTime)
                     {
-                        values.Add("'" + cellValue.ToString().Replace("'", "''") + "'");
+                        values.Add(SqlEscape(cellValue.ToString()));
                     }
                     else if (cellValue is bool)
                     {
@@ -649,7 +656,17 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
                 return "null";
 
             if (value is string)
-                return "\"" + value.ToString().Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
+            {
+                string str = value.ToString();
+                str = str.Replace("\\", "\\\\")
+                         .Replace("\"", "\\\"")
+                         .Replace("\n", "\\n")
+                         .Replace("\r", "\\r")
+                         .Replace("\t", "\\t")
+                         .Replace("\b", "\\b")
+                         .Replace("\f", "\\f");
+                return "\"" + str + "\"";
+            }
 
             if (value is bool)
                 return value.ToString().ToLower();
@@ -658,6 +675,71 @@ namespace ZidUtilities.CommonCode.Win.Controls.Grid.Plugins
                 return "\"" + ((DateTime)value).ToString("yyyy-MM-ddTHH:mm:ss") + "\"";
 
             return value.ToString();
+        }
+
+        /// <summary>
+        /// Escapes a string value for safe inclusion in CSV format.
+        /// </summary>
+        /// <param name="value">The value to escape.</param>
+        /// <returns>
+        /// The escaped string. If the value contains comma, quote, newline, or carriage return,
+        /// it will be wrapped in quotes and any internal quotes will be doubled.
+        /// </returns>
+        private string CsvEscape(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return value;
+
+            // Need to wrap in quotes if contains comma, quote, newline, or carriage return
+            bool needsQuoting = value.Contains(",") || value.Contains("\"") ||
+                                value.Contains("\n") || value.Contains("\r");
+
+            if (needsQuoting)
+            {
+                // Double any quotes and wrap in quotes
+                return "\"" + value.Replace("\"", "\"\"") + "\"";
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Escapes a string value for safe inclusion in SQL INSERT statements.
+        /// </summary>
+        /// <param name="value">The value to escape.</param>
+        /// <returns>
+        /// A SQL-escaped string wrapped in single quotes. Single quotes are doubled,
+        /// and newlines are replaced with CHAR(13)+CHAR(10) or CHAR(10) depending on the line ending type.
+        /// </returns>
+        private string SqlEscape(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return "''";
+
+            // Escape single quotes by doubling them
+            string escaped = value.Replace("'", "''");
+
+            // Replace newlines with SQL CHAR functions
+            // Handle Windows-style line endings (CRLF)
+            if (escaped.Contains("\r\n"))
+            {
+                escaped = escaped.Replace("\r\n", "' + CHAR(13) + CHAR(10) + '");
+            }
+            // Handle Unix-style line endings (LF)
+            else if (escaped.Contains("\n"))
+            {
+                escaped = escaped.Replace("\n", "' + CHAR(10) + '");
+            }
+            // Handle Mac-style line endings (CR)
+            else if (escaped.Contains("\r"))
+            {
+                escaped = escaped.Replace("\r", "' + CHAR(13) + '");
+            }
+
+            // Clean up any empty string concatenations that might have been created
+            escaped = escaped.Replace("'' + ", "").Replace(" + ''", "");
+
+            return "'" + escaped + "'";
         }
     }
 }

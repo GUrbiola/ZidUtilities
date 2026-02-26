@@ -64,13 +64,13 @@
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
     <Reference Include="ZidUtilities.CommonCode, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ZidUtilities.CommonCode.1.0.2\lib\net48\ZidUtilities.CommonCode.dll</HintPath>
+      <HintPath>..\packages\ZidUtilities.CommonCode.1.0.3\lib\net48\ZidUtilities.CommonCode.dll</HintPath>
     </Reference>
-    <Reference Include="ZidUtilities.CommonCode.Files, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ZidUtilities.CommonCode.Files.1.0.3\lib\net48\ZidUtilities.CommonCode.Files.dll</HintPath>
+    <Reference Include="ZidUtilities.CommonCode.Files, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZidUtilities.CommonCode.Files.1.0.7\lib\net48\ZidUtilities.CommonCode.Files.dll</HintPath>
     </Reference>
-    <Reference Include="ZidUtilities.CommonCode.ICSharpTextEditor, Version=1.0.0.6, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ZidUtilities.CommonCode.ICSharpTextEditor.1.0.6\lib\net48\ZidUtilities.CommonCode.ICSharpTextEditor.dll</HintPath>
+    <Reference Include="ZidUtilities.CommonCode.ICSharpTextEditor, Version=1.0.8.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZidUtilities.CommonCode.ICSharpTextEditor.1.0.8\lib\net48\ZidUtilities.CommonCode.ICSharpTextEditor.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -179,6 +179,12 @@
     <Compile Include="Controls\ThemeManager.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\TokenSelect.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\TokenSelect.Designer.cs">
+      <DependentUpon>TokenSelect.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\ComplexObjectSelectionDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -264,6 +270,9 @@
     <EmbeddedResource Include="Controls\ToastForm.resx">
       <DependentUpon>ToastForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\TokenSelect.resx">
+      <DependentUpon>TokenSelect.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\VerticalProgressBar.resx">
       <DependentUpon>VerticalProgressBar.cs</DependentUpon>
     </EmbeddedResource>
@@ -311,6 +320,18 @@
     <None Include="Resources\message.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\Bookmark.png" />
+    <Content Include="Resources\Comment.png" />
+    <Content Include="Resources\DelBookmark.png" />
+    <Content Include="Resources\Next.png" />
+    <Content Include="Resources\Open.png" />
+    <Content Include="Resources\Previous.png" />
+    <Content Include="Resources\RedAlert.png" />
+    <Content Include="Resources\Save.png" />
+    <Content Include="Resources\Search.png" />
+    <Content Include="Resources\Stop.png" />
+    <Content Include="Resources\UnComment.png" />
+    <Content Include="ZidIcon.png" />
     <EmbeddedResource Include="Controls\AddressBar\GenericNode.ico" />
     <EmbeddedResource Include="Controls\AddressBar\AddressBar.ico" />
     <EmbeddedResource Include="Controls\Diff\DiffInspector.ico" />
@@ -322,20 +343,8 @@
     <EmbeddedResource Include="Controls\VerticalProgressBar.ico" />
     <EmbeddedResource Include="Controls\DoubleBufferedPanel.ico" />
     <EmbeddedResource Include="Controls\AnimatedWaitTextBox.ico" />
-    <EmbeddedResource Include="ExtendedEditor.ico" />
-    <Content Include="Resources\Bookmark.png" />
     <Content Include="Resources\Book_32.png" />
     <Content Include="Resources\close_32x32.png" />
-    <Content Include="Resources\Comment.png" />
-    <Content Include="Resources\DelBookmark.png" />
-    <Content Include="Resources\Next.png" />
-    <Content Include="Resources\Open.png" />
-    <Content Include="Resources\Previous.png" />
-    <Content Include="Resources\RedAlert.png" />
-    <Content Include="Resources\Save.png" />
-    <Content Include="Resources\Search.png" />
-    <Content Include="Resources\Stop.png" />
-    <Content Include="Resources\UnComment.png" />
     <None Include="Resources\work-in-progress.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -730,6 +730,13 @@ namespace ZidUtilities.CommonCode
         /// <param name="value">The <see cref="DateTime"/> to format.</param>
         /// <returns>Formatted string representation of the date/time.</returns>
         public static string ToIsoDate(this DateTime value) { return value.ToString("yyyyMMdd HHmmss.ff"); }
+        
+        /// <summary>
+        /// Formats a <see cref="DateTime"/> as an ISO-like compact string: "yyyyMMdd HHmmss.ff".
+        /// </summary>
+        /// <param name="value">The <see cref="DateTime"/> to format.</param>
+        /// <returns>Formatted string representation of the date/time.</returns>
+        public static string ToIsoDate2(this DateTime value) { return value.ToString("yyyy-MM-ddTHH:mm:ss.ff"); }
 
         /// <summary>
         /// Determines whether a <see cref="DayOfWeek"/> represents a weekday.

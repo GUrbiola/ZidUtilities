@@ -48,6 +48,8 @@
             this.GridView.ReadOnly = true;
             this.GridView.Size = new System.Drawing.Size(480, 392);
             this.GridView.TabIndex = 0;
+            this.GridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.GridView_DataBindingComplete_1);
+            this.GridView.SelectionChanged += new System.EventHandler(this.GridView_SelectionChanged);
             // 
             // filterExtender
             // 

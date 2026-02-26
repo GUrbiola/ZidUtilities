@@ -95,6 +95,12 @@ namespace ZidUtilities.TesterWin
             int yPos = 10;
 
             // Add test form buttons
+            AddTestButton(content, "TokenSelect Test", "Test the TokenSelect control with autocomplete and token display",
+                ref yPos, () => OpenForm(new FormTokenSelectTest()));
+
+            AddTestButton(content, "Veins CRUD Test", "Test UIGenerator and ZidGrid with SQLite Veins table (CRUD operations)",
+                ref yPos, () => OpenForm(new FormVeinsTest()));
+
             AddTestButton(content, "UIGenerator Test (CRUD)", "Comprehensive test of UIGenerator for dynamic CRUD dialogs",
                 ref yPos, () => OpenForm(new FormUIGeneratorTest()));
 

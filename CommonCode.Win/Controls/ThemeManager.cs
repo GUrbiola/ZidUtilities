@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
+using System.Reflection;
 using System.Windows.Forms;
 using ZidUtilities.CommonCode.Win.Controls.Grid;
-using System.Reflection;
 using static System.Windows.Forms.Control;
 
 namespace ZidUtilities.CommonCode.Win.Controls
@@ -277,6 +277,10 @@ namespace ZidUtilities.CommonCode.Win.Controls
                 grid.Theme = _theme;
                 return;
             }
+
+            if (control is TokenSelect)
+                ((TokenSelect)control).SetTheme(_theme);
+
 
             // Apply base styling
             control.BackColor = _themeColors.DefaultBackColor;
